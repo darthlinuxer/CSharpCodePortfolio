@@ -1,0 +1,28 @@
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\InMemory EFCore using Services.exe
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\InMemory EFCore using Services.deps.json
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\InMemory EFCore using Services.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\InMemory EFCore using Services.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\InMemory EFCore using Services.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\InMemory EFCore using Services.pdb
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.InMemory.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Caching.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Caching.Memory.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Options.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Primitives.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\System.Collections.Immutable.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\System.ComponentModel.Annotations.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\bin\Debug\netcoreapp3.1\System.Diagnostics.DiagnosticSource.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.csprojAssemblyReference.cache
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.csproj.CopyComplete
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.dll
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.pdb
+D:\Dev\CSharpCodePortfolio\InMemory EFCore using Services\obj\Debug\netcoreapp3.1\InMemory EFCore using Services.genruntimeconfig.cache

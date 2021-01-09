@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "DotNet ZIP Library/1.0.0": {
+        "dependencies": {
+          "SharpZipLib": "1.3.1"
+        },
+        "runtime": {
+          "DotNet ZIP Library.dll": {}
+        }
+      },
+      "SharpZipLib/1.3.1": {
+        "runtime": {
+          "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll": {
+            "assemblyVersion": "1.3.1.9",
+            "fileVersion": "1.3.1.9"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DotNet ZIP Library/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SharpZipLib/1.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/iMph6bLdKzDhwM/vkAo4BU8z5QQnyodlkZon3XRMtRmVuWv5Rph1kaDmd9XjrQxjPJPuLquTSrkEoSPq/flVw==",
+      "path": "sharpziplib/1.3.1",
+      "hashPath": "sharpziplib.1.3.1.nupkg.sha512"
+    }
+  }
+}

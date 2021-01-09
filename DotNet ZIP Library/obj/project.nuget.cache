@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "VFttfVtGvIku0KV8iSXuYAW8ZbzmiB+5zDbMLZlgtoJ74HkHhCgppz1XpdnCJbZSYMbhjfCMov5+y0xDUFJykQ==",
+  "success": true,
+  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\DotNet ZIP Library\\DotNet ZIP Library.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Camilo\\.nuget\\packages\\sharpziplib\\1.3.1\\sharpziplib.1.3.1.nupkg.sha512"
+  ],
+  "logs": []
+}

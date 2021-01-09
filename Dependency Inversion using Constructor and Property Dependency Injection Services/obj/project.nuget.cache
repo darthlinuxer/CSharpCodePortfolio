@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "qRvqVzBxhiflMD0pWqR2AEQqQraQXnc63m+estFsuS5NPoT+iM/QYy3YisuxE8vDXcz8Njp2ahrUI6YdbfVF8g==",
+  "success": true,
+  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Dependency Inversion using Constructor and Property Dependency Injection Services\\Dependency Inversion using Constructor and Property Dependency Injection Services.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Camilo\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\5.0.1\\microsoft.extensions.dependencyinjection.5.0.1.nupkg.sha512",
+    "C:\\Users\\Camilo\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\5.0.0\\microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
