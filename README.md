@@ -15,7 +15,8 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [Using Anonymous Pipes for Communication between Threads][10.1] | [Solid: Interface Segregation Principle][10.2] | [Extention Methods combined with Base64 conversions][10.3]
 | [Json Serializer and De-Serializer][11.1] |  | [Delegates and Events][11.3]
 | [SQLite in .NET][12.1] | | [Secure Strings][12.3]
-| [Convert List<T> to DataTable][13.1] |  |
+| [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
+| | | [Yield][14.3]
 
 
 [1.1]:https://dotnetfiddle.net/HW6qZ7
@@ -53,6 +54,10 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [12.1]:https://dotnetfiddle.net/pXB6i5
 [12.3]:https://dotnetfiddle.net/Z7JIJn
 [13.1]:https://dotnetfiddle.net/4Fze9g
+[13.3]:https://dotnetfiddle.net/GCVP7v
+[14.3]:https://dotnetfiddle.net/Z67LW8
+
+
 
 
 
