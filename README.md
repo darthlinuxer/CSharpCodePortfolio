@@ -10,9 +10,12 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [InMemory EFCore without IRepository][5.1] | [Design Pattern: Bridge][5.2] | [Explicit and Implicit Operators][5.3]
 | [InMemory EFCore without IRepository with Services][6.1] | [Design Pattern: Strategy][6.2] | [Deconstruct Methods][6.3]
 | [Dependency Inversion using Dependency Injection Services for Constructor and Property][7.1] | [Design Pattern: Observer][7.2] | [Standard Interface Methods][7.3]
-|  [UNIT Tests with Reflection and Moq][8.1] | [Design Pattern: Observer using Events][8.2] | [Using Async Main][8.3]
-|  | [Solid: Dependency Inversion][9.2] | [Using Ranges][9.3]
-|  | [Solid: Interface Segregation Principle][10.2] | [Extention Methods combined with Base64 conversions][10.3]
+| [UNIT Tests with Reflection and Moq][8.1] | [Design Pattern: Observer using Events][8.2] | [Using Async Main][8.3]
+| [Client/Server Socket Communication][9.1] | [Solid: Dependency Inversion][9.2] | [Using Ranges][9.3]
+| [Using Anonymous Pipes for Communication between Threads][10.1] | [Solid: Interface Segregation Principle][10.2] | [Extention Methods combined with Base64 conversions][10.3]
+| [Json Serializer and De-Serializer][11.1] |  | [Delegates and Events][11.3]
+| [SQLite in .NET][12.1] | | [Secure Strings][12.3]
+| [Convert List<T> to DataTable][13.1] |  |
 
 
 [1.1]:https://dotnetfiddle.net/HW6qZ7
@@ -39,8 +42,18 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [8.1]:https://dotnetfiddle.net/cGTi5Z
 [8.2]:https://dotnetfiddle.net/mg7hw3
 [8.3]:https://dotnetfiddle.net/lagX58
+[9.1]:https://dotnetfiddle.net/SBFElN
 [9.2]:https://dotnetfiddle.net/sHWtDU
 [9.3]:https://dotnetfiddle.net/LFHPPE
+[10.1]:https://dotnetfiddle.net/7nk1JC
 [10.2]:https://dotnetfiddle.net/w717Kk
 [10.3]:https://dotnetfiddle.net/DwSTrJ
+[11.1]:https://dotnetfiddle.net/zBuJpV
+[11.3]:https://dotnetfiddle.net/AX9w4W
+[12.1]:https://dotnetfiddle.net/pXB6i5
+[12.3]:https://dotnetfiddle.net/Z7JIJn
+[13.1]:https://dotnetfiddle.net/4Fze9g
+
+
+
 
