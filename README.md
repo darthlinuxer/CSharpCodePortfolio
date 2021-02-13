@@ -16,7 +16,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [Json Serializer and De-Serializer][11.1] |  | [Delegates and Events][11.3]
 | [SQLite in .NET][12.1] | | [Secure Strings][12.3]
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
-| | | [Yield][14.3]
+| [Lambda Validators - Part 1 - Eliminating IF's][14.1]| | [Yield][14.3]
 
   
 # Game Developed for a Job Interview
@@ -58,6 +58,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [12.3]:https://dotnetfiddle.net/Z7JIJn
 [13.1]:https://dotnetfiddle.net/4Fze9g
 [13.3]:https://dotnetfiddle.net/GCVP7v
+[14.1]:https://dotnetfiddle.net/1ITBkw
 [14.3]:https://dotnetfiddle.net/Z67LW8
 
 
