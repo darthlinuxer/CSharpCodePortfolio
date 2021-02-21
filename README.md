@@ -18,6 +18,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
 | [Lambda Validators - Part 1 - Eliminating IF's][14.1]| | [Yield][14.3]
 | [Creating string Pipes using reverse PipeBuilder recursion][15.1] | |
+| [Removing If-Then-Else with Reflection][16.1] | |
 
   
 # Game Developed for a Job Interview
@@ -62,6 +63,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [14.1]:https://dotnetfiddle.net/1ITBkw
 [14.3]:https://dotnetfiddle.net/Z67LW8
 [15.1]:https://dotnetfiddle.net/bwA0sO
+[16.1]:https://dotnetfiddle.net/jIL2AQ
 
 
 
