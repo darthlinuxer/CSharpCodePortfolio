@@ -16,7 +16,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [Json Serializer and De-Serializer][11.1] |  | [Delegates and Events][11.3]
 | [SQLite in .NET][12.1] | | [Secure Strings][12.3]
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
-| [Lambda Validators - Part 1 - Eliminating IF's][14.1]| | [Yield][14.3]
+| [Lambda Validators][14.1]| | [Yield][14.3]
 | [Creating string Pipes using reverse PipeBuilder recursion][15.1] | |
 | [Removing If-Then-Else with Reflection][16.1] | |
 
