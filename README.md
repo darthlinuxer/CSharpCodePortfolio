@@ -17,7 +17,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [SQLite in .NET][12.1] | | [Secure Strings][12.3]
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
 | [Lambda Validators - Part 1 - Eliminating IF's][14.1]| | [Yield][14.3]
-| [Creating string Pipes using reverse PipeBuilder recursion]([15.1] | |
+| [Creating string Pipes using reverse PipeBuilder recursion][15.1] | |
 
   
 # Game Developed for a Job Interview
