@@ -18,7 +18,10 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
 | [Lambda Validators][14.1]| | [Yield][14.3]
 | [Creating string Pipes using reverse PipeBuilder recursion][15.1] | |
-| [Removing If-Then-Else with Reflection][16.1] | |
+| [Replace If-Then-Else with Reflection and Attributes][16.1] | |
+| [Replacing If-Then-Else using Pipe Builder structure (simple input types)][17.1] | |
+| [Replacing If-Then-Else for complex objects using Pipe Structure][18.1] | |
+| [Replace If-Then-Else for complex objects (using Reflection)][19.1] | |
 
   
 # Game Developed for a Job Interview
@@ -64,6 +67,9 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [14.3]:https://dotnetfiddle.net/Z67LW8
 [15.1]:https://dotnetfiddle.net/bwA0sO
 [16.1]:https://dotnetfiddle.net/jIL2AQ
+[17.1]:https://dotnetfiddle.net/MlyOqU
+[18.1]:https://dotnetfiddle.net/eUTwv4
+[19.1]:https://dotnetfiddle.net/2ImjJD
 
 
 
