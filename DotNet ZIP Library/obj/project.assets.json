@@ -39,7 +39,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Camilo\\.nuget\\packages\\": {},
+    "C:\\Users\\chave\\.nuget\\packages\\": {},
     "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
@@ -48,14 +48,14 @@
       "projectUniqueName": "D:\\Dev\\CSharpCodePortfolio\\DotNet ZIP Library\\DotNet ZIP Library.csproj",
       "projectName": "DotNet ZIP Library",
       "projectPath": "D:\\Dev\\CSharpCodePortfolio\\DotNet ZIP Library\\DotNet ZIP Library.csproj",
-      "packagesPath": "C:\\Users\\Camilo\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
       "outputPath": "D:\\Dev\\CSharpCodePortfolio\\DotNet ZIP Library\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\Camilo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
@@ -102,7 +102,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
       }
     }
   }

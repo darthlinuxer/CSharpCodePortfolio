@@ -554,7 +554,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Camilo\\.nuget\\packages\\": {},
+    "C:\\Users\\chave\\.nuget\\packages\\": {},
     "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
@@ -563,14 +563,14 @@
       "projectUniqueName": "D:\\Dev\\CSharpCodePortfolio\\InMemory EFCore without IRepository\\InMemory EFCore without IRepository.csproj",
       "projectName": "InMemory EFCore without IRepository",
       "projectPath": "D:\\Dev\\CSharpCodePortfolio\\InMemory EFCore without IRepository\\InMemory EFCore without IRepository.csproj",
-      "packagesPath": "C:\\Users\\Camilo\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
       "outputPath": "D:\\Dev\\CSharpCodePortfolio\\InMemory EFCore without IRepository\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\Camilo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
@@ -617,7 +617,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
       }
     }
   }

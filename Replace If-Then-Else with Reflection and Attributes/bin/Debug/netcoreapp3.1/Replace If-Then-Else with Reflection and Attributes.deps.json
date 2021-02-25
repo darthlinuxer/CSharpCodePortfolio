@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Replace If-Then-Else with Reflection and Attributes/1.0.0": {
+        "runtime": {
+          "Replace If-Then-Else with Reflection and Attributes.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Replace If-Then-Else with Reflection and Attributes/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

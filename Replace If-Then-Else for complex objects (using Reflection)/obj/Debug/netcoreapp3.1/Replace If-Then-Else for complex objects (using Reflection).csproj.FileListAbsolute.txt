@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\bin\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).exe
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\bin\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).deps.json
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\bin\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\bin\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\bin\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).dll
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\bin\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).pdb
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\obj\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\obj\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\obj\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\obj\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).dll
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\obj\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).pdb
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else for complex objects (using Reflection)\obj\Debug\netcoreapp3.1\Replace If-Then-Else for complex objects (using Reflection).genruntimeconfig.cache

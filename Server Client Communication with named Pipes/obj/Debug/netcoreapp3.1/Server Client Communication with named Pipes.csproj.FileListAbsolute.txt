@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\bin\Debug\netcoreapp3.1\Server Client Communication with named Pipes.exe
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\bin\Debug\netcoreapp3.1\Server Client Communication with named Pipes.deps.json
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\bin\Debug\netcoreapp3.1\Server Client Communication with named Pipes.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\bin\Debug\netcoreapp3.1\Server Client Communication with named Pipes.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\bin\Debug\netcoreapp3.1\Server Client Communication with named Pipes.dll
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\bin\Debug\netcoreapp3.1\Server Client Communication with named Pipes.pdb
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\obj\Debug\netcoreapp3.1\Server Client Communication with named Pipes.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\obj\Debug\netcoreapp3.1\Server Client Communication with named Pipes.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\obj\Debug\netcoreapp3.1\Server Client Communication with named Pipes.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\obj\Debug\netcoreapp3.1\Server Client Communication with named Pipes.dll
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\obj\Debug\netcoreapp3.1\Server Client Communication with named Pipes.pdb
+D:\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\obj\Debug\netcoreapp3.1\Server Client Communication with named Pipes.genruntimeconfig.cache

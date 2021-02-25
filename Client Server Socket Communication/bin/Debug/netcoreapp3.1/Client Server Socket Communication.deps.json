@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Client Server Socket Communication/1.0.0": {
+        "runtime": {
+          "Client Server Socket Communication.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Client Server Socket Communication/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

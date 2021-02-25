@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\bin\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.exe
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\bin\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.deps.json
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\bin\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\bin\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\bin\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.dll
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\bin\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.pdb
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\obj\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\obj\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\obj\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\obj\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.dll
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\obj\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.pdb
+D:\Dev\CSharpCodePortfolio\Using Anonymous Pipes for Communication between Threads\obj\Debug\netcoreapp3.1\Using Anonymous Pipes for Communication between Threads.genruntimeconfig.cache

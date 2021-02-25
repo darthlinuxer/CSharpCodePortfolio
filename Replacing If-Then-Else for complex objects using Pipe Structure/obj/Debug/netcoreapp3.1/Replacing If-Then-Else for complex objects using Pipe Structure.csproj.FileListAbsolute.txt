@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\bin\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.exe
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\bin\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.deps.json
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\bin\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\bin\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\bin\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.dll
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\bin\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.pdb
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\obj\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\obj\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\obj\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\obj\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.dll
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\obj\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.pdb
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else for complex objects using Pipe Structure\obj\Debug\netcoreapp3.1\Replacing If-Then-Else for complex objects using Pipe Structure.genruntimeconfig.cache

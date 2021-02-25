@@ -18,7 +18,6 @@ D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\n
 D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\System.Collections.Immutable.dll
 D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\System.ComponentModel.Annotations.dll
 D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\System.Diagnostics.DiagnosticSource.dll
-D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.csprojAssemblyReference.cache
 D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.AssemblyInfoInputs.cache
 D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.AssemblyInfo.cs
 D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.csproj.CoreCompileInputs.cache

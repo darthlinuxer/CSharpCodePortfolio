@@ -19,6 +19,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GmailSendingEmail", "Sendin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unit Tests using Reflection and Moq", "Unit Tests using Reflection and Moq\Unit Tests using Reflection and Moq.csproj", "{17446238-BDFD-4592-97CE-19D027F6B5BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Replace If-Then-Else for complex objects (using Reflection)", "Replace If-Then-Else for complex objects (using Reflection)\Replace If-Then-Else for complex objects (using Reflection).csproj", "{FBF44509-DD2A-43F0-B8BB-EB75B51BBB1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Replacing If-Then-Else for complex objects using Pipe Structure", "Replacing If-Then-Else for complex objects using Pipe Structure\Replacing If-Then-Else for complex objects using Pipe Structure.csproj", "{5A5279B7-2C2D-421A-84F9-9592110363DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Replacing If-Then-Else using Pipe Builder structure (simple input types)", "Replacing If-Then-Else using Pipe Builder structure (simple input types)\Replacing If-Then-Else using Pipe Builder structure (simple input types).csproj", "{DB3A87B5-11C0-4248-A9B4-D54732B3415E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Replace If-Then-Else with Reflection and Attributes", "Replace If-Then-Else with Reflection and Attributes\Replace If-Then-Else with Reflection and Attributes.csproj", "{307C09FC-3BDF-4E18-A15F-CF7A85A79473}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Creating string Pipes using reverse Pipe Builder recursion", "Creating string Pipes using reverse Pipe Builder recursion\Creating string Pipes using reverse Pipe Builder recursion.csproj", "{719118E1-5A3B-4A3F-90E4-5FB233C1F235}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lambda Validators", "Lambda Validators\Lambda Validators.csproj", "{17DB85A5-F92C-4F63-8732-BCAA2917DAA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Using Anonymous Pipes for Communication between Threads", "Using Anonymous Pipes for Communication between Threads\Using Anonymous Pipes for Communication between Threads.csproj", "{4153243E-8320-4EAB-A25D-E70469F2E199}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server Client Communication with named Pipes", "Server Client Communication with named Pipes\Server Client Communication with named Pipes.csproj", "{77959417-60FD-42AE-88BC-230D5927989D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client Server Socket Communication", "Client Server Socket Communication\Client Server Socket Communication.csproj", "{6D043A9B-7B74-4575-8F1C-3338551E5955}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +75,42 @@ Global
 		{17446238-BDFD-4592-97CE-19D027F6B5BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17446238-BDFD-4592-97CE-19D027F6B5BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17446238-BDFD-4592-97CE-19D027F6B5BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF44509-DD2A-43F0-B8BB-EB75B51BBB1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF44509-DD2A-43F0-B8BB-EB75B51BBB1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF44509-DD2A-43F0-B8BB-EB75B51BBB1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF44509-DD2A-43F0-B8BB-EB75B51BBB1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A5279B7-2C2D-421A-84F9-9592110363DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A5279B7-2C2D-421A-84F9-9592110363DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A5279B7-2C2D-421A-84F9-9592110363DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A5279B7-2C2D-421A-84F9-9592110363DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB3A87B5-11C0-4248-A9B4-D54732B3415E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB3A87B5-11C0-4248-A9B4-D54732B3415E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB3A87B5-11C0-4248-A9B4-D54732B3415E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB3A87B5-11C0-4248-A9B4-D54732B3415E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{307C09FC-3BDF-4E18-A15F-CF7A85A79473}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{307C09FC-3BDF-4E18-A15F-CF7A85A79473}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{307C09FC-3BDF-4E18-A15F-CF7A85A79473}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{307C09FC-3BDF-4E18-A15F-CF7A85A79473}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719118E1-5A3B-4A3F-90E4-5FB233C1F235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719118E1-5A3B-4A3F-90E4-5FB233C1F235}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719118E1-5A3B-4A3F-90E4-5FB233C1F235}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719118E1-5A3B-4A3F-90E4-5FB233C1F235}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17DB85A5-F92C-4F63-8732-BCAA2917DAA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17DB85A5-F92C-4F63-8732-BCAA2917DAA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17DB85A5-F92C-4F63-8732-BCAA2917DAA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17DB85A5-F92C-4F63-8732-BCAA2917DAA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4153243E-8320-4EAB-A25D-E70469F2E199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4153243E-8320-4EAB-A25D-E70469F2E199}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4153243E-8320-4EAB-A25D-E70469F2E199}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4153243E-8320-4EAB-A25D-E70469F2E199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77959417-60FD-42AE-88BC-230D5927989D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77959417-60FD-42AE-88BC-230D5927989D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77959417-60FD-42AE-88BC-230D5927989D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77959417-60FD-42AE-88BC-230D5927989D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D043A9B-7B74-4575-8F1C-3338551E5955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D043A9B-7B74-4575-8F1C-3338551E5955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D043A9B-7B74-4575-8F1C-3338551E5955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D043A9B-7B74-4575-8F1C-3338551E5955}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,6 @@ D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Deb
 D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.pdb
 D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.dll
 D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.csprojAssemblyReference.cache
 D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.AssemblyInfoInputs.cache
 D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.AssemblyInfo.cs
 D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.csproj.CoreCompileInputs.cache

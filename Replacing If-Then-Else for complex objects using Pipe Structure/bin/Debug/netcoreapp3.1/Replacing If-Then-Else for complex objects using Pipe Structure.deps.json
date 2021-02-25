@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Replacing If-Then-Else for complex objects using Pipe Structure/1.0.0": {
+        "runtime": {
+          "Replacing If-Then-Else for complex objects using Pipe Structure.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Replacing If-Then-Else for complex objects using Pipe Structure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Replacing If-Then-Else using Pipe Builder structure (simple input types)/1.0.0": {
+        "runtime": {
+          "Replacing If-Then-Else using Pipe Builder structure (simple input types).dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Replacing If-Then-Else using Pipe Builder structure (simple input types)/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

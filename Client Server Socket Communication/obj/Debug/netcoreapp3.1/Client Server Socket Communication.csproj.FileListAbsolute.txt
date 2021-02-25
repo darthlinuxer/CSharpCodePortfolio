@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\bin\Debug\netcoreapp3.1\Client Server Socket Communication.exe
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\bin\Debug\netcoreapp3.1\Client Server Socket Communication.deps.json
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\bin\Debug\netcoreapp3.1\Client Server Socket Communication.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\bin\Debug\netcoreapp3.1\Client Server Socket Communication.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\bin\Debug\netcoreapp3.1\Client Server Socket Communication.dll
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\bin\Debug\netcoreapp3.1\Client Server Socket Communication.pdb
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\obj\Debug\netcoreapp3.1\Client Server Socket Communication.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\obj\Debug\netcoreapp3.1\Client Server Socket Communication.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\obj\Debug\netcoreapp3.1\Client Server Socket Communication.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\obj\Debug\netcoreapp3.1\Client Server Socket Communication.dll
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\obj\Debug\netcoreapp3.1\Client Server Socket Communication.pdb
+D:\Dev\CSharpCodePortfolio\Client Server Socket Communication\obj\Debug\netcoreapp3.1\Client Server Socket Communication.genruntimeconfig.cache

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Using_Anonymous_Pipes_for_Communication_between_Threads</RootNamespace>
+  </PropertyGroup>
+
+</Project>

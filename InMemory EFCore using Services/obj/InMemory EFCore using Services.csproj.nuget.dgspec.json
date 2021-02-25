@@ -10,14 +10,14 @@
         "projectUniqueName": "D:\\Dev\\CSharpCodePortfolio\\InMemory EFCore using Services\\InMemory EFCore using Services.csproj",
         "projectName": "InMemory EFCore using Services",
         "projectPath": "D:\\Dev\\CSharpCodePortfolio\\InMemory EFCore using Services\\InMemory EFCore using Services.csproj",
-        "packagesPath": "C:\\Users\\Camilo\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
         "outputPath": "D:\\Dev\\CSharpCodePortfolio\\InMemory EFCore using Services\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\Camilo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -64,7 +64,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
         }
       }
     }

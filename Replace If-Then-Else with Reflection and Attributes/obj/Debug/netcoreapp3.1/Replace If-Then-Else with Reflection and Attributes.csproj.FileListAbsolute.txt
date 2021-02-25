@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\bin\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.exe
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\bin\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.deps.json
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\bin\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\bin\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\bin\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.dll
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\bin\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.pdb
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\obj\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\obj\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\obj\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\obj\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.dll
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\obj\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.pdb
+D:\Dev\CSharpCodePortfolio\Replace If-Then-Else with Reflection and Attributes\obj\Debug\netcoreapp3.1\Replace If-Then-Else with Reflection and Attributes.genruntimeconfig.cache
