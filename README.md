@@ -25,7 +25,16 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 
   
 # Game Developed for a Job Interview
-[Rock Paper Scissors - a Star Wars Parody](https://bitbucket.org/camilochaves/rockpaperscissors)
+  
+  Game is not anymore in the Google Play or Apple Store, because it has Star Wars characters.  
+  [Rock Paper Scissors - a Star Wars Parody](https://bitbucket.org/camilochaves/rockpaperscissors)  
+  To install, clone the repository and install the APK available there!
+  - hosted on a Linux VM machine running on Digital Ocean Cloud
+  - Database: MongoDb
+  - BackEnd: NodeJs
+  - FrontEnd: Developed with Ionic Framework (version 4) - Angular - Typescript
+    
+  
 
 [1.1]:https://dotnetfiddle.net/HW6qZ7
 [1.2]:https://dotnetfiddle.net/5JF1bE
