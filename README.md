@@ -33,6 +33,10 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
   - Database: MongoDb
   - BackEnd: NodeJs
   - FrontEnd: Developed with Ionic Framework (version 4) - Angular - Typescript
+  
+  ## Scenes  
+[<img src="https://img.youtube.com/vi/TSr06AH5nXY/maxresdefault.jpg" width="33%">](https://www.youtube.com/watch?v=TSr06AH5nXY) [<img src="https://img.youtube.com/vi/-mUJHiYAIC0/maxresdefault.jpg" width="33%">](https://www.youtube.com/watch?v=-mUJHiYAIC0) [<img src="https://img.youtube.com/vi/qalkMGvr3rg/maxresdefault.jpg" width="33%">](https://www.youtube.com/watch?v=qalkMGvr3rg)
+  
     
   
 
