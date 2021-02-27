@@ -17,7 +17,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [SQLite in .NET][12.1] | | [Secure Strings][12.3]
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
 | [Lambda Validators][14.1]| | [Yield][14.3]
-| [Creating string Pipes using reverse PipeBuilder recursion][15.1] | |
+| [Creating string Pipes using reverse PipeBuilder recursion][15.1] | | [Return Option<> for safe null checks][15.3]
 | [Replace If-Then-Else with Reflection and Attributes][16.1] | |
 | [Replacing If-Then-Else using Pipe Builder structure (simple input types)][17.1] | |
 | [Replacing If-Then-Else for complex objects using Pipe Structure][18.1] | |
@@ -79,6 +79,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [14.1]:https://dotnetfiddle.net/1ITBkw
 [14.3]:https://dotnetfiddle.net/Z67LW8
 [15.1]:https://dotnetfiddle.net/bwA0sO
+[15.3]:https://dotnetfiddle.net/NGFV4g
 [16.1]:https://dotnetfiddle.net/jIL2AQ
 [17.1]:https://dotnetfiddle.net/MlyOqU
 [18.1]:https://dotnetfiddle.net/eUTwv4
