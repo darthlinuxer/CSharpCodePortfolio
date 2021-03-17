@@ -38,8 +38,24 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 [<img src="https://img.youtube.com/vi/TSr06AH5nXY/maxresdefault.jpg" width="30%">](https://www.youtube.com/watch?v=TSr06AH5nXY) [<img src="https://img.youtube.com/vi/-mUJHiYAIC0/maxresdefault.jpg" width="30%">](https://www.youtube.com/watch?v=-mUJHiYAIC0) [<img src="https://img.youtube.com/vi/qalkMGvr3rg/maxresdefault.jpg" width="30%">](https://www.youtube.com/watch?v=qalkMGvr3rg)
   
     
+# Automatic Trading Investor - Desenvolvido em C# .NET
   
+ Protrader é uma plataforma de negociação usada por muitas corretoras (Clear, Rico, ModalMais, etc..).
+ Com a ProTrader, você opera simultâneo ao Home Broker e tem inúmeros recursos como negociação multiativos, análises avançadas de mercado, desenvolvimento e execução de estratégias algorítmicas, gestão de risco e muito mais
+  
+  Git  https://camilochaves@bitbucket.org/dollarinvestimentos/robo.git   
+  Este repositório contém diversos robôs desenvolvidos usando a biblioteca PTLRuntime.NETScript da Protrader
+  
+# Guia Tijucano (em desenvolvimento)
+## Atualmente em teste fechado com testadores selectionados  
+O Guia Tijucano, é um aplicativo de Marketing Direcional Geolocalizado, que veiculará promoções, bônus e cupons de desconto, filtrando o conteúdo de acordo com a preferência do usuário, e enviando apenas  peças de marketing digital que estiverem dentro uma área delimitada por você, usuário.
+Assim, facilmente pode-se procurar o que deseja, caçar prêmios e cupons de desconto dentro de uma distância especificada diretamente no aplicativo.
 
+- FrontEnd: Framework Ionic com Angular+Typescript
+- BackEnd API Rest: Node.Js + Express
+- BackEnd Admin: Desenvolvido em Scriptcase (gerador de código PHP) e hospedado na cloud Digital Ocean -> http://159.65.238.114/login_admin/  
+- Db: MySql
+  
 [1.1]:https://dotnetfiddle.net/HW6qZ7
 [1.2]:https://dotnetfiddle.net/5JF1bE
 [1.3]:https://dotnetfiddle.net/4Ksrjg
