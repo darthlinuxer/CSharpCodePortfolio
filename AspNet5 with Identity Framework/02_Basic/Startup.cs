@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,7 +19,6 @@ namespace App
 
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers()
                 .AddNewtonsoftJson(options => 
                 {
@@ -29,6 +27,16 @@ namespace App
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Main App", Version = "v1" });                
+            });           
+
+            StartupDbContext.Init(services, Configuration);
+
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.Cookie.Name = "Identity.Cookie";
+                config.ExpireTimeSpan = TimeSpan.FromHours(24);
+                config.Cookie.HttpOnly = true;
+                config.LoginPath = "/AccessControl/NotLoggedMessage";
             });
             
             
@@ -46,6 +54,8 @@ namespace App
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

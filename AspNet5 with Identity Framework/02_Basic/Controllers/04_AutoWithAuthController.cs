@@ -1,9 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers
 {
-    //This Controller does not follow the Naming Convention 
-    //nor does it have [ApiController] attribute
     [Authorize]
     public class AutoWithAuth: ControllerBase
     {
@@ -11,6 +10,5 @@ namespace App.Controllers
         public IActionResult Query(string msg) => Ok(new {msg});
         public IActionResult Model([FromBody] Msg body) => Ok(new {body.msg});
         public IActionResult ModelWithoutAttributes(Msg body) => Ok(new {body.msg});
-
     }
 }

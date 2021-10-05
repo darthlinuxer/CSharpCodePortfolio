@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8cybTiA6hF/1AyLldBLJEZu5pAoBMNsbeRguuNm2geL4C/573kcmwJ8KEaYYi9kiermvjUJz6KalyLW1OHK5CQ==",
+  "dgSpecHash": "3WjHRnMOWbu81gj9I92X5VwF8s1e4P3O7BbplFW1u9cYJsAlTj0PAx0coIqcMHNafBkz06DAyxQMF0oUWMeQHQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\01_Basic\\01_Basic.csproj",
+  "projectFilePath": "D:\\Exemplos de código\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\01_Basic\\Main.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\5.0.10\\microsoft.aspnetcore.jsonpatch.5.0.10.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\5.0.10\\microsoft.aspnetcore.mvc.newtonsoftjson.5.0.10.nupkg.sha512",

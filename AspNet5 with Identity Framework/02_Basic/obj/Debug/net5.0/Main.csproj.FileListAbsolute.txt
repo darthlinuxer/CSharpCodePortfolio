@@ -29,3 +29,16 @@ D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_Ba
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_Basic\obj\Debug\net5.0\ref\Main.dll
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_Basic\obj\Debug\net5.0\Main.pdb
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_Basic\obj\Debug\net5.0\Main.genruntimeconfig.cache
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.InMemory.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.Extensions.DependencyInjection.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.Extensions.Identity.Core.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\Microsoft.Extensions.Identity.Stores.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_bASIC\bin\Debug\net5.0\System.Diagnostics.DiagnosticSource.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_Basic\bin\Debug\net5.0\Humanizer.dll
+D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\02_Basic\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.Design.dll
