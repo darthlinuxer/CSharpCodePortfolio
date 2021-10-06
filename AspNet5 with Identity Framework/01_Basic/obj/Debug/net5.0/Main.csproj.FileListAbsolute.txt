@@ -25,7 +25,6 @@ D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Ba
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\scopedcss\bundle\Main.styles.css
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\staticwebassets\Main.StaticWebAssets.Manifest.cache
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.RazorTargetAssemblyInfo.cache
-D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.csproj.CopyComplete
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.dll
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\ref\Main.dll
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.pdb
