@@ -15,8 +15,9 @@ namespace App
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseInMemoryDatabase("MemoryDb");
-            });       
+            });    
 
+            //Identity is going to manage authentication
             services.AddIdentity<IdentityUser,IdentityRole>(options =>{
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequireLowercase = false;
@@ -26,9 +27,19 @@ namespace App
                 options.Password.RequireUppercase=false;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(30);
                 options.Lockout.AllowedForNewUsers = true;
+                options.User.RequireUniqueEmail=true;
                 })
                 .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();              
+                .AddDefaultTokenProviders();      
+            
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.Cookie.Name = "Identity.Cookie";
+                config.ExpireTimeSpan = TimeSpan.FromHours(24);
+                config.Cookie.HttpOnly = true;
+                config.LoginPath = "/AccessControl/NotLoggedMessage";
+            });
+                    
 
        }
     }

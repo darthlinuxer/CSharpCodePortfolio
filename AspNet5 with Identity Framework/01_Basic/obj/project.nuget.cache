@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3WjHRnMOWbu81gj9I92X5VwF8s1e4P3O7BbplFW1u9cYJsAlTj0PAx0coIqcMHNafBkz06DAyxQMF0oUWMeQHQ==",
+  "dgSpecHash": "VVgu2fZl2mLMGnUoL+ISJUgymQrpjD7JjYH5WHFFePXhf8Yc5WersRInY4e26AQgNXtpKJX15e12Efijme+9Pw==",
   "success": true,
-  "projectFilePath": "D:\\Exemplos de código\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\01_Basic\\Main.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\01_Basic\\Main.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\5.0.10\\microsoft.aspnetcore.jsonpatch.5.0.10.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\5.0.10\\microsoft.aspnetcore.mvc.newtonsoftjson.5.0.10.nupkg.sha512",
@@ -14,7 +14,8 @@
     "C:\\Users\\chave\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
-    "C:\\Users\\chave\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512"
+    "C:\\Users\\chave\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.8\\microsoft.netcore.app.host.win-x64.5.0.8.nupkg.sha512"
   ],
   "logs": []
 }

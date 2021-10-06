@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers
 {
+    //Only Authorized Users can access these routes
     [Authorize]
-    public class AutoWithAuth: ControllerBase
+    public class AuthRoutesController: ControllerBase
     {
         public class Msg {public string msg;}
         public IActionResult Query(string msg) => Ok(new {msg});

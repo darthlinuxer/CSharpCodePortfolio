@@ -2,14 +2,13 @@
 	"csharp.semanticHighlighting.enabled": true,
 	"omnisharp.enableAsyncCompletion": true,
 	"omnisharp.enableImportCompletion": true,
-	"omnisharp.enableMsBuildLoadProjectsOnDemand": true,
 	"omnisharp.enableRoslynAnalyzers": true,
 	"omnisharp.organizeImportsOnFormat": true,
 	"prettier.insertPragma": true,
 	"prettier.useTabs": true,
 	"csharp.suppressHiddenDiagnostics": false,
-	"omnisharp.useGlobalMono": "never",
 	"omnisharp.autoStart": true,
 	"csharp.showOmnisharpLogOnError": true,
-	"csharp.referencesCodeLens.enabled": true
+	"csharp.referencesCodeLens.enabled": true,
+	"omnisharp.enableEditorConfigSupport": false
 }

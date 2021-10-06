@@ -30,3 +30,35 @@ D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Ba
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\ref\Main.dll
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.pdb
 D:\Exemplos de código\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.genruntimeconfig.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\appsettings.Development.json
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\appsettings.json
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Main.exe
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Main.deps.json
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Main.runtimeconfig.json
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Main.runtimeconfig.dev.json
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Main.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Main.pdb
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Microsoft.OpenApi.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Newtonsoft.Json.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Newtonsoft.Json.Bson.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.csproj.AssemblyReference.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.AssemblyInfoInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.AssemblyInfo.cs
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.csproj.CoreCompileInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\scopedcss\bundle\Main.styles.css
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\staticwebassets\Main.StaticWebAssets.Manifest.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.RazorTargetAssemblyInfo.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.csproj.CopyComplete
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\refint\Main.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.pdb
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.genruntimeconfig.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\ref\Main.dll

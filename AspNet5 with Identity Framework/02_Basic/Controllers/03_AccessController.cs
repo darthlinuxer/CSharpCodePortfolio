@@ -1,18 +1,17 @@
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 using System.Security.Claims;
-using System.Threading.Channels;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using App.Context;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.VisualBasic;
 
 namespace App.Controllers
 {
 
-    public record LoginData
+    public record UserRegisterData
     {
         public string login;
         public string password;
@@ -33,29 +32,49 @@ namespace App.Controllers
 
         public IActionResult NotLoggedMessage() => BadRequest(new {msg = "You must login First!"});
 
-        public async Task<IActionResult> Login([FromBody] LoginData body)
+        public async Task<IActionResult> Login([FromBody] UserRegisterData body)
         {
-            var _user = await _userManager.FindByNameAsync(body.login);
+            var _user = await _userManager.FindByEmailAsync(body.login);
             if (_user is null) return NotFound(new {msg="User does not exist! Please Register first!"});
             var result = await _signInManager.PasswordSignInAsync(_user, body.password, false, true);
             if (!result.Succeeded) return BadRequest(new {msg = "Wrong Password!"});            
             return Ok(new {user = _user});
         }
 
-        public async Task<IActionResult> Register([FromBody] LoginData body)
+        public async Task<IActionResult> Register([FromBody] UserRegisterData body)
         {
             var _user = new IdentityUser
             {
                 Email = body.login,
                 LockoutEnabled = true,
                 PasswordHash = "MySecretPasswordHash",
-                UserName = body.login,
-                AccessFailedCount = 3
+                AccessFailedCount = 3,
+                UserName = body.login
             };
 
             var result = await _userManager.CreateAsync(_user, body.password);
             if (!result.Succeeded) return BadRequest(result.Errors);
+
+            await _userManager.AddClaimsAsync(_user, new List<Claim>
+            {
+                new Claim(ClaimTypes.Role, "User")
+            });
             return Ok(new {msg = "User Created!", user = _user});
+        }
+
+        [Authorize]
+        public async Task<IActionResult> WhoAmI()
+        {
+            var _user = await _userManager.GetUserAsync(User);
+            return Ok(_user);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var _user = await _userManager.GetUserAsync(User);
+            await _signInManager.SignOutAsync();
+            return Ok(new {user = _user?.Email, msg = "Logged out!"});
         }
 
     }

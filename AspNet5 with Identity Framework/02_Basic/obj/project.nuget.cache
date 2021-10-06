@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wxWfxz9oSM2qJXe1w2ccK43EWgRaniQsg3zhqEL/k2IRPIYgSeLDQF3hJ7QVuHLPsbeb9ae1kPjklypXXeNXOw==",
+  "dgSpecHash": "CIvTU9z3lpy6kuyXcueTgRAggAykLL0aXiFmqaXSxsnGBlCda6AdEyYlb7gBe6QqrtbyZvWEik6lzpTgPHlERg==",
   "success": true,
-  "projectFilePath": "D:\\Exemplos de código\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Basic\\Main.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Basic\\Main.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.2.0\\microsoft.aspnetcore.authentication.2.2.0.nupkg.sha512",
@@ -67,7 +67,8 @@
     "C:\\Users\\chave\\.nuget\\packages\\system.security.cryptography.xml\\4.5.0\\system.security.cryptography.xml.4.5.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.security.permissions\\4.5.0\\system.security.permissions.4.5.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.security.principal.windows\\4.5.0\\system.security.principal.windows.4.5.0.nupkg.sha512",
-    "C:\\Users\\chave\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512"
+    "C:\\Users\\chave\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.8\\microsoft.netcore.app.host.win-x64.5.0.8.nupkg.sha512"
   ],
   "logs": []
 }

@@ -29,16 +29,7 @@ namespace App
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Main App", Version = "v1" });                
             });           
 
-            StartupDbContext.Init(services, Configuration);
-
-            services.ConfigureApplicationCookie(config =>
-            {
-                config.Cookie.Name = "Identity.Cookie";
-                config.ExpireTimeSpan = TimeSpan.FromHours(24);
-                config.Cookie.HttpOnly = true;
-                config.LoginPath = "/AccessControl/NotLoggedMessage";
-            });
-            
+           StartupDbContext.Init(services, Configuration);           
             
         }
 
