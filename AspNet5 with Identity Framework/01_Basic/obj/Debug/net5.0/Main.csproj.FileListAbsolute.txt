@@ -55,7 +55,6 @@ C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\scopedcss\bundle\Main.styles.css
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\staticwebassets\Main.StaticWebAssets.Manifest.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.RazorTargetAssemblyInfo.cache
-C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.csproj.CopyComplete
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.dll
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\refint\Main.dll
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\Main.pdb

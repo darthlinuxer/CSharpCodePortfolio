@@ -38,8 +38,7 @@ namespace App
                 config.ExpireTimeSpan = TimeSpan.FromHours(24);
                 config.Cookie.HttpOnly = true;
                 config.LoginPath = "/AccessControl/NotLoggedMessage";
-            });
-                    
+            });                    
 
        }
     }

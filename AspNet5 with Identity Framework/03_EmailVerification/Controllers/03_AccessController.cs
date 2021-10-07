@@ -82,7 +82,7 @@ namespace App.Controllers
         [Authorize]
         public async Task<IActionResult> ChangePassword(string oldPass, string newPass)
         {
-             var _user = await _userManager.GetUserAsync(User);
+            var _user = await _userManager.GetUserAsync(User);
             var result = await _userManager.ChangePasswordAsync(_user, oldPass, newPass);
             if(!result.Succeeded) return BadRequest(result.Errors);
             return Ok(new {msg = $"Password for user {_user.Email} changed!"});

@@ -4,8 +4,6 @@
 	"omnisharp.enableImportCompletion": true,
 	"omnisharp.enableRoslynAnalyzers": true,
 	"omnisharp.organizeImportsOnFormat": true,
-	"prettier.insertPragma": true,
-	"prettier.useTabs": true,
 	"csharp.suppressHiddenDiagnostics": false,
 	"omnisharp.autoStart": true,
 	"csharp.showOmnisharpLogOnError": true,
