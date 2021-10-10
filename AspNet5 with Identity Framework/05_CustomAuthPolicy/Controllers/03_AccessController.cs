@@ -75,7 +75,7 @@ namespace App.Controllers
 
             await _userManager.AddClaimsAsync(_user, new List<Claim>
             {
-                new Claim(ClaimTypes.Role, "User"),
+                new Claim("Role", "User"),
                 new Claim("Email", _user.Email)
             });
             return Ok(new {msg = $"Email confirmation sent to {_user.Email}", user = _user});

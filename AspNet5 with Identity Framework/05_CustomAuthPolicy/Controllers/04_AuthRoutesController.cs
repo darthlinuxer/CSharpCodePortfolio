@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using App.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,8 @@ namespace App.Controllers
     {
         public class Msg {public string msg;}
         
-        [Authorize(Policy = "UserPolicy")]
+        [Authorize(Policy = "Role.User")]
+        [Authorize(Policy = "Email")]
         public IActionResult Query(string msg) => Ok(new {msg});
         public async Task<IActionResult> Model(
             [FromServices] IAuthorizationService authorizationService, 
@@ -36,9 +38,6 @@ namespace App.Controllers
 
         [Authorize(Policy = "Security.5")]
         public IActionResult QueryWithSecureLevel(string msg) => Ok(new {msg});
-
-        [SecurityLevel(5)]
-        public IActionResult QueryWithAttributeSecureLevel(string msg) => Ok(new {msg});
 
         [SecurityLevel(10)]
         public IActionResult QueryWithHigherSecureLevel(string msg) => Ok(new {msg});
