@@ -327,3 +327,4 @@ C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\05_Custom
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\05_CustomAuthPolicy\obj\Debug\net5.0\Main.RazorTargetAssemblyInfo.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\05_CustomAuthPolicy\obj\Debug\net5.0\Main.genruntimeconfig.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\05_CustomAuthPolicy\obj\Debug\net5.0\ref\Main.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\05_CustomAuthPolicy\obj\Debug\net5.0\Main.csproj.CopyComplete
