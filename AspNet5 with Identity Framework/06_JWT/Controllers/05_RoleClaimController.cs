@@ -1,19 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace App.Controllers
 {
-    [Authorize("Bearer")]
+    [Authorize(Policy = "Bearer")]
     public class RoleClaimController:ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -28,9 +23,9 @@ namespace App.Controllers
             _signInManager = signInManager;
         }
         public record ClaimModel{public string claimType; public string value;}
-        public async Task<IActionResult> AddClaim([FromBody] ClaimModel cModel)
+        public async Task<IActionResult> AddClaim([FromBody] ClaimModel cModel, bool updateCookie = false)
         {
-            var _user = await _userManager.GetUserAsync(User);
+            var _user = await _userManager.FindByIdAsync(User.Identity.Name);
             if(_user is null) return BadRequest();
 
             var hasClaim = User.HasClaim(c=>c.Type == cModel.claimType);
@@ -40,15 +35,15 @@ namespace App.Controllers
             var result = await _userManager.AddClaimAsync(_user, customClaim);
             if (result.Succeeded) 
             {                
-                await _signInManager.SignInAsync(_user,false);
+                if(updateCookie) await _signInManager.SignInAsync(_user,false);
                 return Ok(new {msg = "Claim Added!", cModel});
             }
             return BadRequest(new {result.Errors});
         }
 
-        public async Task<IActionResult> RemoveClaim([FromBody] ClaimModel cModel)
+        public async Task<IActionResult> RemoveClaim([FromBody] ClaimModel cModel, bool updateCookie = false)
         {
-            var _user = await _userManager.GetUserAsync(User);
+            var _user = await _userManager.FindByIdAsync(User.Identity.Name);
             if(_user is null) return BadRequest();
 
             IList<Claim> userClaims = await _userManager.GetClaimsAsync(_user);
@@ -60,37 +55,37 @@ namespace App.Controllers
             
             if (result.Succeeded) 
             {
-                await _signInManager.SignInAsync(_user,false);
+                if(updateCookie)await _signInManager.SignInAsync(_user,false);
                 return Ok(new {msg = "Claim Removed!", cModel});
             }
             return BadRequest(new {result.Errors});
         }
 
-        public async Task<IActionResult> AddRole(string role)
+        public async Task<IActionResult> AddRole(string role, bool updateCookie = false)
         {
-            var _user = await _userManager.GetUserAsync(User);
+            var _user = await _userManager.FindByIdAsync(User.Identity.Name);
             if(_user is null) return BadRequest();
             var hasRole = User.IsInRole(role);
             if(hasRole) return BadRequest(new {error = $"User is already in role {role}"});
             var result = await _userManager.AddToRoleAsync(_user, role);
             if (result.Succeeded) 
             {
-                await _signInManager.SignInAsync(_user,false);
+                if(updateCookie) await _signInManager.SignInAsync(_user,false);
                 return Ok(new {msg = "Role added!", role});
             }
             return BadRequest(new {result.Errors});
         }
 
-        public async Task<IActionResult> RemoveRole(string role)
+        public async Task<IActionResult> RemoveRole(string role, bool updateCookie=false)
         {
-            var _user = await _userManager.GetUserAsync(User);
+            var _user = await _userManager.FindByIdAsync(User.Identity.Name);
             if(_user is null) return BadRequest();
             var hasRole = User.IsInRole(role);
             if (!hasRole) return BadRequest(new{error = $"User does not have role {role}"});
             var result = await _userManager.RemoveFromRoleAsync(_user, role);
             if (result.Succeeded) 
             {
-                await _signInManager.SignInAsync(_user,false);
+                if(updateCookie)await _signInManager.SignInAsync(_user,false);
                 return Ok(new {msg = "Role removed!", role});
             }
             return BadRequest(new {result.Errors});
@@ -98,15 +93,15 @@ namespace App.Controllers
 
         public async Task<IActionResult> ListClaims()
         {
-            var _user = await _userManager.GetUserAsync(User);
-            if(_user is null) return BadRequest();
+            var _user = await _userManager.FindByIdAsync(User.Identity.Name);
+            if(_user is null) return BadRequest(new {user = User.Identity.Name, error = "Not Found!"});
             var listOfClaims = await _userManager.GetClaimsAsync(_user);
             return Ok(listOfClaims);
         }
 
         public async Task<IActionResult> ListRoles()
         {
-            var _user = await _userManager.GetUserAsync(User);
+            var _user = await _userManager.FindByIdAsync(User.Identity.Name);
             if(_user is null) return BadRequest();
             var listOfRoles = await _userManager.GetRolesAsync(_user);
             return Ok(listOfRoles);

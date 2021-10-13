@@ -43,7 +43,7 @@ namespace App
             {
                 config.Cookie.Name = "Identity.Cookie";
                 config.ExpireTimeSpan = TimeSpan.FromHours(24);
-                config.Cookie.HttpOnly = true;
+                config.Cookie.HttpOnly = false;
                 config.LoginPath = "/AccessControl/NotLoggedMessage";
                 config.AccessDeniedPath = "/AccessControl/AccessDenied";
                 config.SlidingExpiration = true;

@@ -32,8 +32,10 @@ namespace App
 
            StartupDbContext.Init(services, Configuration);   
            StartupEmail.Init(services,Configuration);    
-           StartupPolicies.Init(services);    
-           StartUpAuthorization.Init(services, Configuration);            
+           StartUpServices.Init(services);               
+           StartUpIdentity.Init(services);
+           StartUpAuthentication.Init(services, Configuration);
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -59,7 +61,8 @@ namespace App
                 // {
                 //     Console.WriteLine(header.ToString());
                 // }
-                Console.WriteLine("Token:"+context.Request.Headers["Authorization"]);
+                //Console.WriteLine("Token:"+context.Request.Headers["Authorization"]);
+                Console.WriteLine("Logged User Id:" + context.User?.Identity?.Name);
                 await next.Invoke();
             });
 

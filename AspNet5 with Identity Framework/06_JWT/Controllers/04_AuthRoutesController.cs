@@ -1,22 +1,26 @@
-using System.Net;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using App.Attributes;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers
 {
-    //Only Authorized Users can access these routes  
-    [Authorize("Bearer")]  
     public class AuthRoutesController: ControllerBase
     {
         public class Msg {public string msg;}
         
+        [Authorize("IdentityCookie")]
         [Authorize(Policy = "Role.User")]
         [Authorize(Policy = "Email")]
-        public IActionResult Query(string msg) => Ok(new {msg});
+        public IActionResult QueryWithCookie(string msg) => Ok(new {msg});
+
+        [Authorize("Bearer")]
+        [Authorize(Policy = "Role.User")]
+        [Authorize(Policy = "Email")]
+        public IActionResult QueryWithBearer(string msg) => Ok(new {msg});
+
         public async Task<IActionResult> Model(
             [FromServices] IAuthorizationService authorizationService, 
             [FromBody] Msg body) 
@@ -36,9 +40,11 @@ namespace App.Controllers
         public IActionResult ModelWithoutAttributes(Msg body) => Ok(new {body.msg});
 
 
+        [Authorize]
         [Authorize(Policy = "Security.5")]
         public IActionResult QueryWithSecureLevel(string msg) => Ok(new {msg});
 
+        [Authorize]
         [SecurityLevel(10)]
         public IActionResult QueryWithHigherSecureLevel(string msg) => Ok(new {msg});
 

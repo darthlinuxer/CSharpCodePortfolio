@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using crypto;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using MimeKit;
+using App.TokenLib;
 
 namespace App.RequiredClaims
 {
@@ -18,8 +21,10 @@ namespace App.RequiredClaims
     }
 
     public class CustomRequireClaimHandler : AuthorizationHandler<CustomRequireClaim>
-    {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CustomRequireClaim requirement)
+    {        
+        protected override Task HandleRequirementAsync(
+            AuthorizationHandlerContext context, 
+            CustomRequireClaim requirement)
         {
             var userClaim = context.User.Claims.FirstOrDefault(x=>x.Type == requirement.ClaimType);
             if (userClaim is null) return Task.CompletedTask;

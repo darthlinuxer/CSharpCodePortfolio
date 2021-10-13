@@ -8,9 +8,7 @@ using NETCore.MailKit.Core;
 using System.Security.Cryptography;
 using System;
 using System.Security.Principal;
-using App.TokenTools;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
+using App.TokenLib;
 
 namespace App.Controllers
 {
@@ -50,22 +48,34 @@ namespace App.Controllers
         public IActionResult AccessDenied() => BadRequest(new {msg = "Access Denied!"});
         public IActionResult NotLoggedMessage() => BadRequest(new {msg = "You must login First!"});
 
-        public async Task<IActionResult> Login(
-            [FromBody] UserRegisterData body,
-            [FromServices] TokenTools.TokenTools handler)
+        public async Task<IActionResult> LoginAndReturnCookie(
+            [FromBody] UserRegisterData body
+            )
         {
             var _user = await _userManager.FindByEmailAsync(body.login);
             if (_user is null) return NotFound(new {msg="User does not exist! Please Register first!"});
-            var result = await _signInManager.PasswordSignInAsync(_user, body.password, false, true);
-            if (!result.Succeeded) return BadRequest(new {msg = "Wrong Password!"});  
+            PasswordVerificationResult passResult = _userManager.PasswordHasher.VerifyHashedPassword(_user, _user.PasswordHash, body.password);
+            if (passResult==0) return BadRequest(new {msg = "Wrong Password!"});
+            
+            //Identity will sign in and create a cookie
+            await _signInManager.PasswordSignInAsync(_user, body.password, false, true);            
+            return Ok(_user);
+        }
 
-            var claims = await _userManager.GetClaimsAsync(_user);
-            var genericIdentity = new GenericIdentity(_user.Id, "UserId");
-            var userIdentity = new ClaimsIdentity(genericIdentity, claims);
+         public async Task<IActionResult> LoginAndReturnToken(
+            [FromBody] UserRegisterData body,
+            [FromServices] TokenTools handler)
+        {
+            var _user = await _userManager.FindByEmailAsync(body.login);
+            if (_user is null) return NotFound(new {msg="User does not exist! Please Register first!"});
+            PasswordVerificationResult passResult = _userManager.PasswordHasher.VerifyHashedPassword(_user, _user.PasswordHash, body.password);
+            if (passResult==0) return BadRequest(new {msg = "Wrong Password!"});            
+            //Generate JWT Token without Claims
+            var genericIdentity = new GenericIdentity(_user.Id);
+            var userIdentity = new ClaimsIdentity(genericIdentity);
             var token = handler.CreateToken(userIdentity);
             
-
-            return Ok(new {user = _user, token });
+            return Ok(new {userIdentity, token });
         }
 
         public async Task<IActionResult> Register([FromBody] UserRegisterData body)
@@ -84,7 +94,7 @@ namespace App.Controllers
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(_user);
             var link = Url.Action(nameof(VerifyEmail), "AccessControl", new {userId = _user.Id, code}, Request.Scheme, Request.Host.ToString());            
-            await _email.SendAsync(_user.Email, "Email Verification", $"<a href=\"{link}\">Click to Verify Account</a>" , true);             
+            //await _email.SendAsync(_user.Email, "Email Verification", $"<a href=\"{link}\">Click to Verify Account</a>" , true);             
 
             await _userManager.AddClaimsAsync(_user, new List<Claim>
             {
@@ -94,7 +104,8 @@ namespace App.Controllers
             return Ok(new {msg = $"Email confirmation sent to {_user.Email}", user = _user});
         }
 
-        [Authorize(Policy = "Bearer")]
+        //Calls default authorization with is JWTBearer
+        [Authorize]
         public async Task<IActionResult> ChangePassword(string oldPass, string newPass)
         {
             var _user = await _userManager.GetUserAsync(User);
@@ -133,21 +144,29 @@ namespace App.Controllers
             return Ok(new {msg = "Account Confirmed! ", _user});            
         }
 
-        [Authorize("Bearer")]
-        public async Task<IActionResult> WhoAmI([FromServices] TokenTools.TokenTools handler)
+        [Authorize]
+        public async Task<IActionResult> WhoAmIFromToken()
         {
-            string token = HttpContext.Request.Headers["Authorization"];
-            ClaimsIdentity identity = handler.ExtractIdentity(token);
-            return Ok(await _userManager.FindByIdAsync(identity.Name));
+            var user = await _userManager.FindByIdAsync(User.Identity.Name);
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            var claims = await _userManager.GetClaimsAsync(user);
+            return Ok(new {_user = user, _claims = claims, User.Identity});
         }
 
-        // [Authorize("Bearer")]
-        // public async Task<IActionResult> Logout()
-        // {
-        //     var _user = await _userManager.GetUserAsync(User);
-        //     await _signInManager.SignOutAsync();
-        //     return Ok(new {user = _user?.Email, msg = "Logged out!"});
-        // }
+        [Authorize(Policy = "IdentityCookie")]
+        public async Task<IActionResult> WhoAmIFromCookie()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return Ok(new {id = User.Identity.Name, user});
+        }
+
+        [Authorize(Policy = "IdentityCookie")]
+        public async Task<IActionResult> Logout()
+        {
+             var _user = await _userManager.GetUserAsync(User);
+             await _signInManager.SignOutAsync();
+             return Ok(new {user = _user?.Email, msg = "Logged out!"});
+        }
 
     }
 }

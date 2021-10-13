@@ -1,8 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using App.RequiredClaims;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
 namespace App.PolicyProvider
@@ -25,17 +27,27 @@ namespace App.PolicyProvider
     {
         public CustomAuthPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
         {            
+            options.Value.DefaultPolicy = new AuthorizationPolicyBuilder()
+            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthenticatedUser()
+            .Build();
+
             options.Value.AddPolicy("Bearer", policyBuilder => policyBuilder
                 .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser()
-                );            
+                );  
+
+            options.Value.AddPolicy("IdentityCookie", policyBuilder => policyBuilder
+                .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme)
+                .RequireAuthenticatedUser()
+                );          
         }
 
         //PolicyName.Value
         public override async Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {       
 
-            if(policyName == "Bearer"){
+            if(policyName == "Bearer" || policyName == "IdentityCookie"){
             var bearerPolicy = await base.GetPolicyAsync(policyName);
             return bearerPolicy;
             }     

@@ -2,11 +2,10 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using crypto;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App.TokenTools
+namespace App.TokenLib
 {
     public class TokenTools
     {   
@@ -28,31 +27,32 @@ namespace App.TokenTools
         public string CreateToken(ClaimsIdentity user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = 
+            var privateTokenKey = 
             Encoding.ASCII.GetBytes(configuration.GetValue<string>("SecretKey"));
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = user,
                 Expires = DateTime.UtcNow.AddHours(8),
-                NotBefore = DateTime.UtcNow,
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(tokenKey), 
+                    new SymmetricSecurityKey(privateTokenKey), 
                     SecurityAlgorithms.HmacSha256Signature),
                 Issuer="Reason Systems",
                 Audience="TCPO",
-                IssuedAt= DateTime.UtcNow
+                IssuedAt= DateTime.UtcNow,
+                NotBefore = DateTime.UtcNow
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
 
-        public ClaimsIdentity ExtractIdentity(string token)
+        public ClaimsPrincipal ExtractPrincipal(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            token = token.Remove(0,7);
             ClaimsPrincipal claimsPrincipal = tokenHandler.ValidateToken(
                 token, tokenParameters, out _);
-            return claimsPrincipal.Identity as ClaimsIdentity;
+            return claimsPrincipal;
         }
+
+    
     }
 }
