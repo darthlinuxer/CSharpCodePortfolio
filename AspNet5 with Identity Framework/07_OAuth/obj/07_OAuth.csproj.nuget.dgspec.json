@@ -91,6 +91,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[5.6.3, )"
+            },
+            "microsoft.aspnetcore.authentication.openidconnect": {
+              "target": "Package",
+              "version": "[5.0.11, )"
             }
           },
           "imports": [

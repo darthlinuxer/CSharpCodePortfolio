@@ -1,9 +1,6 @@
 using System;
-using System.Linq;
-using App.JWTAuthentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,26 +22,25 @@ namespace App
                 {
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Main App", Version = "v1" });                
-            });           
+            // services.AddSwaggerGen(c =>
+            // {
+            //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Main App", Version = "v1" });                
+            // });           
 
            StartupDbContext.Init(services, Configuration);   
            StartupEmail.Init(services,Configuration);    
            StartUpServices.Init(services);               
            StartUpIdentity.Init(services);
-           StartUpAuthentication.Init(services, Configuration);
-
+           StartUpAuthentication.Init(services,Configuration);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Main App v1"));
+                // app.UseSwagger();
+                // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Main App v1"));
             }
 
             app.UseHttpsRedirection();
@@ -57,11 +53,6 @@ namespace App
 
             app.Use(async (context,next) =>
             {
-                // foreach(var header in context.Request.Headers) 
-                // {
-                //     Console.WriteLine(header.ToString());
-                // }
-                //Console.WriteLine("Token:"+context.Request.Headers["Authorization"]);
                 Console.WriteLine("Logged User Id:" + context.User?.Identity?.Name);
                 await next.Invoke();
             });

@@ -136,6 +136,21 @@
           "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.OAuth.dll": {}
         }
       },
+      "Microsoft.AspNetCore.Authentication.OpenIdConnect/5.0.11": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.7.1"
+        },
+        "compile": {
+          "lib/net5.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll": {}
+        },
+        "runtime": {
+          "lib/net5.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.AspNetCore.Authentication.Twitter/5.0.11": {
         "type": "package",
         "compile": {
@@ -2068,6 +2083,21 @@
         "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.OAuth.xml",
         "microsoft.aspnetcore.authentication.oauth.2.2.0.nupkg.sha512",
         "microsoft.aspnetcore.authentication.oauth.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.OpenIdConnect/5.0.11": {
+      "sha512": "sRTDTBjtX/6zFf0NyBk0PuhbTWnuB1XAYnCA/599NSwAOQWXm4o0/5G58FJ3SJ8H6epQ2VwcauwWBleXo8rHWw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.openidconnect/5.0.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net5.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.dll",
+        "lib/net5.0/Microsoft.AspNetCore.Authentication.OpenIdConnect.xml",
+        "microsoft.aspnetcore.authentication.openidconnect.5.0.11.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.openidconnect.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.Twitter/5.0.11": {
@@ -6075,7 +6105,8 @@
       "Microsoft.EntityFrameworkCore.Design >= 5.0.10",
       "Microsoft.EntityFrameworkCore.InMemory >= 5.0.10",
       "NetCore.Mailkit >= 2.0.3",
-      "Swashbuckle.AspNetCore >= 5.6.3"
+      "Swashbuckle.AspNetCore >= 5.6.3",
+      "microsoft.aspnetcore.authentication.openidconnect >= 5.0.11"
     ]
   },
   "packageFolders": {
@@ -6168,6 +6199,10 @@
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[5.6.3, )"
+          },
+          "microsoft.aspnetcore.authentication.openidconnect": {
+            "target": "Package",
+            "version": "[5.0.11, )"
           }
         },
         "imports": [

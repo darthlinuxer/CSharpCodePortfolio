@@ -1,8 +1,6 @@
 using System;
 using App.Context;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App
@@ -13,30 +11,29 @@ namespace App
         {
 
             //Identity is going to manage authentication
-            services.AddIdentityCore<IdentityUser>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = false;
+            services
+            .AddIdentityCore<IdentityUser>(options =>
+                {
+                    options.SignIn.RequireConfirmedAccount = false;
 
-                //Password Settings
-                options.Password.RequireLowercase = false;
-                options.Password.RequiredLength = 2;
-                options.Password.RequireDigit = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
+                    //Password Settings
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequiredLength = 2;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
 
-                //Lockout Settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(30);
-                options.Lockout.AllowedForNewUsers = true;
-                options.Lockout.MaxFailedAccessAttempts = 3;
+                    //Lockout Settings
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(30);
+                    options.Lockout.AllowedForNewUsers = true;
+                    options.Lockout.MaxFailedAccessAttempts = 3;
 
-                options.User.RequireUniqueEmail = true;
-            })
-                //.AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<IdentityUser,IdentityRole>>()
-                .AddSignInManager<SignInManager<IdentityUser>>()
-                .AddUserManager<UserManager<IdentityUser>>()
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();           
-
+                    options.User.RequireUniqueEmail = true;
+                })
+            .AddSignInManager<SignInManager<IdentityUser>>()
+            .AddUserManager<UserManager<IdentityUser>>()
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
         }
     }
 }

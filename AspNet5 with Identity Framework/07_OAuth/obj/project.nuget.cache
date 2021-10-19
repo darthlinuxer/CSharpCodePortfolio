@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fMVPeMqxt9vH0i2F8811/5q8A2CptL5zgNo9qshzgpTq20dCqr/XolM7rKC2B+2APX/hvz+FagET0NFSZC0iGg==",
+  "dgSpecHash": "MlpUvLrnqfJUYIXOwVuqSNR/IC1QQIi1qMg+yrFQgH8MLN33TsKY3o3LHN00A6D+e3U6rs5YTJQpbWpVS1Yj8Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
   "expectedPackageFiles": [
@@ -14,6 +14,7 @@
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\5.0.10\\microsoft.aspnetcore.authentication.jwtbearer.5.0.10.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication.microsoftaccount\\5.0.11\\microsoft.aspnetcore.authentication.microsoftaccount.5.0.11.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication.oauth\\2.2.0\\microsoft.aspnetcore.authentication.oauth.2.2.0.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\5.0.11\\microsoft.aspnetcore.authentication.openidconnect.5.0.11.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication.twitter\\5.0.11\\microsoft.aspnetcore.authentication.twitter.5.0.11.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\5.0.10\\microsoft.aspnetcore.cryptography.internal.5.0.10.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\5.0.10\\microsoft.aspnetcore.cryptography.keyderivation.5.0.10.nupkg.sha512",
