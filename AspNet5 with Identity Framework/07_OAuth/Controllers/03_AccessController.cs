@@ -93,7 +93,7 @@ namespace App.Controllers
                     claim.Type,
                     claim.Value,
                 });
-            var id_token = result.Ticket.Properties.GetTokenValue("id_token");
+            var id_token = result.Ticket.Properties.GetTokenValue("access_token");
             
             return Ok(new {id_token, claims});
         }

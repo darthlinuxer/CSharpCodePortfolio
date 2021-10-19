@@ -16,7 +16,7 @@ namespace App
                      config.ClientId = configuration.GetValue<string>("Google:client_id");
                      config.ClientSecret = configuration.GetValue<string>("Google:client_secret");
                      config.Authority = "https://accounts.google.com";
-                     config.CallbackPath = "/Google/CallBack";
+                     config.CallbackPath = "/Google/CallBack-OpenID";
                      config.AccessDeniedPath = "/AccessControl/AccessDenied";                     
                      config.SaveTokens = true;
                      config.Events = new OpenIdConnectEvents()

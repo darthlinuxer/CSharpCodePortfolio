@@ -33,9 +33,9 @@ namespace App
                 })
                 .AddJwtScheme(tokenTools)
                 .AddCustomOAuthScheme()
-                //.AddGoogleScheme(configuration)                
+                .AddGoogleScheme(configuration)                
                 .AddOpenIdGoogleScheme(configuration)
-                .AddOktaOpenIDScheme(configuration)
+                .AddMicrosoftScheme(configuration)                
             ;
 
             services.AddAuthorization(config =>
