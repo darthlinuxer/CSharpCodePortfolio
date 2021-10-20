@@ -1,0 +1,17 @@
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.exe
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.deps.json
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.dll
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.pdb
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Castle.Core.dll
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\Moq.dll
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\bin\Debug\netcoreapp3.1\nunit.framework.dll
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.csprojAssemblyReference.cache
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.csproj.CopyComplete
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.dll
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.pdb
+D:\Dev\CSharpCodePortfolio\Unit Tests using Reflection and Moq\obj\Debug\netcoreapp3.1\Unit Tests using Reflection and Moq.genruntimeconfig.cache

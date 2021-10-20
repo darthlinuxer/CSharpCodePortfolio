@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\bin\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.exe
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\bin\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.deps.json
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\bin\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\bin\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\bin\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.dll
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\bin\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.pdb
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\obj\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\obj\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\obj\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\obj\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.dll
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\obj\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.pdb
+D:\Dev\CSharpCodePortfolio\Creating string Pipes using reverse Pipe Builder recursion\obj\Debug\netcoreapp3.1\Creating string Pipes using reverse Pipe Builder recursion.genruntimeconfig.cache

@@ -1,0 +1,27 @@
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.exe
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.deps.json
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.pdb
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.InMemory.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Caching.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Caching.Memory.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Options.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Primitives.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\System.Collections.Immutable.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\System.ComponentModel.Annotations.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\bin\Debug\netcoreapp3.1\System.Diagnostics.DiagnosticSource.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.csproj.CopyComplete
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.dll
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.pdb
+D:\Dev\CSharpCodePortfolio\Complete IRepository with InMemory EFCore\obj\Debug\netcoreapp3.1\Complete IRepository with InMemory EFCore.genruntimeconfig.cache

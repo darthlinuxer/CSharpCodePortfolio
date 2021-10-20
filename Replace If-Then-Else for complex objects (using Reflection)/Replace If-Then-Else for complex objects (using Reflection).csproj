@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Replace_If_Then_Else_for_complex_objects__using_Reflection_</RootNamespace>
+  </PropertyGroup>
+
+</Project>

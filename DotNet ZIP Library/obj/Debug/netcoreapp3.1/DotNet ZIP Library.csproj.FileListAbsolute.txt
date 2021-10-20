@@ -1,0 +1,15 @@
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\DotNet ZIP Library.exe
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\DotNet ZIP Library.deps.json
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\DotNet ZIP Library.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\DotNet ZIP Library.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\DotNet ZIP Library.dll
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\DotNet ZIP Library.pdb
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\bin\Debug\netcoreapp3.1\ICSharpCode.SharpZipLib.dll
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.csprojAssemblyReference.cache
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.csproj.CopyComplete
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.dll
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.pdb
+D:\Dev\CSharpCodePortfolio\DotNet ZIP Library\obj\Debug\netcoreapp3.1\DotNet ZIP Library.genruntimeconfig.cache

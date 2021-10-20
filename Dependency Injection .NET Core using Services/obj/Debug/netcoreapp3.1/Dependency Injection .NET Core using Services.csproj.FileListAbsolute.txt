@@ -1,0 +1,15 @@
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.exe
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.deps.json
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.dll
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.pdb
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.dll
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.csproj.CopyComplete
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.dll
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.pdb
+D:\Dev\CSharpCodePortfolio\Dependency Injection .NET Core using Services\obj\Debug\netcoreapp3.1\Dependency Injection .NET Core using Services.genruntimeconfig.cache

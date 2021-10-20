@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\bin\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).exe
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\bin\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).deps.json
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\bin\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\bin\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\bin\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).dll
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\bin\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).pdb
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\obj\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\obj\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\obj\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\obj\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).dll
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\obj\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).pdb
+D:\Dev\CSharpCodePortfolio\Replacing If-Then-Else using Pipe Builder structure (simple input types)\obj\Debug\netcoreapp3.1\Replacing If-Then-Else using Pipe Builder structure (simple input types).genruntimeconfig.cache

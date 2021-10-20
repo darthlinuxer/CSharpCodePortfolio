@@ -1,0 +1,12 @@
+D:\Dev\CSharpCodePortfolio\Lambda Validators\bin\Debug\netcoreapp3.1\Lambda Validators.exe
+D:\Dev\CSharpCodePortfolio\Lambda Validators\bin\Debug\netcoreapp3.1\Lambda Validators.deps.json
+D:\Dev\CSharpCodePortfolio\Lambda Validators\bin\Debug\netcoreapp3.1\Lambda Validators.runtimeconfig.json
+D:\Dev\CSharpCodePortfolio\Lambda Validators\bin\Debug\netcoreapp3.1\Lambda Validators.runtimeconfig.dev.json
+D:\Dev\CSharpCodePortfolio\Lambda Validators\bin\Debug\netcoreapp3.1\Lambda Validators.dll
+D:\Dev\CSharpCodePortfolio\Lambda Validators\bin\Debug\netcoreapp3.1\Lambda Validators.pdb
+D:\Dev\CSharpCodePortfolio\Lambda Validators\obj\Debug\netcoreapp3.1\Lambda Validators.AssemblyInfoInputs.cache
+D:\Dev\CSharpCodePortfolio\Lambda Validators\obj\Debug\netcoreapp3.1\Lambda Validators.AssemblyInfo.cs
+D:\Dev\CSharpCodePortfolio\Lambda Validators\obj\Debug\netcoreapp3.1\Lambda Validators.csproj.CoreCompileInputs.cache
+D:\Dev\CSharpCodePortfolio\Lambda Validators\obj\Debug\netcoreapp3.1\Lambda Validators.dll
+D:\Dev\CSharpCodePortfolio\Lambda Validators\obj\Debug\netcoreapp3.1\Lambda Validators.pdb
+D:\Dev\CSharpCodePortfolio\Lambda Validators\obj\Debug\netcoreapp3.1\Lambda Validators.genruntimeconfig.cache
