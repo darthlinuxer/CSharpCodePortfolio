@@ -4,28 +4,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Threading.Tasks;
+using Okta.AspNetCore;
 
 namespace App
 {
     public static partial class StartUpAuthentication
     {
-        public static AuthenticationBuilder AddOktaOpenIDScheme(this AuthenticationBuilder authBuilder, IConfiguration configuration)
+        public static AuthenticationBuilder AddOktaOpenIDScheme(this AuthenticationBuilder authBuilder)
         {
-            authBuilder.AddOpenIdConnect("Okta-OpenID", config =>
+            authBuilder.AddOktaWebApi(new OktaWebApiOptions()
                 {
-                     config.ClientId = configuration.GetValue<string>("Google:client_id");
-                     config.ClientSecret = configuration.GetValue<string>("Google:client_secret");
-                     config.Authority = "https://accounts.google.com";
-                     config.CallbackPath = "/Google/CallBack";
-                     config.AccessDeniedPath = "/AccessControl/AccessDenied";                     
-                     config.SaveTokens = true;
-                     config.Events = new OpenIdConnectEvents()
-                     {
-                         OnTokenValidated = context =>
-                         {
-                             return Task.CompletedTask;
-                         }
-                     };
+                    OktaDomain = "https://dev-9366943.okta.com"                                  
                 });
             return authBuilder;
         }

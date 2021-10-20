@@ -116,3 +116,5 @@ D:\Dev\CSharpCodePortfolio\AspNet5 with Identity Framework\07_OAuth\obj\Debug\ne
 D:\Dev\CSharpCodePortfolio\AspNet5 with Identity Framework\07_OAuth\obj\Debug\net5.0\staticwebassets\07_OAuth.StaticWebAssets.Manifest.cache
 D:\Dev\CSharpCodePortfolio\AspNet5 with Identity Framework\07_OAuth\obj\Debug\net5.0\07_OAuth.RazorTargetAssemblyInfo.cache
 D:\Dev\CSharpCodePortfolio\AspNet5 with Identity Framework\07_OAuth\obj\Debug\net5.0\07_OAuth.genruntimeconfig.cache
+D:\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\07_OAuth\bin\Debug\net5.0\Okta.AspNet.Abstractions.dll
+D:\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\07_OAuth\bin\Debug\net5.0\Okta.AspNetCore.dll

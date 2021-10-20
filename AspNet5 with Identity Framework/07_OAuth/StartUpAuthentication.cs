@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Okta.AspNetCore;
 
 namespace App
 {
@@ -15,7 +16,7 @@ namespace App
             )
         {
             TokenTools tokenTools = new(configuration);
-
+            
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -36,7 +37,8 @@ namespace App
                 .AddGoogleScheme(configuration)                
                 .AddOpenIdGoogleScheme(configuration)
                 .AddMicrosoftScheme(configuration)   
-                .AddMicrosoftOpenID(configuration)             
+                .AddMicrosoftOpenID(configuration)     
+                .AddOktaOpenIDScheme()        
             ;
 
             services.AddAuthorization(config =>

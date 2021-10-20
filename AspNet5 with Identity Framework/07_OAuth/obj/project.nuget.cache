@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "MlpUvLrnqfJUYIXOwVuqSNR/IC1QQIi1qMg+yrFQgH8MLN33TsKY3o3LHN00A6D+e3U6rs5YTJQpbWpVS1Yj8Q==",
+  "dgSpecHash": "nkzQgSNdcsuf0tCtJObezw8QiI2VZ+5+fTFupJIFj/v/U0Af5p6e3/mHWDV8tu4YNDJRk/FlNIQJ+hf+smoCsQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
+  "projectFilePath": "D:\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",
@@ -69,6 +69,8 @@
     "C:\\Users\\chave\\.nuget\\packages\\netcore.mailkit\\2.0.3\\netcore.mailkit.2.0.3.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\newtonsoft.json\\12.0.2\\newtonsoft.json.12.0.2.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\okta.aspnet.abstractions\\3.2.0\\okta.aspnet.abstractions.3.2.0.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\okta.aspnetcore\\3.5.1\\okta.aspnetcore.3.5.1.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\portable.bouncycastle\\1.8.5\\portable.bouncycastle.1.8.5.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
@@ -111,6 +113,7 @@
     "C:\\Users\\chave\\.nuget\\packages\\system.net.primitives\\4.3.0\\system.net.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.net.security\\4.3.2\\system.net.security.4.3.2.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.reflection\\4.3.0\\system.reflection.4.3.0.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\system.reflection.extensions\\4.3.0\\system.reflection.extensions.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.reflection.primitives\\4.3.0\\system.reflection.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.reflection.typeextensions\\4.3.0\\system.reflection.typeextensions.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.resources.resourcemanager\\4.3.0\\system.resources.resourcemanager.4.3.0.nupkg.sha512",
@@ -118,6 +121,7 @@
     "C:\\Users\\chave\\.nuget\\packages\\system.runtime.extensions\\4.3.0\\system.runtime.extensions.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.runtime.handles\\4.3.0\\system.runtime.handles.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.runtime.interopservices\\4.3.0\\system.runtime.interopservices.4.3.0.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\system.runtime.interopservices.runtimeinformation\\4.3.0\\system.runtime.interopservices.runtimeinformation.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.runtime.numerics\\4.3.0\\system.runtime.numerics.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.runtime.serialization.primitives\\4.3.0\\system.runtime.serialization.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.security.accesscontrol\\4.5.0\\system.security.accesscontrol.4.5.0.nupkg.sha512",
@@ -140,8 +144,7 @@
     "C:\\Users\\chave\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.threading\\4.3.0\\system.threading.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
-    "C:\\Users\\chave\\.nuget\\packages\\system.threading.threadpool\\4.3.0\\system.threading.threadpool.4.3.0.nupkg.sha512",
-    "C:\\Users\\chave\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.8\\microsoft.netcore.app.host.win-x64.5.0.8.nupkg.sha512"
+    "C:\\Users\\chave\\.nuget\\packages\\system.threading.threadpool\\4.3.0\\system.threading.threadpool.4.3.0.nupkg.sha512"
   ],
   "logs": []
 }

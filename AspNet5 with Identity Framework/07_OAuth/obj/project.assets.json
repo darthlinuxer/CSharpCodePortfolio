@@ -836,6 +836,34 @@
           "lib/netstandard2.0/Newtonsoft.Json.Bson.dll": {}
         }
       },
+      "Okta.AspNet.Abstractions/3.2.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.IdentityModel.Tokens": "6.7.1",
+          "System.IdentityModel.Tokens.Jwt": "6.7.1",
+          "System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Okta.AspNet.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Okta.AspNet.Abstractions.dll": {}
+        }
+      },
+      "Okta.AspNetCore/3.5.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "3.1.1",
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "3.1.1",
+          "Okta.AspNet.Abstractions": "3.2.0"
+        },
+        "compile": {
+          "lib/net5.0/Okta.AspNetCore.dll": {}
+        },
+        "runtime": {
+          "lib/net5.0/Okta.AspNetCore.dll": {}
+        }
+      },
       "Portable.BouncyCastle/1.8.5": {
         "type": "package",
         "compile": {
@@ -1399,6 +1427,18 @@
           "ref/netstandard1.5/System.Reflection.dll": {}
         }
       },
+      "System.Reflection.Extensions/4.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Targets": "1.1.0",
+          "System.Reflection": "4.3.0",
+          "System.Runtime": "4.3.0"
+        },
+        "compile": {
+          "ref/netstandard1.0/_._": {}
+        }
+      },
       "System.Reflection.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -1480,6 +1520,34 @@
         },
         "compile": {
           "ref/netcoreapp1.1/_._": {}
+        }
+      },
+      "System.Runtime.InteropServices.RuntimeInformation/4.3.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Reflection": "4.3.0",
+          "System.Reflection.Extensions": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.InteropServices": "4.3.0",
+          "System.Threading": "4.3.0",
+          "runtime.native.System": "4.3.0"
+        },
+        "compile": {
+          "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/unix/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
         }
       },
       "System.Runtime.Numerics/4.3.0": {
@@ -3111,6 +3179,32 @@
         "newtonsoft.json.bson.nuspec"
       ]
     },
+    "Okta.AspNet.Abstractions/3.2.0": {
+      "sha512": "YGfg7ocpIjbVKwUfSOZHgw9+m4HQS3COZmF6m72FNqeq0PMaUut4nRKn0z26OHrj+Wjuqg56Mx0ZOZZNy/u1Rg==",
+      "type": "package",
+      "path": "okta.aspnet.abstractions/3.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net452/Okta.AspNet.Abstractions.dll",
+        "lib/netstandard2.0/Okta.AspNet.Abstractions.dll",
+        "okta.aspnet.abstractions.3.2.0.nupkg.sha512",
+        "okta.aspnet.abstractions.nuspec"
+      ]
+    },
+    "Okta.AspNetCore/3.5.1": {
+      "sha512": "LRafZKu8WgALHQxhoxdgTNyktB7CqiEXPAtv8JHobDbEHLoEQyy6vQxqnpwzs2hD5UpMsOsDyUAE1tobXGyWeQ==",
+      "type": "package",
+      "path": "okta.aspnetcore/3.5.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Okta.AspNetCore.dll",
+        "lib/netcoreapp3.1/Okta.AspNetCore.dll",
+        "okta.aspnetcore.3.5.1.nupkg.sha512",
+        "okta.aspnetcore.nuspec"
+      ]
+    },
     "Portable.BouncyCastle/1.8.5": {
       "sha512": "EaCgmntbH1sOzemRTqyXSqYjB6pLH7VCYHhhDYZ59guHSD5qPwhIYa7kfy0QUlmTRt9IXhaXdFhNuBUArp70Ng==",
       "type": "package",
@@ -4563,6 +4657,63 @@
         "system.reflection.nuspec"
       ]
     },
+    "System.Reflection.Extensions/4.3.0": {
+      "sha512": "rJkrJD3kBI5B712aRu4DpSIiHRtr6QlfZSQsb0hYHrDCZORXCFjQfoipo2LaMUHoT9i1B7j7MnfaEKWDFmFQNQ==",
+      "type": "package",
+      "path": "system.reflection.extensions/4.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/portable-net45+win8+wp8+wpa81/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcore50/System.Reflection.Extensions.dll",
+        "ref/netcore50/System.Reflection.Extensions.xml",
+        "ref/netcore50/de/System.Reflection.Extensions.xml",
+        "ref/netcore50/es/System.Reflection.Extensions.xml",
+        "ref/netcore50/fr/System.Reflection.Extensions.xml",
+        "ref/netcore50/it/System.Reflection.Extensions.xml",
+        "ref/netcore50/ja/System.Reflection.Extensions.xml",
+        "ref/netcore50/ko/System.Reflection.Extensions.xml",
+        "ref/netcore50/ru/System.Reflection.Extensions.xml",
+        "ref/netcore50/zh-hans/System.Reflection.Extensions.xml",
+        "ref/netcore50/zh-hant/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/System.Reflection.Extensions.dll",
+        "ref/netstandard1.0/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/de/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/es/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/fr/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/it/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/ja/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/ko/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/ru/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/zh-hans/System.Reflection.Extensions.xml",
+        "ref/netstandard1.0/zh-hant/System.Reflection.Extensions.xml",
+        "ref/portable-net45+win8+wp8+wpa81/_._",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.reflection.extensions.4.3.0.nupkg.sha512",
+        "system.reflection.extensions.nuspec"
+      ]
+    },
     "System.Reflection.Primitives/4.3.0": {
       "sha512": "5RXItQz5As4xN2/YUDxdpsEkMhvw3e6aNveFXUn4Hl/udNTCNhnKp8lT9fnc3MhvGKh1baak5CovpuQUXHAlIA==",
       "type": "package",
@@ -5033,6 +5184,41 @@
         "ref/xamarinwatchos10/_._",
         "system.runtime.interopservices.4.3.0.nupkg.sha512",
         "system.runtime.interopservices.nuspec"
+      ]
+    },
+    "System.Runtime.InteropServices.RuntimeInformation/4.3.0": {
+      "sha512": "cbz4YJMqRDR7oLeMRbdYv7mYzc++17lNhScCX0goO2XpGWdvAt60CGN+FHdePUEHCe/Jy9jUlvNAiNdM+7jsOw==",
+      "type": "package",
+      "path": "system.runtime.interopservices.runtimeinformation/4.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/win8/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/wpa81/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "runtimes/aot/lib/netcore50/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "runtimes/unix/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "runtimes/win/lib/net45/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "runtimes/win/lib/netcore50/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "runtimes/win/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "system.runtime.interopservices.runtimeinformation.4.3.0.nupkg.sha512",
+        "system.runtime.interopservices.runtimeinformation.nuspec"
       ]
     },
     "System.Runtime.Numerics/4.3.0": {
@@ -6105,29 +6291,38 @@
       "Microsoft.EntityFrameworkCore.Design >= 5.0.10",
       "Microsoft.EntityFrameworkCore.InMemory >= 5.0.10",
       "NetCore.Mailkit >= 2.0.3",
+      "Okta.AspNetCore >= 3.5.1",
       "Swashbuckle.AspNetCore >= 5.6.3",
       "microsoft.aspnetcore.authentication.openidconnect >= 5.0.11"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\chave\\.nuget\\packages\\": {}
+    "C:\\Users\\chave\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
+      "projectUniqueName": "D:\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
       "projectName": "07_OAuth",
-      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
+      "projectPath": "D:\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\obj\\",
+      "outputPath": "D:\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -6196,6 +6391,10 @@
             "target": "Package",
             "version": "[2.0.3, )"
           },
+          "Okta.AspNetCore": {
+            "target": "Package",
+            "version": "[3.5.1, )"
+          },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[5.6.3, )"
@@ -6215,12 +6414,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[5.0.8, 5.0.8]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -6229,7 +6422,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100-preview.7.21379.14\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100-rc.1.21463.6\\RuntimeIdentifierGraph.json"
       }
     }
   }
