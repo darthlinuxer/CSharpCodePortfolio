@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Uo8NxJZQXMWj9yqeiy/OBHumX6KzfZZ6dEtTy4C3bE390TEVBn0Cfko4grZ6VYxIhkJfXs7eP9Nlc7UfOOu1wQ==",
+  "dgSpecHash": "MlpUvLrnqfJUYIXOwVuqSNR/IC1QQIi1qMg+yrFQgH8MLN33TsKY3o3LHN00A6D+e3U6rs5YTJQpbWpVS1Yj8Q==",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\07_OAuth\\07_OAuth.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",
@@ -140,7 +140,8 @@
     "C:\\Users\\chave\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.threading\\4.3.0\\system.threading.4.3.0.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
-    "C:\\Users\\chave\\.nuget\\packages\\system.threading.threadpool\\4.3.0\\system.threading.threadpool.4.3.0.nupkg.sha512"
+    "C:\\Users\\chave\\.nuget\\packages\\system.threading.threadpool\\4.3.0\\system.threading.threadpool.4.3.0.nupkg.sha512",
+    "C:\\Users\\chave\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.8\\microsoft.netcore.app.host.win-x64.5.0.8.nupkg.sha512"
   ],
   "logs": []
 }

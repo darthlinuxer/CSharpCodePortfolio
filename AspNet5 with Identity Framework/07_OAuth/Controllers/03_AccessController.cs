@@ -93,9 +93,10 @@ namespace App.Controllers
                     claim.Type,
                     claim.Value,
                 });
-            var id_token = result.Ticket.Properties.GetTokenValue("access_token");
+            var id_token = result.Ticket.Properties.GetTokenValue("id_token");
+            var access_token = result.Ticket.Properties.GetTokenValue("access_token");
             
-            return Ok(new {id_token, claims});
+            return Ok(new {id_token, access_token, claims});
         }
 
         public async Task<IActionResult> LoginAndReturnToken(

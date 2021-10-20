@@ -35,7 +35,8 @@ namespace App
                 .AddCustomOAuthScheme()
                 .AddGoogleScheme(configuration)                
                 .AddOpenIdGoogleScheme(configuration)
-                .AddMicrosoftScheme(configuration)                
+                .AddMicrosoftScheme(configuration)   
+                .AddMicrosoftOpenID(configuration)             
             ;
 
             services.AddAuthorization(config =>
