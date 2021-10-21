@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Tsp;
+using App.Models;
+using App.Services;
 
 namespace App
 {
@@ -14,7 +16,7 @@ namespace App
             authBuilder.AddOpenIdConnect("Google-OpenID", config =>
                 {
                      config.ClientId = configuration.GetValue<string>("Google:client_id");
-                     config.ClientSecret = configuration.GetValue<string>("Google:client_secret");
+                     config.ClientSecret = FileTools.ReadJsonFromFile<ClientSecret>("c:\\users\\chave\\dev\\secrets.json")?.Google;
                      config.Authority = "https://accounts.google.com";
                      config.CallbackPath = "/Google/CallBack-OpenID";
                      config.AccessDeniedPath = "/AccessControl/AccessDenied";                     

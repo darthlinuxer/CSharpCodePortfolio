@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App.TokenLib
+namespace App.Services
 {
     public class TokenTools
     {   

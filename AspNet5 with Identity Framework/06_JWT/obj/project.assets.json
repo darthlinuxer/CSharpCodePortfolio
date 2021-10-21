@@ -5973,11 +5973,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\Main.csproj",
-      "projectName": "Main",
-      "projectPath": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\Main.csproj",
+      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\06_JWT.csproj",
+      "projectName": "06_JWT",
+      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\06_JWT.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\obj\\",
+      "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config"

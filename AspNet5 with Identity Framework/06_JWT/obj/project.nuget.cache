@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0Fizj887r0FGxy6zg7QSZ+htZheCc+EiWrmfaGPn4zm1ypWG6joTjcvhceMcl6ZbIaX60AQGytxIwpfMbxTNnA==",
+  "dgSpecHash": "PFV2AYiFLrwNyuxpzGIutnGkPcsKHB72w0uS1zzG8G31nSJyNRzDRUaBwLqsKKE/vZ8EFdxic2NFXy1SFy2BhQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\Main.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\06_JWT\\06_JWT.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",

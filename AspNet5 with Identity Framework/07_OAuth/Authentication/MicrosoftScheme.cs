@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using App.Models;
+using App.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +14,7 @@ namespace App
              authBuilder.AddMicrosoftAccount("Microsoft", config =>
                 {
                      config.ClientId = configuration.GetValue<string>("Microsoft:ClientId");
-                     config.ClientSecret = configuration.GetValue<string>("Microsoft:ClientSecret");
+                     config.ClientSecret = FileTools.ReadJsonFromFile<ClientSecret>("c:\\users\\chave\\dev\\secrets.json")?.Microsoft;
                      config.AuthorizationEndpoint = configuration.GetValue<string>("Microsoft:authorize");
                      config.TokenEndpoint = configuration.GetValue<string>("Microsoft:token");
                      config.CallbackPath = configuration.GetValue<string>("Microsoft:CallbackPath");

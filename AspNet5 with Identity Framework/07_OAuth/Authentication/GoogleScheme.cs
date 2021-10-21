@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using App.Models;
+using App.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -15,7 +17,7 @@ namespace App
             authBuilder.AddGoogle("Google", config =>
                  {
                      config.ClientId = configuration.GetValue<string>("Google:client_id");
-                     config.ClientSecret = configuration.GetValue<string>("Google:client_secret");
+                     config.ClientSecret = FileTools.ReadJsonFromFile<ClientSecret>("c:\\users\\chave\\dev\\secrets.json")?.Google;
                      config.AuthorizationEndpoint = configuration.GetValue<string>("Google:auth_uri");
                      config.CallbackPath = "/Google/CallBack";
                      config.AccessDeniedPath = "/AccessControl/AccessDenied";

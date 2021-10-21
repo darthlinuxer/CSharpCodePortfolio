@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using App.Models;
+using App.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,7 @@ namespace App
             authBuilder.AddOpenIdConnect("Microsoft-OpenID", config =>
                {
                    config.ClientId = configuration.GetValue<string>("Microsoft:ClientId");
-                   config.ClientSecret = configuration.GetValue<string>("Microsoft:ClientSecret");
+                   config.ClientSecret = FileTools.ReadJsonFromFile<ClientSecret>("c:\\users\\chave\\dev\\secrets.json")?.Microsoft;
                    config.Authority = configuration.GetValue<string>("Microsoft:authority");
                    config.CallbackPath = configuration.GetValue<string>("Microsoft:OpenIDCallbackPath");
                    config.AccessDeniedPath = "/AccessControl/AccessDenied";
