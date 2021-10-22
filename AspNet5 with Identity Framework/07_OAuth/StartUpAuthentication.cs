@@ -32,7 +32,7 @@ namespace App
                     config.Cookie.HttpOnly = true;
                     config.SlidingExpiration = true;
                 })
-                .AddJwtScheme(tokenTools)
+                .AddJwtScheme(tokenTools, configuration)
                 .AddCustomOAuthScheme()
                 .AddGoogleScheme(configuration)                
                 .AddOpenIdGoogleScheme(configuration)

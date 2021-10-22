@@ -4,5 +4,6 @@ namespace App.Models
     {
         public string Microsoft {get; init; }
         public string Google {get; init; }
+                
     }
 }

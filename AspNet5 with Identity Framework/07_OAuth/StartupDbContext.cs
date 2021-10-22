@@ -7,12 +7,17 @@ namespace App
 {
     public class StartupDbContext
     {
-        public static void Init(IServiceCollection services, IConfiguration config)
+        public static void Init(IServiceCollection services)
         {
 
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseInMemoryDatabase("MemoryDb");
+            });
+
+            services.AddDbContext<OAuthDbContext>(options =>
+            {
+                options.UseInMemoryDatabase("OAuthDb");
             });         
 
         }

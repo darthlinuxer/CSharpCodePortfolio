@@ -1,15 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.IO.Pipelines;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using App.Models;
 using App.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,22 +14,6 @@ using NETCore.MailKit.Core;
 
 namespace App.Controllers
 {
-    public class RandomPassword
-    {
-        public static string Generate(int length)
-        {
-            byte[] rgb = new byte[length];
-            RNGCryptoServiceProvider rngCrypt = new();
-            rngCrypt.GetBytes(rgb);
-            return Convert.ToBase64String(rgb);
-        }
-    }
-    public record UserRegisterData
-    {
-        public string login;
-        public string password;
-    }
-
     public class AccessControl : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;

@@ -1,15 +1,15 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Principal;
+using System;
+using System.Text;
 using System.Threading.Tasks;
 using App.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Tsp;
 
 namespace App
 {
@@ -17,41 +17,32 @@ namespace App
     {
         public static AuthenticationBuilder AddJwtScheme(
             this AuthenticationBuilder authBuilder,
-            TokenTools tokenTools
+            TokenTools tokenTools,
+            IConfiguration configuration
             )
         {
             authBuilder.AddJwtBearer("JWT-Token", options =>
                {
-                   options.RequireHttpsMetadata = true;
+                   options.RequireHttpsMetadata = false;
                    options.SaveToken = true;
-                   options.TokenValidationParameters = tokenTools.tokenParameters;
+                   options.TokenValidationParameters = new TokenValidationParameters
+                   {
+                       ValidIssuer = "Reason Systems",
+                       ValidateIssuer = true,
+                       ValidateAudience = false,
+                       IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("SecretKey"))),
+                       ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                   };
                    options.Events = new JwtBearerEvents()
                    {
-                       OnChallenge = context =>
+                       OnTokenValidated = context =>                       
                        {
-                           context.HandleResponse();
-                           context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                           context.Response.ContentType = "application/json";
-
-                           // Ensure we always have an error and error description.
-                           if (string.IsNullOrEmpty(context.Error))
-                               context.Error = "invalid_token";
-                           if (string.IsNullOrEmpty(context.ErrorDescription))
-                               context.ErrorDescription = "This request requires a valid JWT access token to be provided";
-
-                           // Add some extra context for expired tokens.
-                           if (context.AuthenticateFailure != null && context.AuthenticateFailure.GetType() == typeof(SecurityTokenExpiredException))
-                           {
-                               var authenticationException = context.AuthenticateFailure as SecurityTokenExpiredException;
-                               context.Response.Headers.Add("x-token-expired", authenticationException.Expires.ToString("o"));
-                               context.ErrorDescription = $"The token expired on {authenticationException.Expires.ToString("o")}";
-                           }
-
-                           return context.Response.WriteAsync(JsonConvert.SerializeObject(new
-                           {
-                               error = context.Error,
-                               error_description = context.ErrorDescription
-                           }));
+                           return Task.CompletedTask;
+                       },
+                       OnMessageReceived = context =>
+                       {
+                           return Task.CompletedTask;
                        },
                        OnAuthenticationFailed = options =>
                        {

@@ -22,12 +22,12 @@ namespace App
                 {
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
-            // services.AddSwaggerGen(c =>
-            // {
-            //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Main App", Version = "v1" });                
-            // });           
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Main App", Version = "v1" });                
+            });           
 
-           StartupDbContext.Init(services, Configuration);   
+           StartupDbContext.Init(services);   
            StartupEmail.Init(services,Configuration);    
            StartUpServices.Init(services);               
            StartUpIdentity.Init(services);
@@ -39,8 +39,8 @@ namespace App
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                // app.UseSwagger();
-                // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Main App v1"));
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Main App v1"));
             }
 
             app.UseHttpsRedirection();
