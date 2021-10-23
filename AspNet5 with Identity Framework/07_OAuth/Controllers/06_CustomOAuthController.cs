@@ -33,11 +33,10 @@ namespace App.Controllers
             string redirect_uri,
             string state
         )
-        {
+        {            
             var user = await _userManager.FindByNameAsync(client_id);
-            if (user is null) return BadRequest(new { msg = "User not registered!" });
-            var code = scope.EncodeTo64();
-            this.Code = code;
+            if (user is null) return BadRequest(new { msg = "App Client ID not registered! Please, register the App first to receive a client_id and client_secret!" });
+            var code = (scope!="")? scope.EncodeTo64(): "Read";            
             return Redirect($"{redirect_uri}?state={state}&code={code}");
         }
 
@@ -45,20 +44,18 @@ namespace App.Controllers
             string client_id,
             string client_secret,
             string code,
-            string redirect_uri,
+            string state,
             [FromServices] TokenTools tokenTool
         )
         {
-            if (code != Code) return BadRequest(new { msg = "Code does not match!" });
             var user = await _userManager.FindByNameAsync(client_id);
             if (user is null) return BadRequest(new { msg = "User does not exist!" });
             if (client_secret != user.Client_Secret) return BadRequest(new { msg = "Invalid Secret!" });
-            var claims = await _userManager.GetClaimsAsync(user);
-            claims.Add(new Claim("scope", code.DecodeFrom64()));
-
-            var token = tokenTool.CreateToken(new ClaimsIdentity(new GenericIdentity(user.Email)), audience: user.Client_ID);
-
-            return Ok(new { id_token = token });
+            var _claims = await _userManager.GetClaimsAsync(user);
+            var genericIdentity = new GenericIdentity(user.Id);
+            genericIdentity.AddClaims(_claims);                                  
+            var token = tokenTool.CreateToken(genericIdentity, audience: user.Client_ID);
+            return Ok(new{access_token=token});
         }
 
         public async Task<IActionResult> LoginAndReturnToken(
@@ -94,8 +91,7 @@ namespace App.Controllers
 
             await _userManager.AddClaimsAsync(_user, new List<Claim>
             {
-                new Claim("Client_ID", _user.Client_ID),
-                new Claim("Client_Secret", _user.Client_Secret)
+                new Claim("Client_ID", _user.Client_ID)
             });
 
             var secret = new Models.OAuthRecord()
@@ -106,7 +102,7 @@ namespace App.Controllers
             //optional
             FileTools.WriteJsonToFile<OAuthRecord>(
                 secret,
-                "c:\\users\\chave\\dev\\oauth_secrets.json"
+                @"c:\users\chave\dev\oauth_secrets.json"
             );
 
             return Ok(new { msg = "User Created!", user = _user });

@@ -1,8 +1,11 @@
 using System;
 using App.Context;
 using App.Models;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace App
 {
@@ -36,7 +39,7 @@ namespace App
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-             //Identity is going to manage authentication
+            //Identity is going to manage authentication
             services
             .AddIdentityCore<OAuthUser>(options =>
                 {
@@ -59,7 +62,29 @@ namespace App
             .AddSignInManager<SignInManager<OAuthUser>>()
             .AddUserManager<UserManager<OAuthUser>>()
             .AddEntityFrameworkStores<OAuthDbContext>()
-            .AddDefaultTokenProviders();
+            .AddTokenProvider<PasswordResetTokenProvider<OAuthUser>>("passwordReset")
+            ;
+        }
+
+
+        public class PasswordResetTokenProvider<TUser> : DataProtectorTokenProvider<TUser> where TUser : class
+        {
+            public PasswordResetTokenProvider(IDataProtectionProvider dataProtectionProvider,
+                IOptions<PasswordResetTokenProviderOptions> options,
+                ILogger<DataProtectorTokenProvider<TUser>> logger)
+                : base(dataProtectionProvider, options, logger)
+            {
+
+            }
+        }
+
+        public class PasswordResetTokenProviderOptions : DataProtectionTokenProviderOptions
+        {
+            public PasswordResetTokenProviderOptions()
+            {
+                Name = "PasswordResetTokenProvider";
+                TokenLifespan = TimeSpan.FromDays(3);
+            }
         }
     }
 }
