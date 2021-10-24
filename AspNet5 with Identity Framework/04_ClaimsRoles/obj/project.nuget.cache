@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "MRla4cB2z25Kd4NOqnpTKHukEFHGvo2Db0yr311M3w3c6AyCzVQyYsk6urNokXK5IxU6QauJkhCKjJ8/FEvT1A==",
+  "dgSpecHash": "z5cibtDabWVlIXfj11JZVLZgNZC1I2NgKuZuIhZa2GsTdcznQ4vkFs/xJ4zEtJmj0OLDzP7Etp9S8bInrSUjYA==",
   "success": true,
-  "projectFilePath": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\Main.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\04_ClaimsRoles.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",

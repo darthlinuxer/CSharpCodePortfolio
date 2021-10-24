@@ -5766,11 +5766,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\Main.csproj",
-      "projectName": "Main",
-      "projectPath": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\Main.csproj",
+      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\04_ClaimsRoles.csproj",
+      "projectName": "04_ClaimsRoles",
+      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\04_ClaimsRoles.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\obj\\",
+      "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\04_ClaimsRoles\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config"

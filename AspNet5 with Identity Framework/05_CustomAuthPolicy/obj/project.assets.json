@@ -5766,9 +5766,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\05_CustomAuthPolicy\\Main.csproj",
-      "projectName": "Main",
-      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\05_CustomAuthPolicy\\Main.csproj",
+      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\05_CustomAuthPolicy\\05_CustomAuth.csproj",
+      "projectName": "05_CustomAuth",
+      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\05_CustomAuthPolicy\\05_CustomAuth.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\05_CustomAuthPolicy\\obj\\",
       "projectStyle": "PackageReference",

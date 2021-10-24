@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CIvTU9z3lpy6kuyXcueTgRAggAykLL0aXiFmqaXSxsnGBlCda6AdEyYlb7gBe6QqrtbyZvWEik6lzpTgPHlERg==",
+  "dgSpecHash": "rriPtj1h3fBcmYS364GjAjuV2nSerESBOHAjRS6Tszv605466K2HidhrfBzrtIF5N5yTeTSWL0CJQHXbp99o5A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Basic\\Main.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Identity\\02_Identity.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.2.0\\microsoft.aspnetcore.authentication.2.2.0.nupkg.sha512",

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bHP4kKmq8wDnsFJkCkQj+huegsAMP36V6tNE3xt1CWbMO2kkoXPK6PcgTsiCi7rBRdRQg9dcBUaRV8BKd+e6Sw==",
+  "dgSpecHash": "fhWHAG6OVMm99eg2u5ZCLeaUot8nUrBmVkVRqVhKeOSr5vVHhpDAKSKX9M1Tqk8hiTAMg2685Wl7DO9TK5RE4A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\Main.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\03_EmailVerification.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",

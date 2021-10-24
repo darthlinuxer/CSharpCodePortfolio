@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/07_OAuth/bin/Debug/net5.0/07_OAuth.dll",
+            "program": "${workspaceFolder}/08_Custom_OpenID/bin/Debug/net5.0/08_OpenId.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/07_OAuth",
+            "cwd": "${workspaceFolder}/08_Custom_OpenID",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {

@@ -2213,11 +2213,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Basic\\Main.csproj",
-      "projectName": "Main",
-      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Basic\\Main.csproj",
+      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Identity\\02_Identity.csproj",
+      "projectName": "02_Identity",
+      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Identity\\02_Identity.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Basic\\obj\\",
+      "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\02_Identity\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config"

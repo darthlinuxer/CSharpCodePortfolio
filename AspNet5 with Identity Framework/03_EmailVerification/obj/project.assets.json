@@ -5766,9 +5766,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\Main.csproj",
-      "projectName": "Main",
-      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\Main.csproj",
+      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\03_EmailVerification.csproj",
+      "projectName": "03_EmailVerification",
+      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\03_EmailVerification.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\03_EmailVerification\\obj\\",
       "projectStyle": "PackageReference",

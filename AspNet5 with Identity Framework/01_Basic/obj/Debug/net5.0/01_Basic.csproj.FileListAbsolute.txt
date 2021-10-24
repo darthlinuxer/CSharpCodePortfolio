@@ -5,7 +5,6 @@ C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\01_Basic.runtimeconfig.json
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\01_Basic.runtimeconfig.dev.json
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\01_Basic.dll
-C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\ref\01_Basic.dll
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\01_Basic.pdb
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.csproj.AssemblyReference.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.GeneratedMSBuildEditorConfig.editorconfig
@@ -14,7 +13,6 @@ C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.csproj.CoreCompileInputs.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\staticwebassets\01_Basic.StaticWebAssets.Manifest.cache
-C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\staticwebassets\01_Basic.StaticWebAssets.xml
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\scopedcss\bundle\01_Basic.styles.css
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.RazorTargetAssemblyInfo.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.dll
@@ -31,3 +29,5 @@ C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\01_Basic.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\bin\Debug\net5.0\01_Basic.StaticWebAssets.xml
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\01_Basic\obj\Debug\net5.0\refint\01_Basic.dll
