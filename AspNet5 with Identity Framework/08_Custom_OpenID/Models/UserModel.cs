@@ -6,11 +6,7 @@ using Microsoft.AspNetCore.Identity;
 namespace App.Models
 {
     public class UserModel: IdentityUser
-    {
-        [Required]
-        public string Client_ID {get; set;}
-        [Required]
-        public string Client_Secret { get; set; }
+    {       
         
     }
 }

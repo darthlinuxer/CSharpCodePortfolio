@@ -62,40 +62,39 @@ namespace App.Services
         }
 
         private const string _alg = "HmacSHA256";
-        public string CreateAccessToken(string username, string password, string ip, string userAgent, long ticks)
+        public string CreateAccessToken(string username, string secretKey, string ip, string userAgent, long ticks)
         {
-            string hash = string.Join(":", new string[] { username, ip, userAgent, ticks.ToString() });
+            string textToEncrypt = string.Join(":", new string[] { username, ip, userAgent });
             using HMAC hmac = HMACSHA256.Create(_alg);
-            hmac.Key = Encoding.UTF8.GetBytes(GetHashedPassword(password));
-            hmac.ComputeHash(Encoding.UTF8.GetBytes(hash));
-            string hashLeft = Convert.ToBase64String(hmac.Hash);
-            string hashRight = string.Join(":", new string[] { username, ticks.ToString() });
-            return Convert.ToBase64String(
-                Encoding.UTF8.GetBytes(string.Join(":", hashLeft, hashRight)));
+            hmac.Key = Encoding.UTF8.GetBytes(GetHashedPassword(secretKey));
+            hmac.ComputeHash(Encoding.UTF8.GetBytes(textToEncrypt));
+            string hashedCode = Convert.ToBase64String(hmac.Hash);
+            string hashedParams = string.Join(":", new string[] { username, ticks.ToString() });
+            return string.Join(":", hashedCode, hashedParams).EncodeTo64();
         }
 
         public string GetHashedPassword(string password)
         {
             string _salt = Secret.Get("Salt");
-            string key = string.Join(":", new string[] { password, _salt });
+            string passwordToEncrypt = string.Join(":", new string[] { password, _salt });
 
             using HMAC hmac = HMACSHA256.Create(_alg);
             // Hash the key.
             hmac.Key = Encoding.UTF8.GetBytes(_salt);
-            hmac.ComputeHash(Encoding.UTF8.GetBytes(key));
+            hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordToEncrypt));
             return Convert.ToBase64String(hmac.Hash);
         }
 
         public static string[] DecodeTokenAndSeparateParts(string token)
         {
-             string key = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+             string key = token.DecodeFrom64();
             // Split the parts.
             string[] parts = key.Split(new char[] { ':' });
             return parts;
         }
 
         private const int _expirationMinutes = 10;
-        public bool IsTokenValid(string token, string ip, string userAgent, string password)
+        public bool IsTokenValid(string token, string ip, string userAgent)
         {
             bool result = false;
             try
@@ -109,11 +108,13 @@ namespace App.Services
                 long ticks = long.Parse(parts[2]);
                 DateTime timeStamp = new(ticks);
 
+                var secretKey = Secret.Get("PasswordHash");
+
                 // Ensure the timestamp is valid.
                 var elapsedTime = Math.Abs((DateTime.UtcNow - timeStamp).TotalMinutes);
-                bool expired = elapsedTime < _expirationMinutes;
-                if (expired) return false;
-                var computedToken = CreateAccessToken(username, password, ip, userAgent, ticks);
+                //bool expired = elapsedTime > _expirationMinutes;
+                //if (expired) return false;
+                var computedToken = CreateAccessToken(username, secretKey, ip, userAgent, ticks);
                 result = (computedToken == token);
             }
             catch

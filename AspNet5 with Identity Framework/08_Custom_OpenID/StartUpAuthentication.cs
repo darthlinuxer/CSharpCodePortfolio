@@ -1,8 +1,5 @@
-using System;
 using App.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App
@@ -21,13 +18,15 @@ namespace App
                 options.DefaultScheme = "JWT-Token";
                 options.DefaultChallengeScheme = "JWT-Token";
             })
-                .AddJwtScheme(secret)                                   
+                .AddJwtScheme(secret)         
+                .AddAccessTokenScheme()                          
             ;
 
             services.AddAuthorization(config =>
             {
                 config.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .AddAuthenticationSchemes("JWT-Token")                
+                .AddAuthenticationSchemes("JWT-Token")     
+                .AddAuthenticationSchemes("Access-Token-Scheme")           
                 .RequireAuthenticatedUser()
                 .Build();             
             });

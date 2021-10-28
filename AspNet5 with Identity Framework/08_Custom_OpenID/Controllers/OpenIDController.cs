@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using App.Models;
 using App.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,22 @@ namespace App.Controllers
         [Authorize(AuthenticationSchemes = "JWT-Token")]
         [HttpGet]
         [Route("[controller]/[action]")]
-        public IActionResult Test() => Ok(new { msg = "You are authorized to read this!" });
+        public IActionResult TestWithIdToken() => Ok(new { msg = "You are authorized to read this endpoint with Id Token!" });
+
+        [HttpGet]
+        [Route("[controller]/[action]")]
+        public async Task<IActionResult> TestWithAccessToken([FromServices] TokenTools tokenTools, string access_token)
+        {
+            var parts = TokenTools.DecodeTokenAndSeparateParts(access_token);
+            var userName = parts[1];
+            var _user = await _userManager.FindByEmailAsync(userName);
+            if (_user is null) return BadRequest(new { error = "Token username does not exist!" });
+            var isValid = tokenTools.IsTokenValid(access_token, Request.Host.Host, Request.Headers["User-Agent"]);
+            if (!isValid) return BadRequest(new { error = "Token is not valid!" });
+            return Ok(new { 
+                msg = "You are authorized to read this endpoint with Access Token!",
+                parts });
+        }
 
         [Route(".well-known/openid-configuration")]
         [HttpGet]
@@ -50,48 +66,6 @@ namespace App.Controllers
             var dir = Directory.GetCurrentDirectory() + @"\Controllers\";
             var openId = FileTools.ReadJsonFromFile<OpenIDModel>(dir + "openid-configuration.json");
             return Ok(openId);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Authority
-        (
-            string client_id,
-            string scope,
-            string response_type,
-            string redirect_uri,
-            string state
-        )
-        {
-            var user = await _userManager.FindByNameAsync(client_id);
-            if (user is null) return BadRequest(new { msg = "App Client ID not registered! Please, register the App first to receive a client_id and client_secret!" });
-            var code = (scope != "") ? scope.EncodeTo64() : "Read";
-            return Redirect($"{redirect_uri}?state={state}&code={code}");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Token(
-                    string client_id,
-                    string client_secret,
-                    string code,
-                    string state,
-                    [FromServices] TokenTools tokenTool
-                )
-        {
-            var user = await _userManager.FindByNameAsync(client_id);
-            if (user is null) return BadRequest(new { msg = "User does not exist!" });
-            if (client_secret != user.Client_Secret) return BadRequest(new { msg = "Invalid Secret!" });
-            var _claims = await _userManager.GetClaimsAsync(user);
-            var genericIdentity = new GenericIdentity(user.Id);
-            genericIdentity.AddClaims(_claims);
-            var id_token = tokenTool.CreateIdToken(genericIdentity, audience: user.Client_ID);
-            var access_token = tokenTool.CreateAccessToken(
-                user.Email,
-                user.PasswordHash,
-                HttpContext.Connection.LocalIpAddress.ToString(),
-                HttpContext.Request.Headers["User-Agent"].ToString() ?? "User-Agent",
-                10
-                );
-            return Ok(new { id_token, access_token });
         }
 
         [HttpPost]
@@ -104,24 +78,29 @@ namespace App.Controllers
                 LockoutEnabled = true,
                 PasswordHash = _configuration.GetSection("PasswordHash").Get<string>(),
                 AccessFailedCount = 3,
-                Client_ID = Guid.NewGuid().ToString(),
-                Client_Secret = RandomPassword.Generate(10)
+                UserName = body.Login
             };
-
-            _user.UserName = _user.Client_ID;
 
             var result = await _userManager.CreateAsync(_user, body.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            await _userManager.AddClaimsAsync(_user, new List<Claim>
-            {
-                new Claim("Client_ID", _user.Client_ID)
-            });
-
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(_user);
-            var link = Url.Action(nameof(VerifyEmail), "OpenId", new { userId = _user.Id, code }, Request.Scheme, Request.Host.ToString());
+            var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(_user);
+            var link = Url.Action(nameof(VerifyEmail), "OpenId", new { userId = _user.Id, emailToken }, Request.Scheme, Request.Host.ToString());
             await _email.SendAsync(_user.Email, "Email Verification", $"<a href=\"{link}\">Click to Verify Account</a>", true);
-            return Ok(new { msg = $"Email confirmation sent to {_user.Email}", user = _user });
+            return Ok(new { msg = $"Email confirmation sent to {_user.Email}" });
+        }
+
+        [HttpPost]
+        [Route("[controller]/[action]")]
+        public async Task<IActionResult> ReSendConfirmationAccountEmail([FromBody] UserRegisterData body)
+        {
+            var _user = await _userManager.FindByEmailAsync(body.Login);
+            if (_user is null) return BadRequest(new { msg = "User is not registered!" });
+            if (_user.EmailConfirmed) return BadRequest(new { msg = "User account was already confirmed! Just login!" });
+            var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(_user);
+            var link = Url.Action(nameof(VerifyEmail), "OpenId", new { userId = _user.Id, emailToken }, Request.Scheme, Request.Host.ToString());
+            await _email.SendAsync(_user.Email, "Email Verification", $"<a href=\"{link}\">Click to Verify Account</a>", true);
+            return Ok(new { msg = $"Email confirmation sent to {_user.Email}" });
         }
 
         [HttpPost]
@@ -137,56 +116,56 @@ namespace App.Controllers
             if (passResult == 0) return BadRequest(new { msg = "Wrong Password!" });
             //Generate JWT Token 
             var claims = await _userManager.GetClaimsAsync(_user);
-            var genericIdentity = new GenericIdentity(_user.Client_ID);
+            var genericIdentity = new GenericIdentity(_user.Email);
             genericIdentity.AddClaims(claims);
-            var token = handler.CreateIdToken(genericIdentity, audience: _user.Client_ID);
+            var token = handler.CreateIdToken(genericIdentity, audience: _user.Email);
             return Ok(new { id_token = token });
         }
 
         [HttpGet]
         [Authorize]
         [Route("[controller]/[action]")]
-        public async Task<IActionResult> RequestAccessToken([FromServices] TokenTools tokenTools)
+        public async Task<IActionResult> RequestAccessToken(
+            [FromServices] TokenTools tokenTools,
+            [FromServices] SecretService secret)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
             if (user is null) return BadRequest(new { error = "Logged user not identified" });
-            var localIP = HttpContext.Connection.LocalIpAddress.ToString();
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "User-Agent";
+            var CallerIP = HttpContext.Request.Host.Host;
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
             var access_token = tokenTools.CreateAccessToken(user.Email,
-               user.PasswordHash, localIP, userAgent, TimeSpan.TicksPerMinute*10 );
-            return Ok(new {access_token});
+               secret.Get("PasswordHash"), CallerIP, userAgent, TimeSpan.TicksPerMinute * 10);
+            return Ok(new { access_token });
         }
 
         [HttpGet]
-        [Authorize]
         [Route("[controller]/[action]")]
-        public async Task<IActionResult> ValidateAccessToken([FromServices] TokenTools tokenTools, string token)
-        {
-            var parts = TokenTools.DecodeTokenAndSeparateParts(token);
-            if (parts.Length !=3) return BadRequest(new {error = "Token has wrong format"});
-            var username = parts[1];
-            var user = await _userManager.FindByEmailAsync(username);
-            if (user is null) return BadRequest(new {error = "Access Token User is not registered!"});            
+        public IActionResult ValidateAccessTokenFromQuery([FromServices] TokenTools tokenTools, string access_token)
+        {            
             var isValid = tokenTools.IsTokenValid(
-                token,
-                HttpContext.Connection.LocalIpAddress.ToString(),
-                HttpContext.Request.Headers["User-Agent"].ToString() ?? "User-Agent", 
-                user.PasswordHash
+                access_token,
+                HttpContext.Request.Host.Host,
+                HttpContext.Request.Headers["User-Agent"].ToString()
                 );
             return Ok(isValid);
         }
 
-
-
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "Access-Token-Scheme")]
+        [Route("[controller]/[action]")]
+        public IActionResult ValidateAccessTokenFromAttributes()
+        {            
+            return Ok(User.Identity);
+        }
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = "JWT-Token")]
         [Route("[controller]/[action]")]
         public async Task<IActionResult> GetSecret()
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
             if (user is null) return BadRequest(new { msg = "User does not exist!" });
-            return Ok(new { user.Client_Secret });
+            return Ok(new { user.Email });
         }
 
         [Authorize(AuthenticationSchemes = "JWT-Token")]
@@ -194,7 +173,7 @@ namespace App.Controllers
         [Route("[controller]/[action]")]
         public async Task<IActionResult> ChangePassword(string oldPass, string newPass)
         {
-            var _user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var _user = await _userManager.FindByEmailAsync(User.Identity.Name);
             if (_user is null) return BadRequest(new { error = "User not found!" });
             var result = await _userManager.ChangePasswordAsync(_user, oldPass, newPass);
             if (!result.Succeeded) return BadRequest(result.Errors);
@@ -235,15 +214,16 @@ namespace App.Controllers
             if (_user is null) return BadRequest(new { msg = "User does not exist!" });
             var result = await _userManager.ConfirmEmailAsync(_user, code);
             if (!result.Succeeded) return BadRequest(new { msg = "Invalid code!" });
-            return Ok(new { msg = "Account Confirmed! ", _user });
+            return Ok(new { msg = "Account Confirmed! ", _user.Email });
         }
 
         [Authorize(AuthenticationSchemes = "JWT-Token")]
         [HttpGet]
         [Route("[controller]/[action]")]
-        public IActionResult WhoAmIFromToken()
+        public async Task<IActionResult> WhoAmIFromToken()
         {
-            return Ok(new { User.Identity });
+            var _user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            return Ok(_user);
         }
 
     }
