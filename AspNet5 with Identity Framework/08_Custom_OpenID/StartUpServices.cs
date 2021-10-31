@@ -1,6 +1,5 @@
-using App.Models;
+using App.Middlewares;
 using App.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App
@@ -10,7 +9,10 @@ namespace App
         public static void Init(IServiceCollection services)
         {
             services.AddScoped<SecretService>();
-            services.AddScoped<TokenTools>();            
+            services.AddScoped<TokenTools>();
+            services.AddScoped<RequestLocalizationCookiesMiddleware>();
+            services.AddScoped<ILanguageService, LanguageService>();
+            services.AddScoped<ILocalizationService, LocalizationService>();
         }
     }
 }

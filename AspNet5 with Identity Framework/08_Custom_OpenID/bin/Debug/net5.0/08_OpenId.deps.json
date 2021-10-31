@@ -40,6 +40,7 @@
           "Microsoft.EntityFrameworkCore": "5.0.10",
           "Microsoft.EntityFrameworkCore.Design": "5.0.10",
           "Microsoft.EntityFrameworkCore.InMemory": "5.0.10",
+          "Microsoft.Extensions.Localization": "5.0.11",
           "NETCore.MailKit": "2.0.3",
           "Swashbuckle.AspNetCore": "5.6.3",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "5.0.11",
@@ -143,8 +144,6 @@
           "Microsoft.Extensions.Hosting.Abstractions.Reference": "5.0.0.0",
           "Microsoft.Extensions.Hosting": "5.0.0.0",
           "Microsoft.Extensions.Http": "5.0.0.0",
-          "Microsoft.Extensions.Localization.Abstractions": "5.0.0.0",
-          "Microsoft.Extensions.Localization": "5.0.0.0",
           "Microsoft.Extensions.Logging.Abstractions.Reference": "5.0.0.0",
           "Microsoft.Extensions.Logging.Configuration": "5.0.0.0",
           "Microsoft.Extensions.Logging.Console": "5.0.0.0",
@@ -705,6 +704,34 @@
         },
         "compile": {
           "lib/net5.0/Microsoft.Extensions.Identity.Stores.dll": {}
+        }
+      },
+      "Microsoft.Extensions.Localization/5.0.11": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Localization.Abstractions": "5.0.11",
+          "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0"
+        },
+        "runtime": {
+          "lib/net5.0/Microsoft.Extensions.Localization.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.1121.47605"
+          }
+        },
+        "compile": {
+          "lib/net5.0/Microsoft.Extensions.Localization.dll": {}
+        }
+      },
+      "Microsoft.Extensions.Localization.Abstractions/5.0.11": {
+        "runtime": {
+          "lib/net5.0/Microsoft.Extensions.Localization.Abstractions.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.1121.47605"
+          }
+        },
+        "compile": {
+          "lib/net5.0/Microsoft.Extensions.Localization.Abstractions.dll": {}
         }
       },
       "Microsoft.Extensions.Logging/5.0.0": {
@@ -2067,18 +2094,6 @@
         },
         "compileOnly": true
       },
-      "Microsoft.Extensions.Localization.Abstractions/5.0.0.0": {
-        "compile": {
-          "Microsoft.Extensions.Localization.Abstractions.dll": {}
-        },
-        "compileOnly": true
-      },
-      "Microsoft.Extensions.Localization/5.0.0.0": {
-        "compile": {
-          "Microsoft.Extensions.Localization.dll": {}
-        },
-        "compileOnly": true
-      },
       "Microsoft.Extensions.Logging.Abstractions.Reference/5.0.0.0": {
         "compile": {
           "Microsoft.Extensions.Logging.Abstractions.dll": {}
@@ -3417,6 +3432,20 @@
       "path": "microsoft.extensions.identity.stores/5.0.10",
       "hashPath": "microsoft.extensions.identity.stores.5.0.10.nupkg.sha512"
     },
+    "Microsoft.Extensions.Localization/5.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tsdk+zUNLHrDD5PArLroukXJsRCsyX01EyxAisVf+S3OmeifQuZsWkoXDd/N117r94T1TXcBy9aYAEv0OzA2dg==",
+      "path": "microsoft.extensions.localization/5.0.11",
+      "hashPath": "microsoft.extensions.localization.5.0.11.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Localization.Abstractions/5.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-mnsPIwru48tiQ7l91s5e+1+Mcia/Gr2AvBOBm6rgNDvQ3tnxv2M85jUcLYpbcwpDLB1f+QjF92XeA/LlRTfmDA==",
+      "path": "microsoft.extensions.localization.abstractions/5.0.11",
+      "hashPath": "microsoft.extensions.localization.abstractions.5.0.11.nupkg.sha512"
+    },
     "Microsoft.Extensions.Logging/5.0.0": {
       "type": "package",
       "serviceable": true,
@@ -4564,16 +4593,6 @@
       "sha512": ""
     },
     "Microsoft.Extensions.Http/5.0.0.0": {
-      "type": "referenceassembly",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Microsoft.Extensions.Localization.Abstractions/5.0.0.0": {
-      "type": "referenceassembly",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Microsoft.Extensions.Localization/5.0.0.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""

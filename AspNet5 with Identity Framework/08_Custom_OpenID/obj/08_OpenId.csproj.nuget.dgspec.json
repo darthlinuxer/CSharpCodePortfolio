@@ -68,6 +68,10 @@
               "target": "Package",
               "version": "[5.0.10, )"
             },
+            "Microsoft.Extensions.Localization": {
+              "target": "Package",
+              "version": "[5.0.11, )"
+            },
             "NetCore.Mailkit": {
               "target": "Package",
               "version": "[2.0.3, )"

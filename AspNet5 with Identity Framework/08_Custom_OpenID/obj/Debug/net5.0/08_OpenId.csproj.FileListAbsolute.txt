@@ -55,3 +55,5 @@ C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\08_Custom
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\08_Custom_OpenID\obj\Debug\net5.0\08_OpenId.pdb
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\08_Custom_OpenID\obj\Debug\net5.0\08_OpenId.genruntimeconfig.cache
 C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\08_Custom_OpenID\obj\Debug\net5.0\ref\08_OpenId.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\08_Custom_OpenID\bin\Debug\net5.0\Microsoft.Extensions.Localization.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AspNet5 with Identity Framework\08_Custom_OpenID\bin\Debug\net5.0\Microsoft.Extensions.Localization.Abstractions.dll
