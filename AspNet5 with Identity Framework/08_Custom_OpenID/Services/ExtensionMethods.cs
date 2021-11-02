@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace App.Services
+namespace OpenIDApp.Services
 {
     public static class StringExtensions
     {

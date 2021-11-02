@@ -3,8 +3,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
+using OAuthApp.Models;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NETCore.MailKit.Core;
 
-namespace App.Controllers
+namespace OAuthApp.Controllers
 {
     public class AccessControl : ControllerBase
     {
@@ -34,6 +34,7 @@ namespace App.Controllers
         public IActionResult AlreadyLogged() => Ok(new { msg = "You are already Logged!" });
         public IActionResult AccessDenied() => BadRequest(new { msg = "Access Denied!" });
         public IActionResult NotLoggedMessage() => BadRequest(new { msg = "You must login first!" });
+        public IActionResult Test([FromQuery] string msg) => Ok(msg);
 
         public async Task<IActionResult> LoginAndReturnCookie(
             [FromBody] UserRegisterData body
@@ -79,6 +80,7 @@ namespace App.Controllers
             return Ok(new {id_token, access_token, claims});
         }
 
+        [HttpPost]
         public async Task<IActionResult> LoginAndReturnToken(
            [FromBody] UserRegisterData body,
            [FromServices] TokenTools handler)
@@ -91,11 +93,12 @@ namespace App.Controllers
             var _claims = await _userManager.GetClaimsAsync(_user);
             var genericIdentity = new GenericIdentity(_user.Id);
             genericIdentity.AddClaims(_claims);
-            var token = handler.CreateToken(genericIdentity);
-            return Ok(new { token });
+            var id_token = handler.CreateToken(genericIdentity);
+            return Ok(new { id_token });
         }
 
-        public async Task<IActionResult> Register([FromBody] UserRegisterData body)
+        [HttpPost]
+        public async Task<IActionResult> RegisterUser([FromBody] UserRegisterData body)
         {
             var _user = new IdentityUser
             {

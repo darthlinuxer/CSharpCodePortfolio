@@ -1,13 +1,13 @@
 using System;
-using App.Context;
-using App.Models;
+using OpenIDApp.Context;
+using OpenIDApp.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace App
+namespace OpenIDApp
 {
     public class StartUpIdentity
     {

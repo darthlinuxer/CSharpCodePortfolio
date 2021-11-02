@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {

@@ -2,9 +2,8 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using App.Middlewares;
-using App.Services;
+using OpenIDApp.Middlewares;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -13,12 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.OpenApi.Models;
-using Org.BouncyCastle.Tsp;
 
 [assembly: ResourceLocation("Resources")]
-[assembly: RootNamespace("App")]
+[assembly: RootNamespace("OpenIDApp")]
 
-namespace App
+namespace OpenIDApp
 {
     public class Startup
     {

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 
-namespace App.Models
+namespace OAuthApp.Models
 {
     public class OAuthUser: IdentityUser
     {

@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App.Services
+namespace OAuthApp.Services
 {
     public class TokenTools
     {

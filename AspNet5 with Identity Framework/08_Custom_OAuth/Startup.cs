@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-namespace App
+namespace OAuthApp
 {
     public class Startup
     {
@@ -53,7 +53,7 @@ namespace App
 
             app.Use(async (context,next) =>
             {
-                Console.WriteLine("Logged User Id:" + context.User?.Identity?.Name);
+                Console.WriteLine("OAuth Logged User Id:" + context.User?.Identity?.Name);
                 await next.Invoke();
             });
 

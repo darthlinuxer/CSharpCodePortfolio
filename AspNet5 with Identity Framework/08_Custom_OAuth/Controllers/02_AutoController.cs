@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Controllers
+namespace OAuthApp.Controllers
 {
     //This Controller does not follow the Naming Convention 
     //nor does it have [ApiController] attribute

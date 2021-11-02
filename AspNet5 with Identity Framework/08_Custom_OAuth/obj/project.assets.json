@@ -6302,9 +6302,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\08_OpenId.csproj",
-      "projectName": "08_OpenId",
-      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\08_OpenId.csproj",
+      "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\08_OAuth.csproj",
+      "projectName": "08_OAuth",
+      "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\08_OAuth.csproj",
       "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\obj\\",
       "projectStyle": "PackageReference",

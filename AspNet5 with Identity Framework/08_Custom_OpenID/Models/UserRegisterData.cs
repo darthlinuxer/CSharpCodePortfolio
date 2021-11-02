@@ -1,4 +1,4 @@
-namespace App.Models
+namespace OpenIDApp.Models
 {
     public class UserRegisterData
     {

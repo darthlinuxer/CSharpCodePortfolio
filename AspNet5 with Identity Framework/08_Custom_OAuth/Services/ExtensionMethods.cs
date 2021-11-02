@@ -1,4 +1,4 @@
-namespace App.Services
+namespace OAuthApp.Services
 {
     public static class StringExtensions
     {

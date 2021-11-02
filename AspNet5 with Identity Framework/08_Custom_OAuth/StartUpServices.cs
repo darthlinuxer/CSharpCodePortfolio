@@ -1,8 +1,8 @@
-using App.Services;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OAuthApp
 {
     public class StartUpServices
     {

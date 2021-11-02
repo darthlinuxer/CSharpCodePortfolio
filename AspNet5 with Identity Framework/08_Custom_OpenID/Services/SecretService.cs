@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace App.Services
+namespace OpenIDApp.Services
 {
     public class SecretService
     {

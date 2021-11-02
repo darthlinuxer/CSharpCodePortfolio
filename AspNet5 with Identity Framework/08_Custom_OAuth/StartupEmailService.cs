@@ -4,7 +4,7 @@ using NETCore.MailKit.Core;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
 
-namespace App
+namespace OAuthApp
 {
     public class StartupEmail
     {

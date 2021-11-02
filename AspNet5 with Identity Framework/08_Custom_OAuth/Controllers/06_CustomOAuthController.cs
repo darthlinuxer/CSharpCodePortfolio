@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
+using OAuthApp.Models;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Controllers
+namespace OAuthApp.Controllers
 {
     public class OAuth : ControllerBase
     {

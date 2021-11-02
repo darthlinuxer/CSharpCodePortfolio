@@ -1,7 +1,7 @@
-using App.Authentication;
+using OpenIDApp.Authentication;
 using Microsoft.AspNetCore.Authentication;
 
-namespace App
+namespace OpenIDApp
 {
      public static partial class StartUpAuthentication
     {

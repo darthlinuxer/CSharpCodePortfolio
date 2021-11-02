@@ -1,8 +1,8 @@
 using System.Linq;
-using App.Context;
-using App.Models;
+using OpenIDApp.Context;
+using OpenIDApp.Models;
 
-namespace App.Services
+namespace OpenIDApp.Services
 {
     public interface ILocalizationService
     {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace App.Controllers
+namespace OAuthApp.Controllers
 {
     [ApiController]
     [Route("[controller]")]

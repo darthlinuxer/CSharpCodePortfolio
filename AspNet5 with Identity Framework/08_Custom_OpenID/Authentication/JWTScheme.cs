@@ -2,14 +2,14 @@ using System;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using App.Services;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App
+namespace OpenIDApp
 {
     public static partial class StartUpAuthentication
     {

@@ -1,8 +1,8 @@
-using App.Models;
+using OAuthApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Context
+namespace OAuthApp.Context
 {
     public class OAuthDbContext : IdentityDbContext
     {

@@ -1,8 +1,8 @@
-using App.Models;
+using OpenIDApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Context
+namespace OpenIDApp.Context
 {
     public class OpenIdDbContext : IdentityDbContext
     {

@@ -2,8 +2,8 @@ using System;
 using System.IO;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
+using OpenIDApp.Models;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using NETCore.MailKit.Core;
 
-namespace App.Controllers
+namespace OpenIDApp.Controllers
 {
     public class OpenIdController : ControllerBase
     {

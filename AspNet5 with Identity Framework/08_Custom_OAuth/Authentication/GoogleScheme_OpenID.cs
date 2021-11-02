@@ -4,10 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Tsp;
-using App.Models;
-using App.Services;
+using OAuthApp.Models;
+using OAuthApp.Services;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {

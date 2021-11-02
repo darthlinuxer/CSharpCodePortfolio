@@ -1,8 +1,8 @@
-using App.Middlewares;
-using App.Services;
+using OpenIDApp.Middlewares;
+using OpenIDApp.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OpenIDApp
 {
     public class StartUpServices
     {

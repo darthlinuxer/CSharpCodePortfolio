@@ -1,11 +1,11 @@
 using System;
-using App.Services;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {

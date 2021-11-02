@@ -1,14 +1,14 @@
 using System;
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
+using OAuthApp.Models;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {

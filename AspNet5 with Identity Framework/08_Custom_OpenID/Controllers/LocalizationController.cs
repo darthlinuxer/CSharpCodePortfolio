@@ -2,16 +2,14 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using App.Models;
-using App.Services;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
-namespace App.Controllers
+namespace OpenIDApp.Controllers
 {
     public class LocalizationController : ControllerBase
     {

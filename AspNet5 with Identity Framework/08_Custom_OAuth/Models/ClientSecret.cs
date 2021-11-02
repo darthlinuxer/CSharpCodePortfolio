@@ -1,4 +1,4 @@
-namespace App.Models
+namespace OAuthApp.Models
 {
     public class ClientSecret
     {

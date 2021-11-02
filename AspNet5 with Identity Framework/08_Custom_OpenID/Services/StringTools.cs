@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace App.Services
+namespace OpenIDApp.Services
 {
     public class RandomPassword
     {

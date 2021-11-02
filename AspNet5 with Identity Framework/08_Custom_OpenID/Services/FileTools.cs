@@ -1,7 +1,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace App.Services
+namespace OpenIDApp.Services
 {
     public class FileTools
     {

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using App.Context;
-using App.Models;
+using OpenIDApp.Context;
+using OpenIDApp.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Services
+namespace OpenIDApp.Services
 {
     public interface ILanguageService
     {

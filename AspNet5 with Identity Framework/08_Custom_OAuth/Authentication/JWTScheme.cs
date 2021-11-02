@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using App.Services;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Tsp;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {

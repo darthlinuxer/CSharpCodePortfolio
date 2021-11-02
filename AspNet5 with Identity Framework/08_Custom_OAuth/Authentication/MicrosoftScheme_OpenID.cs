@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
+using OAuthApp.Models;
+using OAuthApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {

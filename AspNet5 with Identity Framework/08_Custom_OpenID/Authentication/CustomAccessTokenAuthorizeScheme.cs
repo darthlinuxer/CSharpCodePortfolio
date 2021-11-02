@@ -2,12 +2,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using App.Services;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace App.Authentication
+namespace OpenIDApp.Authentication
 {
     public class ValidateAccessTokenSchemeOptions : AuthenticationSchemeOptions
     {

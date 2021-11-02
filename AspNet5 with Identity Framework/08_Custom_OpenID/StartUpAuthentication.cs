@@ -1,8 +1,8 @@
-using App.Services;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OpenIDApp
 {
     public static partial class StartUpAuthentication
     {

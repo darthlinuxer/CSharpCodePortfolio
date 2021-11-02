@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3fpv0cOtcXNfziZLWPCEkrqjh5PrpjqdadcafFRofvyfd5CWyuSS8vcdDJaD4BLnzeYMajZPgr1fBRVJdG/pGg==",
+  "dgSpecHash": "wG17VMiDps/msqHNdFtoA/nahbfPf4LATtgX5qq0qIBZkmPwR6t0a5X3UzePFPUVRpmjt+vN6u+rj4j82Oz05w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\08_OpenId.csproj",
+  "projectFilePath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\AspNet5 with Identity Framework\\08_Custom_OAuth\\08_OAuth.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\chave\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\chave\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",

@@ -1,13 +1,12 @@
 using System;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
-using Microsoft.AspNetCore.DataProtection;
+using OpenIDApp.Models;
+using OpenIDApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Controllers
+namespace OpenIDApp.Controllers
 {
     public class OpenIdExternalController : ControllerBase
     {

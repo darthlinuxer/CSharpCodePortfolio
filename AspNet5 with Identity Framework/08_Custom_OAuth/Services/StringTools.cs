@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace App.Services
+namespace OAuthApp.Services
 {
     public class RandomPassword
     {

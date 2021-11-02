@@ -1,5 +1,0 @@
-{
-  "authorization_endpoint": "https://localhost:5003/OpenId/Authority",
-  "token_endpoint": "https://localhost:5003/OpenId/Token",
-  "userinfo_endpoint": ""  
-}

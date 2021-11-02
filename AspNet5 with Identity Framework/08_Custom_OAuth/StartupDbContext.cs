@@ -1,9 +1,9 @@
-using App.Context;
+using OAuthApp.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OAuthApp
 {
     public class StartupDbContext
     {

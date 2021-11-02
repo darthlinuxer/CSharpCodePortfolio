@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 
-namespace App.Middlewares
+namespace OpenIDApp.Middlewares
 {
     public class RequestLocalizationCookiesMiddleware : IMiddleware
     {

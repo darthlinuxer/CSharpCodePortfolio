@@ -15616,7 +15616,7 @@
     ],
     "CSharpLanguageVersion": 900
   },
-  "RootNamespace": "App",
+  "RootNamespace": "OpenIDApp",
   "Documents": [],
   "SerializationFormat": "0.2"
 }

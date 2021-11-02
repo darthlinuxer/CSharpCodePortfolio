@@ -1,20 +1,10 @@
-using System;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
-using App.Models;
-using App.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Org.BouncyCastle.Tsp;
 
-namespace App
+namespace OAuthApp
 {
     public static partial class StartUpAuthentication
     {
@@ -25,7 +15,7 @@ namespace App
                     string server = "https://localhost:5001";
                     config.ClientId = "client_id";
                     config.ClientSecret = "client_secret";
-                    config.Authority = $"{server}/OpenID/Authority";
+                    config.Authority = $"{server}/OpenIdExternal/Authority";
                     config.AccessDeniedPath = "/AccessControl/AccessDenied";
                     config.CallbackPath = "/OpenID/CallBack";
                     config.SaveTokens = true;

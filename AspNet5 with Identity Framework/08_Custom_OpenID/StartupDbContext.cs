@@ -1,8 +1,8 @@
-using App.Context;
+using OpenIDApp.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App
+namespace OpenIDApp
 {
     public class StartupDbContext
     {

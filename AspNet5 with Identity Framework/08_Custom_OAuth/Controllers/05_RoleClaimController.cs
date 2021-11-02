@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Controllers
+namespace OAuthApp.Controllers
 {
     [Authorize(Policy = "Bearer")]
     public class RoleClaimController:ControllerBase

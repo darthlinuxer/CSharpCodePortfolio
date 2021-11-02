@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using App.Models;
+using OpenIDApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 
-namespace App.Context
+namespace OpenIDApp.Context
 {
     public class CulturesDbContext : DbContext
     {
