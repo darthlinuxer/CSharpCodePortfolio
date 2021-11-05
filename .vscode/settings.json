@@ -1,3 +1,9 @@
 {
-	"DockerRun.DisableAutoGenerateConfig": true
+	"DockerRun.DisableAutoGenerateConfig": true,
+	"omnisharp.enableAsyncCompletion": true,
+	"omnisharp.enableRoslynAnalyzers": true,
+	"omnisharp.organizeImportsOnFormat": true,
+	"razor.devmode": true,
+	"razor.languageServer.debug": true,
+	"razor.trace": "Messages"
 }

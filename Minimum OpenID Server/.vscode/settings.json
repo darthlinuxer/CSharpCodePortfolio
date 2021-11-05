@@ -1,0 +1,5 @@
+{
+    "razor.trace": "Messages",
+    "omnisharp.enableImportCompletion": true,
+    "csharp.semanticHighlighting.enabled": true
+}
