@@ -1,0 +1,31 @@
+﻿@page "{handler?}/{id?}"
+@model IndexModel
+
+@{
+    ViewData["Title"] = "My App";
+}
+
+<h1> @ViewData["Hello"] </h1>
+
+<form method="post">
+    <div class="row">
+        <div class="col-lg-1">
+            <button asp-page-handler="Post" class="btn btn-primary">Post</button>
+        </div>
+        <div class="col-lg-1">
+            <button asp-page-handler="Put" asp-route-id="7" class="btn btn-secondary">Put</button>
+        </div>
+        <div class="col-lg-1">
+            <button asp-page-handler="Delete" asp-route-id="8" class="btn btn-danger">Delete</button>
+        </div>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <input class="form-control width30" name="msg" id="msgId">
+                <span class="input-group-btn">
+                    <button asp-page-handler="Submit" class="btn btn-warning">Submit</button>
+                </span>
+            </div>
+        </div>
+    </div>
+</form>
+<h3 class="clearfix">@Model.Message</h3>

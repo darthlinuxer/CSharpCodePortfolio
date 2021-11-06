@@ -10,8 +10,8 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryContentRootAttribute("MainApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\MainApp", "MainApp.csproj", "0")]
-[assembly: Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryContentRootAttribute("OpenID, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "c:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer", "OpenID.csproj", "0")]
+[assembly: Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryContentRootAttribute("MainApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\MainApp", "MainApp.csproj", "0")]
+[assembly: Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryContentRootAttribute("OpenIdMVC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC", "OpenIdMVC.csproj", "0")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]

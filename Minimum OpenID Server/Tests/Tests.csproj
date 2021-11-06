@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MainApp\MainApp.csproj" />
-    <ProjectReference Include="..\OpenIDServer\OpenID.csproj" />
+    <ProjectReference Include="..\OpenIDMVC\OpenIdMVC.csproj" />
   </ItemGroup>
 
 </Project>

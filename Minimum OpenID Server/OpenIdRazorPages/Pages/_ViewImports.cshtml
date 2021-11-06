@@ -1,0 +1,10 @@
+﻿@* _ViewImports.cshtml link
+The purpose of the _ViewImports.cshtml file is to provide a mechanism to make directives available
+ to Razor pages globally so that you don't have to add them to pages individually.
+The default Razor Pages template includes a _ViewImports.cshtml file in the Pages folder - 
+the root folder for Razor pages. All Razor pages in the folder heirarchy will be affected by the 
+directives set in the _ViewImports.cshtml file. *@
+
+@using OpenIDAppRazor.Pages
+@namespace OpenIDAppRazor.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

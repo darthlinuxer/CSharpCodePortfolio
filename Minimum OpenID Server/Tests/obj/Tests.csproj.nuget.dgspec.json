@@ -105,14 +105,14 @@
         }
       }
     },
-    "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj": {
+    "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj",
-        "projectName": "OpenID",
-        "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj",
+        "projectUniqueName": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj",
+        "projectName": "OpenIdMVC",
+        "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj",
         "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\obj\\",
+        "outputPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -239,8 +239,8 @@
               "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\MainApp\\MainApp.csproj": {
                 "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\MainApp\\MainApp.csproj"
               },
-              "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj": {
-                "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj"
+              "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj": {
+                "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj"
               }
             }
           }

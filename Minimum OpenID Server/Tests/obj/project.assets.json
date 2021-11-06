@@ -3011,7 +3011,7 @@
           "Microsoft.AspNetCore.App"
         ]
       },
-      "OpenID/1.0.0": {
+      "OpenIdMVC/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -3027,10 +3027,10 @@
           "microsoft.aspnetcore.authentication.openidconnect": "5.0.11"
         },
         "compile": {
-          "bin/placeholder/OpenID.dll": {}
+          "bin/placeholder/OpenIdMVC.dll": {}
         },
         "runtime": {
-          "bin/placeholder/OpenID.dll": {}
+          "bin/placeholder/OpenIdMVC.dll": {}
         },
         "frameworkReferences": [
           "Microsoft.AspNetCore.App"
@@ -9633,10 +9633,10 @@
       "path": "../MainApp/MainApp.csproj",
       "msbuildProject": "../MainApp/MainApp.csproj"
     },
-    "OpenID/1.0.0": {
+    "OpenIdMVC/1.0.0": {
       "type": "project",
-      "path": "../OpenIDServer/OpenID.csproj",
-      "msbuildProject": "../OpenIDServer/OpenID.csproj"
+      "path": "../OpenIDMVC/OpenIdMVC.csproj",
+      "msbuildProject": "../OpenIDMVC/OpenIdMVC.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -9646,7 +9646,7 @@
       "MainApp >= 1.0.0",
       "Microsoft.AspNetCore.Mvc.Testing >= 5.0.11",
       "Microsoft.NET.Test.Sdk >= 16.9.4",
-      "OpenID >= 1.0.0",
+      "OpenIdMVC >= 1.0.0",
       "coverlet.collector >= 3.0.2"
     ]
   },
@@ -9678,8 +9678,8 @@
             "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\MainApp\\MainApp.csproj": {
               "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\MainApp\\MainApp.csproj"
             },
-            "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj": {
-              "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDServer\\OpenID.csproj"
+            "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj": {
+              "projectPath": "C:\\Users\\chave\\dev\\CSharpCodePortfolio\\Minimum OpenID Server\\OpenIDMVC\\OpenIdMVC.csproj"
             }
           }
         }
