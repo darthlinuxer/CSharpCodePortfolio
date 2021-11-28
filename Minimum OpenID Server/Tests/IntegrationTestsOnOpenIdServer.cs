@@ -71,7 +71,7 @@ public class IntegrationTestsOnOpenIdServer
         req.Method = HttpMethod.Get;
         response = await client.SendAsync(req);
         string? access_token = await response.Content.ReadAsStringAsync();
-        Assert.IsNotNull(access_token;
+        Assert.IsNotNull(access_token);
 
         req = new HttpRequestMessage();
         req.Headers.Add("Access-Token",access_token);
