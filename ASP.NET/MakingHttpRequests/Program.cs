@@ -1,5 +1,4 @@
 using Polly;
-using Polly.NoOp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient("BibleClient", c =>
 {
     c.BaseAddress = new Uri("https://bible-api.com/");
-    c.Timeout = System.TimeSpan.FromSeconds(2);
+    //c.Timeout = System.TimeSpan.FromSeconds(2);
 });
 
 var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(10));

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
+using Polly;
+using Polly.Registry;
 
 namespace MakingHttpRequests.Controllers;
 
@@ -72,5 +75,30 @@ public class BibleController : ControllerBase
         return Ok(await bibleService.GetAsync(book, chapter, verse));
         //on console
         //netstat -ano | findstr 104.131.238.28
+    }
+
+    [HttpGet]
+    [Route("[action]/{book}/{chapter}/{verse}")]
+    public async Task<IActionResult> GetWithPolicy(string book, string chapter, string verse)
+    {
+        var httpClient = factory.CreateClient("BibleClient");
+        var URL = $"{httpClient.BaseAddress}/{book} {chapter}:{verse}?translation=almeida";
+
+        var policies = Policy.WrapAsync(
+            Policy.Handle<HttpRequestException>().WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(1)),
+            Policy.Handle<HttpRequestException>().CircuitBreakerAsync(5, TimeSpan.FromSeconds(10))
+        );
+
+        return await policies.ExecuteAsync(async () =>
+            {            
+                var rand = new Random();
+                if(rand.Next(1,3) == 1)
+                    throw new HttpRequestException("Fake Request Exception");
+                    
+                var result = await httpClient.GetAsync(URL);
+                var content = await result.Content.ReadAsStringAsync();
+                return Ok(content);                
+            }
+        );
     }
 }
