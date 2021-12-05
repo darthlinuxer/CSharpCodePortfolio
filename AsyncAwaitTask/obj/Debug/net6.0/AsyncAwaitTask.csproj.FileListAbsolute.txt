@@ -1,0 +1,16 @@
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\bin\Debug\net6.0\AsyncAwaitTask.exe
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\bin\Debug\net6.0\AsyncAwaitTask.deps.json
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\bin\Debug\net6.0\AsyncAwaitTask.runtimeconfig.json
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\bin\Debug\net6.0\AsyncAwaitTask.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\bin\Debug\net6.0\AsyncAwaitTask.pdb
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.csproj.AssemblyReference.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.AssemblyInfoInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.AssemblyInfo.cs
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.ImplicitNamespaceImports.cs
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.csproj.CoreCompileInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\refint\AsyncAwaitTask.dll
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.pdb
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\AsyncAwaitTask.genruntimeconfig.cache
+C:\Users\chave\dev\CSharpCodePortfolio\AsyncAwaitTask\obj\Debug\net6.0\ref\AsyncAwaitTask.dll

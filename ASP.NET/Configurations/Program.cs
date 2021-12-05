@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 ConfigurationManager configuration = builder.Configuration;
 IWebHostEnvironment environment = builder.Environment;
-configuration.AddJsonFile("MyConfig.json", true);
+configuration.AddJsonFile("MyConfig.json", optional:true, reloadOnChange: true);
 
 var inMemory = new Dictionary<string,string>
 {
@@ -14,7 +14,11 @@ var inMemory = new Dictionary<string,string>
 configuration.AddInMemoryCollection(inMemory);
 
 builder.Services.AddControllers();
-builder.Services.Configure<MyApiOptions>(configuration.GetSection("MyApi"));
+
+//builder.Services.Configure<MyApiOptions>(configuration.GetSection("MyApi"));
+builder.Services.AddOptions<MyApiOptions>()
+                .Bind(configuration.GetSection("MyApi"))
+                .ValidateDataAnnotations();
 
 var app = builder.Build();
 
