@@ -1,0 +1,12 @@
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\bin\Debug\net6.0\EmployeeManagementLibrary.deps.json
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\bin\Debug\net6.0\EmployeeManagementLibrary.dll
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\bin\Debug\net6.0\ref\EmployeeManagementLibrary.dll
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\bin\Debug\net6.0\EmployeeManagementLibrary.pdb
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.csproj.AssemblyReference.cache
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.AssemblyInfoInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.AssemblyInfo.cs
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.csproj.CoreCompileInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.dll
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\ref\EmployeeManagementLibrary.dll
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net6.0\EmployeeManagementLibrary.pdb

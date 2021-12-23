@@ -1,0 +1,5 @@
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net5.0\EmployeeManagementLibrary.csproj.AssemblyReference.cache
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net5.0\EmployeeManagementLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net5.0\EmployeeManagementLibrary.AssemblyInfoInputs.cache
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net5.0\EmployeeManagementLibrary.AssemblyInfo.cs
+C:\Users\chave\dev\CSharpCodePortfolio\ASP.NET\MediaTrCQRS\EmployeeManagementLibrary\obj\Debug\net5.0\EmployeeManagementLibrary.csproj.CoreCompileInputs.cache
