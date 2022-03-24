@@ -1,0 +1,105 @@
+version: "3.9"
+
+services:
+
+  orderapi:
+    container_name: ${API_CONTAINER_NAME}
+    hostname: ${API_HOSTNAME}
+    image: ${API_IMAGE_NAME}:${API_TAG_NAME}
+    build:
+      context: ./
+      dockerfile: Dockerfile-Local
+    restart: "no"
+    tty: true
+    networks:
+      - host
+    ports:
+      - 8080:80  
+      - 443:443          
+    profiles:
+      - api     
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_HTTP_PORT=80 
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${API_KESTREL_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=app/${API_CERTIFICATE_PATH}/${API_CERTIFICATE_FILE}
+    volumes:
+      - ~/.aspnet/https:/app/${API_CERTIFICATE_PATH}
+
+  #UNSECURE RAVEN CONTAINER
+  ravenunsecure:
+    container_name: ${RAVEN_HOSTNAME}
+    hostname: ${RAVEN_HOSTNAME}
+    image: ravendb/ravendb
+    restart: always
+    tty: true
+    networks:
+      - host
+    ports:
+      - 8081:8080
+      - 38888:38888
+    profiles:
+      - unsecureserver
+    environment:
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork 
+      - RAVEN_Setup_Mode=Initial    
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_DataDir=/opt/RavenDB/Server/RavenData
+      - RAVEN_ServerUrl=http://${RAVEN_HOSTNAME}:8080
+      - RAVEN_ServerUrl_Tcp=tcp://${RAVEN_HOSTNAME}:38888       
+      - RAVEN_MaxPageSize=4000
+      - RAVEN_IN_DOCKER=true    
+    volumes:
+      - data_unsecurecontainer:/opt/RavenDB/Server/RavenData 
+  
+  #SECURE RAVEN CONTAINER
+  ravensecure:
+    container_name: ${RAVEN_HOSTNAME}
+    hostname: ${RAVEN_HOSTNAME}
+    image: ravendb/ravendb
+    #restart: always
+    tty: true
+    networks:
+      - host
+    ports:
+      - 8081:443
+      - 38888:38888
+    expose:
+      - "443"
+      - "38888"
+    profiles:
+      - secureserver
+    environment:
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_HTTP_PORT=80 
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork 
+      - RAVEN_Setup_Mode=${RAVEN_INITIAL_MODE}
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_DataDir=/opt/RavenDB/Server/RavenData   
+      - RAVEN_ServerUrl=https://${RAVEN_HOSTNAME}:443
+      - RAVEN_ServerUrl_Tcp=tcp://${RAVEN_HOSTNAME}:38888          
+      - RAVEN_Security_Certificate_Path=/opt/RavenDB/Server/${RAVEN_CERTIFICATE_PATH}/${RAVEN_CERTIFICATE_FILE}
+      #  If your certificate does not have a password, comment line below
+      - RAVEN_Security_Certificate_Password=${RAVEN_SERVER_PASSWORD}   
+      - RAVEN_AUTO_INSTALL_CA=true   
+      - RAVEN_MaxPageSize=4000
+      - RAVEN_IN_DOCKER=true
+    #env_file: ./license.env      
+    volumes:
+      - data_securecontainer:/opt/RavenDB/Server/RavenData
+      - ~/.raven:/opt/RavenDB/Server/${RAVEN_CERTIFICATE_PATH}
+        
+volumes:
+  data_unsecurecontainer:
+  data_securecontainer:
+
+networks:
+  host:
+    driver: bridge
+
+  
