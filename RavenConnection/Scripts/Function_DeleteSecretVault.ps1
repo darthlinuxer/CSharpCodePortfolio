@@ -12,20 +12,26 @@ function DeleteVault {
     If ((Get-ExecutionPolicy) -ne $Policy) { Set-ExecutionPolicy $Policy -Force }   
 
     #Check if SecretVault exists and if exists, delete it!
-    If ($null -ne (Get-SecretVault -Name $VaultName)) {   
-        Write-Host "Deleting Vault " + $VaultName
-        if($null -ne $vaultpasswordSecureStringObject){
-            Unlock-SecretStore -Password $vaultpasswordSecureStringObject
-        } else{
-            Unlock-SecretStore 
-        }        
-        Get-SecretInfo -Vault $VaultName  | ForEach-Object { Remove-Secret -Vault $VaultName $_.Name }
-        UnRegister-SecretVault -Name $VaultName 
-        return $true
+    try {
+        If ($null -ne (Get-SecretVault -Name $VaultName -ErrorAction Stop)) {   
+            Write-Host "Deleting Vault " + $VaultName
+            if($null -ne $vaultpasswordSecureStringObject){
+                Unlock-SecretStore -Password $vaultpasswordSecureStringObject
+            } else{
+                Unlock-SecretStore 
+            }        
+            Get-SecretInfo -Vault $VaultName  | ForEach-Object { Remove-Secret -Vault $VaultName $_.Name }
+            UnRegister-SecretVault -Name $VaultName 
+            return $true
+        }
+    }catch
+    {
+        Write-Host `
+        -BackgroundColor red `
+        -ForegroundColor white `
+        "Vault: $VaultName does not exist!"
+
     }
-    else {
-        Write-Host "There is no Vault named $VaultName"
-        return $false
-    }
+   
 
 }

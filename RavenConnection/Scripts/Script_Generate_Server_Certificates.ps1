@@ -6,10 +6,13 @@ param(
     [SecureString]$CertificatePassword,
     $CN = $null,
     $DNS = $null,
-    $CertFile = "ravensecure.pfx",
+    $CertFile = "ravencertificate.pfx",
     $SignerName = "RavenDB Server CA",
     $SubjectCA = "CN=$env:UserDomain Certificate Authority,O=$env:UserDomain,OU=$env:UserDomain's RavenDB Operations"
 )
+
+if (Test-Path -Path "~\raven") { Remove-Item -Path ~\raven -Recurse -Force }
+New-Item -Path "~" -Name "raven" -ItemType "directory" 
 
 $rootStore = new-object System.Security.Cryptography.X509Certificates.X509Store(
     [System.Security.Cryptography.X509Certificates.StoreName]::AuthRoot,
@@ -18,9 +21,13 @@ $rootStore = new-object System.Security.Cryptography.X509Certificates.X509Store(
 
 $rootStore.Open("MaxAllowed")
 
-if ([string]::IsNullOrEmpty($CN)) { $CN = "ravensecure" }
+if ([string]::IsNullOrEmpty($CN)) {
+    $CN = "ravensecure"
+}
 
-if ([string]::IsNullOrEmpty($DNS)) { $DNS = $CN }
+if ([string]::IsNullOrEmpty($DNS)) {
+    $DNS = $CN
+}
 
 if ([string]::IsNullOrEmpty($CertName)) {
     $certId = -Join ((65..90) | Get-Random -Count 5 | % { [char]$_ })
@@ -31,7 +38,7 @@ $existingCert = $($rootStore.Certificates | Where-Object { $_.FriendlyName -eq $
 
 if ($existingCert -eq $null) {
    
-    $existingCert = New-SelfSignedCertificate `
+    $existingCert = PKI\New-SelfSignedCertificate `
         -CertStoreLocation "cert:\LocalMachine\My" `
         -HashAlgorithm sha256 `
         -NotAfter ([DateTime]::Today).AddYears(3) `
@@ -57,7 +64,7 @@ Write-Host
 Write-Host "Friendly name is $CertName"
 Write-Host "Subject is $subject"
 
-$cert = New-SelfSignedCertificate `
+$cert = PKI\New-SelfSignedCertificate `
     -Verbose `
     -NotAfter ([DateTime]::Today).AddYears(3) `
     -NotBefore ([DateTime]::Today).AddDays(-1) `
@@ -73,7 +80,7 @@ $cert = New-SelfSignedCertificate `
     -Signer $existingCert
 
 $certThumbprint = $cert.Thumbprint
-$pfxPath = [io.path]::combine(".", $CertFile)
+$pfxPath = "~\raven\$CertFile"
 $certStorePath = "cert:\CurrentUser\My\$certThumbprint";
 
 Export-PfxCertificate -cert $certStorePath -FilePath $pfxPath -Password $CertificatePassword -Force -Verbose

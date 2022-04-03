@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  #UNSECURE RAVEN CONTAINER
+  ravenunsecure:
+    image: ravendb/ravendb
+    hostname: "{{.Service.Name}}"
+    ports:
+      - 8083:8080
+      - 38888:38888
+      - 2377:2377
+      - 7946:7946
+      - 4789:4789
+    networks:
+      - host
+    environment:
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork 
+      - RAVEN_Setup_Mode=${RAVEN_INITIAL_MODE}    
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_DataDir=/opt/RavenDB/Server/RavenData
+      - RAVEN_ServerUrl=http://${RAVEN_HOSTNAME}:8080
+      - RAVEN_ServerUrl_Tcp=tcp://${RAVEN_HOSTNAME}:38888       
+      - RAVEN_MaxPageSize=4000
+      - RAVEN_IN_DOCKER=true    
+    volumes:
+      - data_unsecurecontainer:/opt/RavenDB/Server/RavenData 

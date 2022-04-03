@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  test:
+    image: alpine:latest
+    hostname: "{{.Service.Name}}"
+    entrypoint:
+      - Scripts/Linux_Initial_Test_Script.sh
+    ports:
+      - 2377:2377
+      - 7946:7946
+      - 4789:4789
+    networks:
+      - host
+    environment:
+      - LOGSPOUT=ignore
+    volumes:
+      - ./Scripts:/Scripts

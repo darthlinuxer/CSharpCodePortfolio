@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  test:
+    image: alpine:latest
+    hostname: "{{.Service.Name}}"
+    entrypoint:
+      - Scripts/Linux_Initial_Test_Script.sh
+    ports:
+      - 2377:2377
+      - 7946:7946
+      - 4789:4789
+    networks:
+      - host
+    secrets:
+      - API_KESTREL_PASSWORD
+      - RAVEN_SERVER_PASSWORD
+    environment:
+      - API_CERTIFICATE_PATH=${API_CERTIFICATE_PATH}
+      - API_CERTIFICATE_FILE=${API_CERTIFICATE_FILE}
+      - RAVEN_HOSTNAME=${RAVEN_HOSTNAME}
+      - RAVEN_CERTIFICATE_PATH=${RAVEN_CERTIFICATE_PATH}
+      - API_KESTREL_PASSWORD_FILE=/run/secrets/API_KESTREL_PASSWORD
+      - RAVEN_SERVER_PASSWORD_FILE=/run/secrets/RAVEN_SERVER_PASSWORD
+      - LOGSPOUT=ignore
+    volumes:
+      - ./Scripts:/Scripts
+      - ${USERPROFILE}/.aspnet/https:/${API_CERTIFICATE_PATH}

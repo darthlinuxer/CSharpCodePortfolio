@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  api:
+    image: mytestapi:dev
+    hostname: "{{.Service.Name}}"
+    ports:
+      - 8081:80  
+      - 443:443       
+    secrets:
+      - API_KESTREL_PASSWORD 
+    networks:
+      - host
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_HTTP_PORT=80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password_FILE=/run/secrets/API_KESTREL_PASSWORD
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/${API_CERTIFICATE_PATH}/${API_CERTIFICATE_FILE}
+    volumes:
+      - ${USERPROFILE}\.aspnet\https:/app/${API_CERTIFICATE_PATH} 
+      - .\Scripts:/Scripts

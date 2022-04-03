@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:  
+  ravensecure:
+    image: ravendb/ravendb
+    hostname: "{{.Service.Name}}"
+    ports:
+      - 8082:443
+      - 38888:38888
+      - 2377:2377
+      - 7946:7946
+      - 4789:4789
+    networks:
+      - host
+    expose:
+      - "443"
+      - "38888"
+    secrets:
+      - RAVEN_SERVER_PASSWORD
+    environment:
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_HTTP_PORT=80 
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork 
+      - RAVEN_Setup_Mode=${RAVEN_INITIAL_MODE}
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_Logs_Mode=Information
+      - RAVEN_DataDir=/opt/RavenDB/Server/RavenData   
+      - RAVEN_ServerUrl=https://${RAVEN_HOSTNAME}:443
+      - RAVEN_ServerUrl_Tcp=tcp://${RAVEN_HOSTNAME}:38888          
+      - RAVEN_Security_Certificate_Path=/opt/RavenDB/Server/${RAVEN_CERTIFICATE_PATH}/${RAVEN_CERTIFICATE_FILE}
+      #  If your certificate does not have a password, comment line below
+      - RAVEN_Security_Certificate_Password_FILE=/run/secrets/RAVEN_SERVER_PASSWORD
+      - RAVEN_AUTO_INSTALL_CA=true   
+      - RAVEN_MaxPageSize=4000
+      - RAVEN_IN_DOCKER=true   
+    volumes:
+      - data_securecontainer:/opt/RavenDB/Server/RavenData
+      - ${USERPROFILE}/.raven:/opt/RavenDB/Server/${RAVEN_CERTIFICATE_PATH}

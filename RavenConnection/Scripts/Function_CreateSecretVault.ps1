@@ -24,22 +24,42 @@ function CreateVault {
         Write-Host "Secure Module not installed! Installing..."
         Install-Module -Name `
             Microsoft.PowerShell.SecretManagement, `
-            Microsoft.PowerShell.SecretStore
+            Microsoft.PowerShell.SecretStore `
+            -Force -AllowClobber -Verbose 
         Get-Command -Module Microsoft.PowerShell.SecretManagement
         Get-Command -Module Microsoft.PowerShell.SecretStore
+    } else {
+        Write-Host "Secure Modules are installed! Ok..."
     }
 
     #Create a Secret Vault
-    If ($null -eq (Get-SecretVault -Name $VaultName)) {   
-        Write-Host "Vault $VaultName does not exist!"
-        Write-Host "Creating Vault $VaultName"
-        Register-SecretVault -Name $VaultName -ModuleName Microsoft.PowerShell.SecretStore -Description "My Secret vault"
+    try {
+        If ($null -ne (Get-SecretVault -Name $VaultName -ErrorAction Stop)) {   
+            Write-Host `
+                -BackgroundColor yellow `
+                -ForegroundColor black `
+                "Vault $VaultName already exists!!!"
+        }
     }
-
+    catch {
+        Write-Host `
+            -BackgroundColor red `
+            -ForegroundColor white `
+            "Vault $VaultName does not exist!"
+        Write-Host `
+            -BackgroundColor yellow `
+            -ForegroundColor black `
+            "Creating Vault $VaultName"
+        Register-SecretVault -Name $VaultName -ModuleName Microsoft.PowerShell.SecretStore -Description "My Secret vault"
+        #Show created Vault
+        Get-SecretVault -Name $VaultName | Select-Object *
+        Write-Host `
+            -BackgroundColor yellow `
+            -ForegroundColor black `
+            "Check if Vault was created correctly!"
+        PAUSE
+    }
+    
     #This will Disable passwords in the Vault. 
     #Set-SecretStoreConfiguration -Authentication None -Interaction None
-
-    #Show created Vault
-    Get-SecretVault -Name $VaultName | Select-Object *
-
 }
