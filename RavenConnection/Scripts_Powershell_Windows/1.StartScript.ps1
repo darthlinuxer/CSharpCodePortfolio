@@ -34,10 +34,10 @@ $host.ui.rawui.ForegroundColor = "White"
 $Host.PrivateData.ErrorForegroundColor = "White"
 $Host.PrivateData.ErrorBackgroundColor = "Red"
 #Load External Functions
-. ".\Scripts\Function_GetPwdFromSecureString.ps1"
-. ".\Scripts\Function_CreateSecretVault.ps1"
-. ".\Scripts\Function_DeleteSecretVault.ps1"
-. ".\Scripts\Function_Write_Message.ps1"
+. ".\Scripts_Powershell_Windows\Function_GetPwdFromSecureString.ps1"
+. ".\Scripts_Powershell_Windows\Function_CreateSecretVault.ps1"
+. ".\Scripts_Powershell_Windows\Function_DeleteSecretVault.ps1"
+. ".\Scripts_Powershell_Windows\Function_Write_Message.ps1"
 
 #TRY TO READ CREDENTIALS FROM FILE
 try {
@@ -312,7 +312,7 @@ Function RUN_TEST_CONTAINER {
     WRITE_MSG `
         -Message "docker stack deploy -c stack-common.yml -c stack-test.yml -c stack-visualizer.yml rdi" `
         -Type "info"
-    docker stack deploy -c stack-common.yml -c stack-test.yml -c stack-visualizer.yml rdi
+    docker stack deploy -c ..\Cluster_Swarm\stack-common.yml -c ..\Cluster_Swarm\stack-test.yml -c ..\Cluster_Swarm\stack-visualizer.yml rdi
     WRITE_MSG -Message "Waiting 7s until all services are initialized" -Type "info"
     Start-Sleep 7
     WRITE_MSG `
@@ -334,8 +334,8 @@ Function RUN_API_CONTAINER {
         -Message "docker stack deploy -c stack-common.yml -c stack-api.yml rdi" `
         -Type "info"
     docker stack deploy `
-        -c stack-common.yml `
-        -c stack-api.yml `
+        -c ..\Cluster_Swarm\stack-common.yml `
+        -c ..\Cluster_Swarm\stack-api.yml `
         rdi
     WRITE_MSG -Message "Waiting 5s until container starts..." -Type "info"
     Start-Sleep 5
@@ -351,8 +351,8 @@ Function RUN_VISUALIZER_CONTAINER {
         -Message "docker stack deploy -c stack-common.yml -c stack-visualizer.yml rdi" `
         -Type "info"
     docker stack deploy `
-        -c stack-common.yml `
-        -c stack-visualizer.yml `
+        -c ..\Cluster_Swarm\stack-common.yml `
+        -c ..\Cluster_Swarm\stack-visualizer.yml `
         rdi
     PAUSE
     MENU
@@ -364,8 +364,8 @@ Function RUN_LOGGING_IN_CLOUD_CONTAINER {
         -Message "docker stack deploy -c stack-common.yml -c stack-logging.yml rdi" `
         -Type "info"
     docker stack deploy `
-        -c stack-common.yml `
-        -c stack-logging.yml `
+        -c ..\Cluster_Swarm\stack-common.yml `
+        -c ..\Cluster_Swarm\stack-logging.yml `
         rdi
     PAUSE
     MENU
@@ -377,7 +377,7 @@ Function RUN_RAVEN_UNSECURE_CONTAINER {
     WRITE_MSG `
         -Message "docker stack deploy -c stack-common.yml -c stack-ravenunsecure.yml -c stack-visualizer.yml rdi" `
         -Type "info"
-    docker stack deploy -c stack-common.yml -c stack-ravenunsecure.yml -c stack-visualizer.yml rdi 
+    docker stack deploy -c ..\Cluster_Swarm\stack-common.yml -c ..\Cluster_Swarm\stack-ravenunsecure.yml -c ..\Cluster_Swarm\stack-visualizer.yml rdi 
     PAUSE
     MENU
 }
@@ -388,7 +388,7 @@ Function RUN_RAVEN_SECURE_CONTAINER {
     WRITE_MSG `
         -Message "docker stack deploy -c stack-common.yml -c stack-ravensecure.yml -c stack-visualizer.yml rdi" `
         -Type "info"
-    docker stack deploy -c stack-common.yml -c stack-ravensecure.yml -c stack-visualizer.yml rdi
+    docker stack deploy -c ..\Cluster_Swarm\stack-common.yml -c ..\Cluster_Swarm\stack-ravensecure.yml -c ..\Cluster_Swarm\stack-visualizer.yml rdi
     PAUSE
     MENU
 }
