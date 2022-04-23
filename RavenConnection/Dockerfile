@@ -22,4 +22,4 @@ RUN dotnet publish "RavenConnection.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT [ "bash" , "/Scripts_Bash_Linux/Linux_Initial_API_Script.sh"]
+ENTRYPOINT [ "dotnet" , "RavenConnection.dll"]

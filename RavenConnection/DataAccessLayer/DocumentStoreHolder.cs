@@ -45,7 +45,7 @@ namespace RavenConnection.Database
             bool runningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
             string serverUrl = runningInContainer ? RavenDbConfig.UrlFromContainer : RavenDbConfig.UrlFromWindows;
 
-            bool ravenIsSecure = Environment.GetEnvironmentVariable("RAVEN_IS_SECURE") == "true";
+            /*bool ravenIsSecure = Environment.GetEnvironmentVariable("RAVEN_IS_SECURE") == "true";
             
             if (ravenIsSecure)
             {
@@ -70,7 +70,7 @@ namespace RavenConnection.Database
                 {
                     throw new Exception($"{ex.Message} , {ex.InnerException?.Message}");
                 }
-            }
+            }*/
 
             return new DocumentStore()
             {
