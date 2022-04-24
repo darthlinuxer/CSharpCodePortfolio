@@ -38,6 +38,7 @@ namespace RavenConnection
             // Configure RavenDB options and store holder
             services.Configure<RavenConfiguration>(Configuration.GetSection("Raven"));
             services.AddSingleton<IDocumentStoreHolder, DocumentStoreHolder>();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +50,8 @@ namespace RavenConnection
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RavenConnection v1"));
             }
+
+            app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
             app.UseHttpsRedirection();
 

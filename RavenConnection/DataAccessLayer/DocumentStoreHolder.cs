@@ -33,7 +33,7 @@ namespace RavenConnection.Database
 
             this._logger.LogInformation(
                 "🌟  Initialized RavenDB document store for {0} at {1}",
-                RavenDbConfig.Database, RavenDbConfig.UrlFromContainer);
+                RavenDbConfig.Database, RavenDbConfig.UrlsFromContainer.ToString());
 
             // Create indexes
             // IndexCreation.CreateIndexes(
@@ -43,7 +43,7 @@ namespace RavenConnection.Database
         private IDocumentStore CreateStore()
         {
             bool runningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-            string serverUrl = runningInContainer ? RavenDbConfig.UrlFromContainer : RavenDbConfig.UrlFromWindows;
+            var serverUrls = runningInContainer ? RavenDbConfig.UrlsFromContainer : RavenDbConfig.UrlsFromWindows;
 
             /*bool ravenIsSecure = Environment.GetEnvironmentVariable("RAVEN_IS_SECURE") == "true";
             
@@ -74,7 +74,7 @@ namespace RavenConnection.Database
 
             return new DocumentStore()
             {
-                Urls = new[]{serverUrl},
+                Urls = serverUrls.ToArray(),
                 Conventions =
                 {
                     MaxNumberOfRequestsPerSession = 10,

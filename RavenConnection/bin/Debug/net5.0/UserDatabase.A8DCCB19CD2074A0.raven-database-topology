@@ -1,0 +1,1 @@
+{"Nodes":[{"Url":"http://raven2:8080","Database":"UserDatabase","ClusterTag":"B","ServerRole":"Member"},{"Url":"http://localhost:8081","Database":"UserDatabase","ClusterTag":"A","ServerRole":"Member"}],"Etag":14,"PersistedAt":"2022-04-24T20:58:54.9453526+00:00"}

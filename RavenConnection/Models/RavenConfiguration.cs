@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+
 namespace RavenConnection.Models
 {
      public class RavenConfiguration
     {
-        public string UrlFromWindows { get; set; }
-        public string UrlFromContainer { get; set; }
+        public List<string> UrlsFromWindows { get; set; } = new List<string>();
+        public List<string> UrlsFromContainer { get; set; } = new List<string>();
         public string Database { get; set; }
     }
 }
