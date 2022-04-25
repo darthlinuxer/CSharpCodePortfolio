@@ -46,8 +46,8 @@ if (($SetupReplication -eq "N") -or ($SetupReplication -eq "n")) {
 }
   
 $nodes = @(
-    "http://raven1:8080",
-    "http://raven2:8080"
+    "http://localhost:8081",
+    "http://localhost:8082"
 );
   
 function AddNodeToCluster() {
