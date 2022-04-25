@@ -15,7 +15,7 @@ services:
       - RAVEN_PublicServerUrl=http://${Docker_Host_IP}:8081
       - RAVEN_PublicServerUrl_Tcp=tcp://${Docker_Host_IP}:38881
       - RAVEN_License_Eula_Accepted=true
-      - RAVEN_SecurityAuthenticationEnabled=false
+      - RAVEN_SecurityAuthenticationEnabled=true
     env_file: ./license.env
         
   raven2:
@@ -33,5 +33,5 @@ services:
       - RAVEN_PublicServerUrl=http://${Docker_Host_IP}:8082
       - RAVEN_PublicServerUrl_Tcp=tcp://${Docker_Host_IP}:38882
       - RAVEN_License_Eula_Accepted=true
-      - RAVEN_SecurityAuthenticationEnabled=false
+      - RAVEN_SecurityAuthenticationEnabled=true
     env_file: ./license.env

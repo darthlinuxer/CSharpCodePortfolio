@@ -1,4 +1,5 @@
 clear
+echo "Version 1.0.0"
 export Docker_Host_IP=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
 echo "Docker_Host_IP = $Docker_Host_IP"
 defaultContainerSecurity="unsecure"
