@@ -89,8 +89,10 @@ namespace RavenConnection.Database
             try
             {
                 DatabaseRecord databaseRecord = new DatabaseRecord(RavenDbConfig.Database);
-                CreateDatabaseOperation createDatabaseOperation = new CreateDatabaseOperation(databaseRecord);
-
+                CreateDatabaseOperation createDatabaseOperation =
+                    new CreateDatabaseOperation(
+                        databaseRecord: databaseRecord,
+                        replicationFactor: this.RavenDbConfig.UrlsFromContainer.Count);
                 Store.Maintenance.Server.Send(createDatabaseOperation);
             }
             catch (ConcurrencyException)

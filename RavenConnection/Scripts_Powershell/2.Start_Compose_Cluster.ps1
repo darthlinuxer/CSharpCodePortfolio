@@ -1,8 +1,20 @@
 Clear-Host
-docker-compose down
+$env:Docker_Host_Ip=Docker_Host_IP=docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
+Write-Host "Docker_Host_Ip: $Docker_Host_Ip"
+$DefaultSecurity="unsecure"
+$ContainerSecurity=$DefaultSecurity
+$ContainerSecurity = Read-Host "Start the Containers in Secure or Unsecure mode ? [Default:$DefaultSecurity]"
+if (([string]::IsNullOrWhiteSpace($ContainerSecurity)) -or ($ContainerSecurity.Equals($DefaultSecurity))) 
+{ 
+    $dockerComposeFile = "docker-compose-unsecure.yml"
+} else {
+    $dockerComposeFile = "docker-compose-secure.yml"
+}
+
+docker-compose -f $dockerComposeFile down
 docker container prune --force
 Clear-Host
-$composeCommand = "docker-compose up -d"
+
  
 $defaultContainerType="Linux"
 $ContainerOS = $defaultContainerType
@@ -16,7 +28,7 @@ if ($ContainerOS.Equals('Windows') -or $ContainerOS.Equals('windows')) {
     $env:container_image="ravendb/ravendb:5.2-ubuntu-latest"
 }
   
-Invoke-Expression -Command "$composeCommand $composeArgs"
+Invoke-Expression -Command "docker-compose -f $dockerComposeFile up -d"
 Start-Sleep -Seconds 10
 
 while(($containersStarted -ne "Y") -and ($containersStarted -ne "y"))

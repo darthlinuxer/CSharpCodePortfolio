@@ -1,8 +1,23 @@
 clear
-docker-compose down
+export Docker_Host_IP=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
+echo "Docker_Host_IP = $Docker_Host_IP"
+defaultContainerSecurity="unsecure"
+containerSecurity=$defaultContainerSecurity
+read -p "Start containers in Secure or Unsecure mode?  [Default:$defaultContainerSecurity] :"
+if [ ! -z ${REPLY} ]; then containerSecurity=${REPLY}; fi
+if [ $containerSecurity == "secure" ]; then 
+    dockercomposefile="docker-compose-secure.yml";
+else 
+    dockercomposefile="docker-compose-unsecure.yml"
+fi
+
+echo "docker-compose -f $dockercomposefile down"
+docker-compose -f $dockercomposefile down
 docker container prune --force
+echo "docker container prune --force"
 clear
  
+echo "executing $containerSecurity containers script..."
 defaultContainerType="Linux"
 ContainerOS=$defaultContainerType
 read -p "ContainerOS (Windows or Linux) [Default:$defaultContainerType] :"
@@ -16,15 +31,16 @@ else
     export container_image="ravendb/ravendb:5.2-ubuntu-latest";
 fi
   
-echo "Starting containers..."
-docker-compose up -d
+echo "Starting containers in $containerSecurity mode..."
+echo "docker-compose -f $dockercomposefile up -d"
+docker-compose -f $dockercomposefile up -d;
 sleep 10
 
 containersStarted="N"
 while [ $containersStarted == "N" ] || [ $containersStarted == "n" ]
 do
     clear
-    docker-compose ps -a
+    docker-compose -f $dockercomposefile ps -a
     read -p "Have all containers started (Y/N)?"
     if [ -z ${REPLY} ]; then containersStarted="N"; else containersStarted=${REPLY}; fi 
 done
