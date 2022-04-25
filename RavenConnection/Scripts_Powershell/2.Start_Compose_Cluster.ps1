@@ -52,10 +52,9 @@ $nodes = @(
   
 function AddNodeToCluster() {
     param($FirstNodeUrl, $OtherNodeUrl, $AssignedCores = 1)
-  
-    $otherNodeUrlEncoded = $OtherNodeUrl
-    $uri = "$FirstNodeUrl/admin/cluster/node?url=$otherNodeUrlEncoded"
+    $uri = "$($FirstNodeUrl)/admin/cluster/node?url=$($OtherNodeUrl)"
     $curlCmd = "curl -L -X PUT $uri"
+    Write-Host "docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c $curlCmd"
     docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c $curlCmd
     Write-Host
     docker logs $(docker ps -q -f name=raven_raven1)
@@ -71,8 +70,9 @@ foreach ($node in $nodes | Select-Object -Skip 1) {
   
     if ($nodeAcoresReassigned -eq $false) {
         write-host "Reassign cores on A to 1"
-        $uri = "$firstNodeIp/admin/license/set-limit?nodeTag=A&newAssignedCores=1"
+        $uri = "$($firstNodeIp)/admin/license/set-limit?nodeTag=A&newAssignedCores=1"
         $curlCmd = "curl -L -X PUT $uri"
+        Write-Host "docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c $curlCmd"
         docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c $curlCmd
         docker logs $(docker ps -q -f name=raven_raven1)
         Start-Sleep -Seconds 5
