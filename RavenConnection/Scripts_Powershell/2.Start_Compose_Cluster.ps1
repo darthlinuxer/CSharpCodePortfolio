@@ -5,10 +5,10 @@ Clear-Host
 $composeCommand = "docker-compose up -d"
  
 $defaultContainerType="Linux"
-$ContainerOS = "Linux"
+$ContainerOS = $defaultContainerType
 $ContainerOS = Read-Host "ContainerOS (Windows or Linux) [Default:$defaultContainerType]"
-$sh = @()
-if ($ContainerOS.Equals('Windows')) {
+
+if ($ContainerOS.Equals('Windows') -or $ContainerOS.Equals('windows')) {
     $sh = "pwsh"
     $env:container_image="ravendb/ravendb:5.2-windows-latest"
 } else {
@@ -19,15 +19,17 @@ if ($ContainerOS.Equals('Windows')) {
 Invoke-Expression -Command "$composeCommand $composeArgs"
 Start-Sleep -Seconds 10
 
-while(($containersStarted -ne "Y"))
+while(($containersStarted -ne "Y") -and ($containersStarted -ne "y"))
 {
     Invoke-Expression -Command "docker-compose ps -a"
     $containersStarted = Read-Host "Have all containers started (Y/N)?"
+    Clear-Host
 }
 
 
-$DontSetupReplication = Read-Host "Do you want to automatically setup replication (Y/N) "
-if ($DontSetupReplication -ne "Y") {
+$SetupReplication = Read-Host "Do you want to automatically setup replication (Y/N) "
+if ([string]::IsNullOrWhiteSpace($SetupReplication)) { $SetupReplication = "y" }
+if (($SetupReplication -eq "N") -or ($SetupReplication -eq "n")) {
     exit 0
 }
   
@@ -68,3 +70,5 @@ foreach ($node in $nodes | Select-Object -Skip 1) {
   
 write-host "Access raven1 on localhost:8081"
 write-host "Access raven2 on localhost:8082"  
+Start-Process microsoft-edge:http://localhost:8081
+Start-Process microsoft-edge:http://localhost:8082

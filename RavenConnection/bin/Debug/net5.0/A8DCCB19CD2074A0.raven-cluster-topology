@@ -1,1 +1,1 @@
-{"Topology":{"TopologyId":"fa05443f-4da4-4395-bc51-7cb902b303ac","Members":{"A":"http://localhost:8081","B":"http://raven2:8080"},"Promotables":{},"Watchers":{},"LastNodeId":"B","Etag":6},"Leader":"A","NodeTag":"A","Etag":6,"PersistedAt":"2022-04-24T20:58:54.3695534+00:00"}
+{"Topology":{"TopologyId":"b31198be-ea55-4e43-aaf1-d54993b9ffb6","Members":{"A":"http://localhost:8081","B":"http://raven2:8080"},"Promotables":{},"Watchers":{},"LastNodeId":"B","Etag":6},"Leader":"A","NodeTag":"A","Etag":6,"PersistedAt":"2022-04-25T12:09:58.0387332+00:00"}
