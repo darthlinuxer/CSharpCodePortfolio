@@ -1,5 +1,5 @@
 Clear-Host
-$env:Docker_Host_Ip=Docker_Host_IP=docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
+$env:Docker_Host_Ip=docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
 Write-Host "Docker_Host_Ip: $Docker_Host_Ip"
 $DefaultSecurity="unsecure"
 $ContainerSecurity=$DefaultSecurity
@@ -33,7 +33,7 @@ Start-Sleep -Seconds 10
 
 while(($containersStarted -ne "Y") -and ($containersStarted -ne "y"))
 {
-    Invoke-Expression -Command "docker-compose ps -a"
+    Invoke-Expression -Command "docker-compose -f $dockerComposeFile ps -a"
     $containersStarted = Read-Host "Have all containers started (Y/N)?"
     Clear-Host
 }
@@ -54,7 +54,7 @@ function AddNodeToCluster() {
     param($FirstNodeUrl, $OtherNodeUrl, $AssignedCores = 1)
   
     $otherNodeUrlEncoded = $OtherNodeUrl
-    $uri = "$($FirstNodeUrl)/admin/cluster/node?url=$($otherNodeUrlEncoded)"
+    $uri = "$FirstNodeUrl/admin/cluster/node?url=$otherNodeUrlEncoded"
     $curlCmd = "curl -L -X PUT $uri"
     docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c $curlCmd
     Write-Host
@@ -71,7 +71,7 @@ foreach ($node in $nodes | Select-Object -Skip 1) {
   
     if ($nodeAcoresReassigned -eq $false) {
         write-host "Reassign cores on A to 1"
-        $uri = "$($firstNodeIp)/admin/license/set-limit?nodeTag=A&newAssignedCores=1"
+        $uri = "$firstNodeIp/admin/license/set-limit?nodeTag=A&newAssignedCores=1"
         $curlCmd = "curl -L -X PUT $uri"
         docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c $curlCmd
         docker logs $(docker ps -q -f name=raven_raven1)

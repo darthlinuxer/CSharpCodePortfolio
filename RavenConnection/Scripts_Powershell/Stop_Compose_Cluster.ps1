@@ -1,2 +1,1 @@
-$composeCommand = "docker compose down"
-Invoke-Expression -Command $composeCommand
+docker compose -f docker-compose-secure.yml down
