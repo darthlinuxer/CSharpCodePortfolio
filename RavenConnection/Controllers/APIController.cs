@@ -3,6 +3,7 @@ using Microsoft.Net.Http.Headers;
 using Raven.Client.Documents.Session;
 using RavenConnection.Database;
 using RavenConnection.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -49,7 +50,7 @@ namespace RavenConnection.API
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetAllUsersWithPagination(int page=1, int pageSize=10)
+        public IActionResult GetAllUsersWithPagination(int page = 1, int pageSize = 10)
         {
             using IDocumentSession session = _db.Store.OpenSession();
             var users = session
@@ -62,20 +63,27 @@ namespace RavenConnection.API
             return Ok(new { users = users, stats = stats });
         }
 
-         [HttpGet]
+        [HttpGet]
         [Route("[action]")]
-        public IActionResult GetAllUsersWithName(string name, int page=1, int pageSize=10)
+        public IActionResult GetAllUsersWithName(string name, int page = 1, int pageSize = 10)
         {
-            using IDocumentSession session = _db.Store.OpenSession();
-            var users = session
-                .Query<User>()
-                .Statistics(out QueryStatistics stats)
-                .Where<User>(x=>x.FirstName == name)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            return Ok(new { users = users, stats = stats });
+            try{
+            using (IDocumentSession session = _db.Store.OpenSession())
+            {
+                var users = session
+                                  .Query<User>()
+                                  .Statistics(out QueryStatistics stats)
+                                  .Where<User>(x => x.FirstName == name)
+                                  .Skip((page - 1) * pageSize)
+                                  .Take(pageSize)
+                                  .ToList();
+                return Ok(new { users = users, stats = stats });
+            }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(ex);
+            }
         }
 
         [HttpGet]
