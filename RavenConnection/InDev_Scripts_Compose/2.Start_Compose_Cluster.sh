@@ -1,6 +1,7 @@
 clear
 echo "Version 1.0.0"
-export Docker_Host_IP=$(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
+sudo docker network create camilonet
+export Docker_Host_IP=$(sudo docker network inspect camilonet --format='{{(index .IPAM.Config 0).Gateway}}')
 echo "Docker_Host_IP = $Docker_Host_IP"
 defaultContainerSecurity="unsecure"
 containerSecurity=$defaultContainerSecurity
@@ -13,8 +14,8 @@ else
 fi
 
 echo "docker-compose -f $dockercomposefile down"
-docker-compose -f $dockercomposefile down
-docker container prune --force
+sudo docker-compose -f $dockercomposefile down
+sudo docker container prune --force
 echo "docker container prune --force"
 clear
  
@@ -34,14 +35,14 @@ fi
   
 echo "Starting containers in $containerSecurity mode..."
 echo "docker-compose -f $dockercomposefile up -d"
-docker-compose -f $dockercomposefile up -d;
+sudo docker-compose -f $dockercomposefile up -d;
 sleep 10
 
 containersStarted="N"
 while [ $containersStarted == "N" ] || [ $containersStarted == "n" ]
 do
     clear
-    docker-compose -f $dockercomposefile ps -a
+    sudo docker-compose -f $dockercomposefile ps -a
     read -p "Have all containers started (Y/N)?"
     if [ -z ${REPLY} ]; then containersStarted="N"; else containersStarted=${REPLY}; fi 
 done
@@ -63,9 +64,9 @@ function AddNodeToCluster {
     otherNodeUrlEncoded=$2
     uri="$firstNodeUrl/admin/cluster/node?url=$otherNodeUrlEncoded"
     curlCmd="curl -L -X PUT $uri"
-    echo docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c "$curlCmd"
-    docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c "$curlCmd"
-    docker logs $(docker ps -q -f name=raven_raven1)
+    echo sudo docker exec -it $(sudo docker ps -q -f name=raven_raven1) $sh -c "$curlCmd"
+    sudo docker exec -it $(sudo docker ps -q -f name=raven_raven1) $sh -c "$curlCmd"
+    sudo docker logs $(sudo docker ps -q -f name=raven_raven1)
     sleep 5
 }
       
@@ -80,9 +81,9 @@ do
         echo "Reassign cores on A to 1";
         uri="$firstNodeIp/admin/license/set-limit?nodeTag=A&newAssignedCores=1";
         curlCmd="curl -L -X PUT $uri";
-        echo docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c "$curlCmd";
-        docker exec -it $(docker ps -q -f name=raven_raven1) $sh -c "$curlCmd";
-        docker logs $(docker ps -q -f name=raven_raven1);
+        echo sudo docker exec -it $(sudo docker ps -q -f name=raven_raven1) $sh -c "$curlCmd";
+        sudo docker exec -it $(sudo docker ps -q -f name=raven_raven1) $sh -c "$curlCmd";
+        sudo docker logs $(sudo docker ps -q -f name=raven_raven1);
         sleep 5;
     fi
 done

@@ -3,6 +3,8 @@ services:
   raven1:
     image: ${container_image}
     container_name: raven_raven1
+    networks:
+      - camilonet
     ports:
       - 8081:8080
       - 38881:38888
@@ -21,6 +23,8 @@ services:
   raven2:
     image: ${container_image}
     container_name: raven_raven2
+    networks:
+      - camilonet
     ports:
       - 8082:8080
       - 38882:38888
@@ -35,3 +39,9 @@ services:
       - RAVEN_License_Eula_Accepted=true
       - RAVEN_SecurityAuthenticationEnabled=true
     env_file: ./license.env
+
+networks:
+  camilonet:
+
+volumes:
+  data:
