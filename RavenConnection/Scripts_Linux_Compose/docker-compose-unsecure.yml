@@ -12,8 +12,8 @@ services:
       - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
       - RAVEN_ServerUrl=http://raven1:8080
       - RAVEN_ServerUrl_Tcp=tcp://raven1:38888
-      #- RAVEN_PublicServerUrl=http://${Docker_Host_IP}:8081
-      #- RAVEN_PublicServerUrl_Tcp=tcp://${Docker_Host_IP}:38881
+      - RAVEN_PublicServerUrl=http://${Docker_Host_IP}:8081
+      - RAVEN_PublicServerUrl_Tcp=tcp://${Docker_Host_IP}:38881
       - RAVEN_License_Eula_Accepted=true
       - RAVEN_SecurityAuthenticationEnabled=false
     env_file: ./license.env

@@ -9,9 +9,9 @@ read -p "ContainerOS (Windows or Linux) [Default:$defaultContainerType] : "
 if [ ! -z ${REPLY} ]; then container_os = ${REPLY}; fi
 
 if [ $container_os == "Windows" ]; then 
-    container_image="ravendb/ravendb:5.2-windows-latest";
+    container_image="ravendb/ravendb:latest";
 else 
-    container_image="ravendb/ravendb:5.2-ubuntu-latest";
+    container_image="ravendb/ravendb:latest";
 fi
 
 docker run -d -it \

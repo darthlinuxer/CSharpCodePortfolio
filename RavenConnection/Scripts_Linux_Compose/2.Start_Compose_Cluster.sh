@@ -29,7 +29,7 @@ if [ $ContainerOS == 'Windows' ]; then
     export container_image="ravendb/ravendb:5.2-windows-latest";
 else 
     sh="bash";
-    export container_image="ravendb/ravendb:5.2-ubuntu-latest";
+    export container_image="ravendb/ravendb:latest";
 fi
   
 echo "Starting containers in $containerSecurity mode..."
