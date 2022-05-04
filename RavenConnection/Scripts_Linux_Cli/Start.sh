@@ -1,28 +1,37 @@
 clear
+Raven_BindPort=8080
+Raven_BindTcpPort=38888
 
 function StartRaven
 {
-    mode=$1; port=$2; tcpPort=$3; hostnameOrIp=$4
+    mode=$1; port=$2; tcpPort=$3; hostname=$4; publicIP=$5
     sudo docker kill "raven$node"
     sudo docker container prune --force
     clear
     sudo docker network create raven_net
-    sudo docker run -it -d --name $hostnameOrIp \
+    sudo docker volume create data_$hostname
+    sudo docker run -it -d --name $hostname \
+            -e RAVEN_ARGS="--log-to-console" \
             -e RAVEN_Setup_Mode=$mode \
-            -e RAVEN_Logs_Mode=Information \
-            -e RAVEN_License_Eula_Accepted=true \
-            -e RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork \
-            -e RAVEN_ServerUrl=http://$hostnameOrIp:8080 \
-            -e RAVEN_ServerUrl_Tcp=tcp://$hostnameOrIp:38888 \
-            -p $port:8080 -p $tcpPort:38888 \
-            -h $hostnameOrIp --network raven_net \
-            ravendb/ravendb:5.2-ubuntu-latest
+            -e RAVEN_Logs_Mode="Information" \
+            -e RAVEN_License_Eula_Accepted="true" \
+            -e RAVEN_Security_UnsecuredAccessAllowed="PublicNetwork" \
+            -e RAVEN_BindPort=$Raven_BindPort \
+            -e RAVEN_BindTcpPort=$Raven_BindTcpPort \
+            -e RAVEN_PublicServerUrl="http://$publicIp:$Raven_BindPort" \
+            -e RAVEN_PublicServerUrl_Tcp="tcp://$publicIp:$Raven_BindTcpPort" \
+            -e RAVEN_AUTO_INSTALL_CA="true" \
+            -e RAVEN_IN_DOCKER="true" \
+            -p $port:$Raven_BindPort -p $tcpPort:$Raven_BindTcpPort  \
+            -h $hostname --network bridge \
+            -v data_$hostname:/opt/RavenDB/Server/RavenData \
+            ravendb/ravendb:latest
 }
 
 function AddNodeToCluster {  
     master=$1
     slave=$2
-    uri="http://$master:8080/admin/cluster/node?url=http://$slave:8080"
+    uri="http://$master:$Raven_BindPort/admin/cluster/node?url=http://$slave:$Raven_BindPort"
     curlCmd="curl -L -X PUT $uri"
     echo sudo docker exec -it $(sudo docker ps -q -f name=$master) bash -c "$curlCmd"
     sudo docker exec -it $(sudo docker ps -q -f name=$master) bash -c "$curlCmd"
@@ -45,13 +54,15 @@ function menu
     if [ -z ${REPLY} ]; then showMenu=1 ; fi
     if [ ${REPLY} == 0 ]; then showMenu=0; fi
     if [ ${REPLY} == 1 ]; then 
-        read -p "Choose the node hostname or IP: "
-        hostnameOrIp=${REPLY}
+        read -p "Choose the node hostname: "
+        hostname=${REPLY}
+        read -p "what is the node publicIP ? <0.0.0.0 if local> "
+        publicIp=${REPLY}
         read -p "Choose the Port: "
         port=${REPLY}
         read -p "Choose the TCP Port: "
         tcpPort=${REPLY}
-        StartRaven "None" $port $tcpPort $hostnameOrIp; 
+        StartRaven "None" $port $tcpPort $hostname $publicIp; 
     fi  
     if [ ${REPLY} == 2 ]; then
         for container in $(sudo docker ps -q -f name=raven)

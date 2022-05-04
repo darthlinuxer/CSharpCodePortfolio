@@ -1,0 +1,1 @@
+{"Topology":{"TopologyId":"c5787b1e-a7f7-48cc-b95a-92e9b5297a11","Members":{"A":"http://localhost:8080","B":"http://raven2:8080","C":"http://raven3:8080"},"Promotables":{},"Watchers":{},"LastNodeId":"C","Etag":12},"Leader":"A","NodeTag":"A","Etag":12,"PersistedAt":"2022-05-04T19:31:29.5392308+00:00"}

@@ -33,7 +33,7 @@ namespace RavenConnection.Database
 
             this._logger.LogInformation(
                 "🌟  Initialized RavenDB document store for {0} at {1}",
-                RavenDbConfig.Database, RavenDbConfig.UrlsFromContainer.ToString());
+                RavenDbConfig.Database, RavenDbConfig.UrlsFromWindows.ToString());
 
             // Create indexes
             // IndexCreation.CreateIndexes(
@@ -92,7 +92,7 @@ namespace RavenConnection.Database
                 CreateDatabaseOperation createDatabaseOperation =
                     new CreateDatabaseOperation(
                         databaseRecord: databaseRecord,
-                        replicationFactor: this.RavenDbConfig.UrlsFromContainer.Count);
+                        replicationFactor: this.RavenDbConfig.UrlsFromWindows.Count);
                 Store.Maintenance.Server.Send(createDatabaseOperation);
             }
             catch (ConcurrencyException)
