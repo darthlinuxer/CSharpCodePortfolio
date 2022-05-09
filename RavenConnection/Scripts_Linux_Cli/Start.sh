@@ -8,11 +8,7 @@ defaultTcpPort=38888
 function StartRaven
 {
     mode=$1; port=$2; tcpPort=$3; hostname=$4; publicIP=$5 ; runInCloud=$6
-<<<<<<< HEAD
-    if [ $runInCloud == "yes" ]; then 
-=======
     if [ $runInCloud == "yes" ] || [ $runInCloud == "y" ] || [ $runInCloud == "Y" ]; then
->>>>>>> 7adefefdf7872259d48ed8b9a8389abb4afccb5e
         RAVEN_URL="RAVEN_PublicServerUrl";
         RAVEN_TCP="RAVEN_PublicServerUrl_Tcp";
     else
