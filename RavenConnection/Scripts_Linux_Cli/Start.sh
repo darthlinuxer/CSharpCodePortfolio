@@ -8,13 +8,16 @@ defaultTcpPort=38888
 function StartRaven
 {
     mode=$1; port=$2; tcpPort=$3; hostname=$4; publicIP=$5 ; runInCloud=$6
-    if [ $runInCloud == "yes "]; then 
+    if [ $runInCloud == "yes" ]; then 
         RAVEN_URL="RAVEN_PublicServerUrl";
         RAVEN_TCP="RAVEN_PublicServerUrl_Tcp";
     else
         RAVEN_URL="RAVEN_ServerUrl";
         RAVEN_TCP="RAVEN_ServerUrl_Tcp";
     fi
+    echo "Start Raven Container"
+    echo "RAVEN_URL=$RAVEN_URL"
+    echo "RAVEN_TCP=$RAVEN_TCP"
     sudo docker kill "raven$node"
     sudo docker container prune --force
     clear
@@ -66,7 +69,7 @@ function menu
     if [ $option == 0 ]; then showMenu=0; fi
     if [ $option == 1 ]; then 
         read -p "Is container running in cloud? [no] (yes/no) :";
-        if [ -z ${REPLY} ]; then runInCloud="no"; else runInCloud="yes"; fi
+        if [ -z ${REPLY} ] || [ ${REPLY} == "no" ] || [ ${REPLY} == "NO" ]; then runInCloud="no"; else runInCloud="yes"; fi
         echo "runInCloud: $runInCloud"
         read -p "Choose the node hostname: ";
         hostname=${REPLY};
