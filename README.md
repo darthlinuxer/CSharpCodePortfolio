@@ -13,7 +13,7 @@ My Collection of C# Codes in [Fiddle](https://dotnetfiddle.net/)
 | [Dependency Inversion using Dependency Injection Services for Constructor and Property][7.1] | [Design Pattern: Observer][7.2] | [Standard Interface Methods][7.3]
 | [UNIT Tests with Reflection and Moq][8.1] | [Design Pattern: Observer using Events][8.2] | [Using Async Main][8.3]
 | [Client/Server Socket Communication][9.1] | [Solid: Dependency Inversion][9.2] | [Using Ranges][9.3]
-| [Using Anonymous Pipes for Communication between Threads][10.1] | [Solid: Interface Segregation Principle][10.2] | [Extention Methods combined with Base64 conversions][10.3]
+| [Using Anonymous Pipes for Communication between Threads][10.1] | [Solid: Interface Segregation Principle][10.2] | [ Extension Methods combined with Base64 conversions][10.3]
 | [Json Serializer and De-Serializer][11.1] |  | [Delegates and Events][11.3]
 | [SQLite in .NET][12.1] | | [Secure Strings][12.3]
 | [Convert List<T> to DataTable][13.1] |  | [Exceptions][13.3]
