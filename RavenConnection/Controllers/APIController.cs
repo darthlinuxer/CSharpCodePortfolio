@@ -53,12 +53,11 @@ namespace RavenConnection.API
         public IActionResult GetAllUsersWithPagination(int page = 1, int pageSize = 10)
         {
             using IDocumentSession session = _db.Store.OpenSession();
-            var users = session
-                .Query<User>()
-                .Statistics(out QueryStatistics stats)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var users = session.Query<User>()
+                               .Statistics(out QueryStatistics stats)
+                               .Skip((page - 1) * pageSize)
+                               .Take(pageSize)
+                               .ToList();
 
             return Ok(new { users = users, stats = stats });
         }
@@ -67,19 +66,21 @@ namespace RavenConnection.API
         [Route("[action]")]
         public IActionResult GetAllUsersWithName(string name, int page = 1, int pageSize = 10)
         {
-            try{
-            using (IDocumentSession session = _db.Store.OpenSession())
+            try
             {
-                var users = session
-                                  .Query<User>()
-                                  .Statistics(out QueryStatistics stats)
-                                  .Where<User>(x => x.FirstName == name)
-                                  .Skip((page - 1) * pageSize)
-                                  .Take(pageSize)
-                                  .ToList();
-                return Ok(new { users = users, stats = stats });
+                using (IDocumentSession session = _db.Store.OpenSession())
+                {
+                    var users = session
+                                      .Query<User>()
+                                      .Statistics(out QueryStatistics stats)
+                                      .Where<User>(x => x.FirstName == name)
+                                      .Skip((page - 1) * pageSize)
+                                      .Take(pageSize)
+                                      .ToList();
+                    return Ok(new { users = users, stats = stats });
+                }
             }
-            } catch (Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return BadRequest(ex);
@@ -122,6 +123,36 @@ namespace RavenConnection.API
             session.SaveChanges();
             return Ok(new { User = usrFromDb, message = "User updated successfully!" });
         }
+
+        [HttpDelete]
+        [Route("[action]")]
+        public IActionResult DeleteUserById(string id)
+        {
+            using IDocumentSession session = _db.Store.OpenSession();
+            var user = session.Load<User>(id);
+            if (user is null) return NotFound(new { error = $"user with Id {id} does not exist!" });
+            session.Delete(id);
+            session.SaveChanges();
+            return Ok(new { User = user, message = "User deleted!" });
+        }
+
+        [HttpDelete]
+        [Route("[action]")]
+        public IActionResult DeleteUserByIdWithoutCheckIfIdExists(string id)
+        {
+            try
+            {
+                using IDocumentSession session = _db.Store.OpenSession();
+                session.Delete(id);
+                session.SaveChanges();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Ok(ex.Message);
+            }
+        }
+
 
     }
 }

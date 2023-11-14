@@ -4,6 +4,7 @@ Raven_BindPort=8080
 Raven_BindTcpPort=38888
 defaultPort=8080
 defaultTcpPort=38888
+version="latest"
 
 function StartRaven
 {
@@ -43,7 +44,7 @@ function StartRaven
             -p $port:$Raven_BindPort -p $tcpPort:$Raven_BindTcpPort  \
             -h $hostname --network raven_net \
             -v data_$hostname:/opt/RavenDB/Server/RavenData \
-            ravendb/ravendb:latest
+            ravendb/ravendb:$version
 }
 
 function AddNodeToCluster {  

@@ -1,30 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "/home/cchaves/dev/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {}
+    "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {}
   },
   "projects": {
-    "/home/cchaves/dev/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {
+    "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/cchaves/dev/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
+        "projectUniqueName": "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
         "projectName": "RavenConnection",
-        "projectPath": "/home/cchaves/dev/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
-        "packagesPath": "/home/cchaves/.nuget/packages/",
-        "outputPath": "/home/cchaves/dev/CSharpCodePortfolio/RavenConnection/obj/",
+        "projectPath": "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
+        "packagesPath": "/root/.nuget/packages/",
+        "outputPath": "/home/CSharpCodePortfolio/RavenConnection/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/cchaves/.nuget/NuGet/NuGet.Config"
+          "/root/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net5.0"
+          "net6.0"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net5.0": {
-            "targetAlias": "net5.0",
+          "net6.0": {
+            "targetAlias": "net6.0",
             "projectReferences": {}
           }
         },
@@ -32,11 +32,14 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "default"
         }
       },
       "frameworks": {
-        "net5.0": {
-          "targetAlias": "net5.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "dependencies": {
             "RavenDB.Client": {
               "target": "Package",
@@ -53,7 +56,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -65,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.202/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/root/.dotnet/sdk/8.0.100-preview.7.23376.3/RuntimeIdentifierGraph.json"
         }
       }
     }
