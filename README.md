@@ -1049,6 +1049,7 @@ Source:  <br>
 (3) What is Polymorphism in C# | CodeGuru.com. https://www.codeguru.com/csharp/c-sharp-polymorphism/.<br>
 (4) Understanding Polymorphism In C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/ff2f08/understanding-polymorphism-in-C-Sharp/.<br>
 </details>
+<details>
 <summary>Explain operator overloading</summary>
 
 Operator overloading in C# allows a user-defined type to overload a predefined C# operator. This means a type can provide a custom implementation of an operation when one or both of the operands are of that type¹. 
