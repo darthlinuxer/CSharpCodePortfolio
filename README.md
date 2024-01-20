@@ -727,6 +727,7 @@ public class Animal
 
 public class Pig : Animal
 {
+    public string LikesBest {get;} = "corn";
     public override void animalSound()
     {
         Console.WriteLine("The pig says: wee wee");
@@ -742,6 +743,7 @@ class Program
 
         myAnimal.animalSound();
         myPig.animalSound();
+        Console.WriteLine("Likes:" + myPig.LikesBest);
     }
 }
 ```
@@ -773,6 +775,12 @@ public class Dog : Animal
     }
 }
 
+public class Calculator
+{
+	public static int Add(int a, int b) => a + b;
+	public static int Add(string a, string b) => Int32.Parse(a)+Int32.Parse(b);
+}
+
 class Program
 {
     static void Main(string[] args)
@@ -784,6 +792,9 @@ class Program
         myAnimal.animalSound();
         myPig.animalSound();
         myDog.animalSound();
+
+        Console.WriteLine(Calculator.Add(1,2));
+	    Console.WriteLine(Calculator.Add("1","2"));	
     }
 }
 ```
@@ -801,25 +812,319 @@ Source: <br>
 </details>
 <details>
 <summary>What is a class and what is an object?</summary>
+In programming, a class is a blueprint or template that defines what an object’s characteristics should be. It is a user-defined data type that holds its own data members and member functions. 
+
+An object, on the other hand, is an instance of a class. All data members and member functions of the class can be accessed with the help of objects. When a class is defined, no memory is allocated, but memory is allocated when it is instantiated (i.e., an object is created)
 </details>
 <details>
 <summary>Abstraction vs Encapsulation</summary>
+
+
+| Concept | Definition | Phase | Implementation |
+| --- | --- | --- | --- |
+| **Abstraction** | Abstraction is a design thought process that decides what has to be shown public. It means showing only what is necessary. | Design Phase | Implemented by Encapsulation |
+| **Encapsulation** | Encapsulation is the use of access modifiers like private, public, and protected to hide complexity. It hides the functions that are created during the execution phase. | Execution Phase | Implemented by using access modifiers |
+
+Both abstraction and encapsulation complement each other. While abstraction happens during the design phase, encapsulation is executed during the coding phase. Encapsulation implements the thought process of abstraction.
 </details>
 <details>
 <summary>Explain Inheritance?</summary>
+
+**Inheritance** is a key concept in Object-Oriented Programming (OOP) that allows a new class to inherit the properties and methods of an existing class. This establishes a parent-child relationship between two classes. For example, consider an `Employee` class. A new class, `Manager`, can be created that inherits from `Employee`, thereby gaining all its properties and methods. 
+
+In addition to the inherited characteristics, the `Manager` class can define its own unique methods. If an object is created from the `Manager` class, it will have access to both the inherited properties and methods from the `Employee` class, as well as any additional methods defined in the `Manager` class.
+
+This concept is often referred to as an "is-a" relationship. In this context, a `Manager` "is-a" type of `Employee`. This relationship is a common way to frame questions about inheritance in interviews. 
+
+Here is a summary:
+
+| Concept | Definition |
+| --- | --- |
+| **Inheritance** | A property of OOP that allows a new class to inherit the properties and methods of an existing class, establishing a parent-child relationship. |
+| **Is-a Relationship** | A way of describing the inheritance relationship, where the child class "is a" type of the parent class. |
 </details>
 <details>
 <summary>Explain virtual keyword</summary>
+
+In C# .NET, the `virtual` keyword is used to modify a method, property, indexer, or event declaration and allow it to be overridden in a derived class¹. This concept is known as method overriding, and it is a fundamental feature of object-oriented programming, enabling polymorphism and providing flexibility in class hierarchies⁵.
+
+Here's an example of how the `virtual` keyword can be used in C#:
+
+```csharp
+public abstract class Shape
+{
+	public const double PI = Math.PI;
+	protected double _x, _y;
+
+	public Shape(double x, double y)
+	{
+		_x = x;
+		_y = y;
+	}
+
+	public virtual double Area()
+	{
+		return _x * _y;
+	}
+}
+
+public class Circle : Shape
+{
+	public Circle(double r) : base(r, 0) { }
+
+	public override double Area()
+	{
+		return PI * _x * _x;
+	}
+}
+
+void Main(){
+	var circle = new Circle(10);
+	Console.WriteLine(circle.Area());
+}
+```
+
+In this example, `Shape` is a base class with a `virtual` method `Area()`. The `Circle` class is a derived class that overrides the `Area()` method with its own implementation¹.
+
+By default, methods are non-virtual. You cannot override a non-virtual method¹. You also cannot use the `virtual` modifier with the `static`, `abstract`, `private`, or `override` modifiers¹.
+
+The `virtual` keyword is essential for implementing polymorphism, one of the four fundamental principles of Object-Oriented Programming (OOP), alongside encapsulation, inheritance, and abstraction¹.
+
+Source: <br>
+(1) virtual - C# Reference - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/virtual.<br>
+(2) Understanding the 'virtual' Keyword in C# - techieclues.com. https://www.techieclues.com/tutorials/csharp-keywords/virtual-keyword-in-csharp.<br>
+(3) .net - virtual keyword in c# - Stack Overflow. https://stackoverflow.com/questions/13856879/virtual-keyword-in-c-sharp.<br>
+(4) Virtual Keyword in C# | Learn How Virtual Keyword Functions in C# - EDUCBA. https://www.educba.com/virtual-keyword-in-c-sharp/.<br>
+(5) Understanding Virtual, Override and New Keywords in C#. https://dev.to/nextpixel/understanding-virtual-override-and-new-keywords-in-c-2g0e.<br>
+(6) github.com. https://github.com/dotnet/docs/tree/4085baad57ae3bfc82c0a0a77898b0ad55faaad3/samples%2Fsnippets%2Fcsharp%2FVS_Snippets_VBCSharp%2FcsrefKeywordsModifiers%2FCS%2FcsrefKeywordsModifiers.cs.<br>
 </details>
 <details>
 <summary>What is overriding ?</summary>
+
+**Overriding** in C# is a feature of Object-Oriented Programming (OOP) that allows a derived class to provide a specific implementation of a method that is already provided by its base class¹². This is achieved by creating a method in the derived class with the same name, return type, and parameter list as the method in the base class¹².
+
+Overriding is used to achieve runtime polymorphism, also known as dynamic polymorphism¹. The method that is overridden by an override declaration is known as the overridden base method¹². The overridden base method must be virtual, abstract, or override¹².
+
+Here is an example of method overriding in C#:
+
+```csharp
+public class Employee {
+    public virtual decimal CalculatePay() {
+        // calculate pay for an employee
+    }
+}
+
+public class SalesEmployee : Employee {
+    public override decimal CalculatePay() {
+        // calculate pay for a sales employee, which may include bonuses
+    }
+}
+```
+
+In this example, `CalculatePay()` is a virtual method in the `Employee` base class. The `SalesEmployee` class, which is a derived class, overrides the `CalculatePay()` method to provide its own implementation¹².
+
+Remember, you cannot override a non-virtual or static method². Both the override method and the virtual method must have the same access level modifier². You cannot use the new, static, or virtual modifiers to modify an override method²..
+
+Source: <br>
+(1) C# | Method Overriding - GeeksforGeeks. https://www.geeksforgeeks.org/c-sharp-method-overriding/.<br>
+(2) override modifier - C# Reference - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/override.<br>
+(3) Overriding in C# | Types of Overriding in C# with Examples - EDUCBA. https://www.educba.com/overriding-in-c-sharp/.<br>
+(4) C Sharp Method Overriding - W3schools. https://www.w3schools.blog/c-sharp-method-overriding.<br>
+(5) Method Overriding in C# - Code Maze. https://code-maze.com/csharp-method-overriding/.<br>
+(6) en.wikipedia.org. https://en.wikipedia.org/wiki/Method_overriding.<br>
 </details>
 <details>
 <summary>Explain overloading</summary>
+
+**Overloading** in C# is a feature of Object-Oriented Programming (OOP) that allows a class to have multiple methods with the same name but with a different signature¹². The methods can be overloaded based on the number, type (int, float, etc), order, and kind (Value, Ref or Out) of parameters⁴. This is known as **Method Overloading**¹².
+
+Method overloading is useful to perform multiple tasks with the same method name by passing different arguments¹. It is a common way of implementing polymorphism¹. Overloaded methods are differentiated based on the number and type of the parameters passed as arguments to the methods¹. You cannot define more than one method with the same name, order, and the type of the arguments¹.
+
+Here is an example of method overloading in C#:
+
+```csharp
+public class Calculation {
+    public int Add(int a, int b) {
+        return a + b;
+    }
+
+    public int Add(int a, int b, int c) {
+        return a + b + c;
+    }
+
+    public double Add(double a, double b, double c) {
+        return a + b + c;
+    }
+}
+```
+
+In this example, the `Add` method is overloaded with three different parameter lists. One method takes two integers, another takes three integers, and the third takes three doubles¹².
+
+Please note that the compiler does not consider the return type while differentiating the overloaded method¹. But you cannot declare two methods with the same signature and different return type¹. It will throw a compile-time error¹.
+
+Source: <br>
+(1) C# | Method Overloading - GeeksforGeeks. https://www.geeksforgeeks.org/c-sharp-method-overloading/.<br>
+(2) C# Method Overloading - W3Schools. https://www.w3schools.com/cs/cs_method_overloading.php.<br>
+(3) Method Overloading in C# with Examples - Dot Net Tutorials. https://dotnettutorials.net/lesson/function-overloading-csharp/.<br>
+(4) C# Method Overloading and Method Overriding with Examples. https://www.tutlane.com/article/csharp/method-overloading-and-overriding-in-csharp.<br>
+(5) Method Overloading In C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/0c1bb2/method-oveloading-and-overriding-C-Sharp/.<br>
 </details>
 <details>
 <summary>Overloading vs Overriding</summary>
+
+
+| | Overloading | Overriding |
+| --- | --- | --- |
+| **Definition** | Overloading allows a class to have multiple methods with the same name but with a different signature. | Overriding allows a derived class to provide a specific implementation of a method that is already provided by its base class. |
+| **Purpose** | Overloading is used to perform multiple tasks with the same method name by passing different arguments. | Overriding is used to achieve runtime polymorphism. |
+| **Method Name** | The method name is the same. | The method name is the same. |
+| **Parameter List** | The parameter list is different. | The parameter list is the same. |
+| **Return Type** | The return type can be different. | The return type is the same. |
+| **Modifiers** | No specific modifiers are required. | The base method must be marked with the `virtual`, `abstract`, or `override` keyword. The derived method must be marked with the `override` keyword. |
+| **Example** | `public int Add(int a, int b)` and `public int Add(int a, int b, int c)` are overloaded methods. | If `public virtual void Display()` is a method in the base class, `public override void Display()` is an overridden method in the derived class. |
+
 </details>
+
+<details>
+<summary>What is Polimorphism ?</summary>
+
+**Polymorphism** is one of the fundamental concepts of Object-Oriented Programming (OOP). The term is derived from two Greek words: "poly" meaning many, and "morphs" meaning forms¹. Therefore, polymorphism means "many forms" or the ability to take more than one form¹.
+
+In programming, polymorphism refers to the ability of a single entity (like a method or operator) to behave differently based on its input¹. It allows us to perform a single task in different ways¹. Polymorphism provides flexibility in our code because we can perform various operations using methods with the same names according to our business requirements¹.
+
+There are two types of polymorphism in C#:
+1. **Compile-Time Polymorphism / Static Polymorphism**: This is achieved through method overloading and operator overloading².
+2. **Run-Time Polymorphism / Dynamic Polymorphism**: This is achieved through method overriding².
+
+Here are some examples in C#:
+
+**Method Overloading (Compile-Time Polymorphism)**:
+
+```csharp
+public class Calculation {
+    // method adds two integer numbers
+    void totalSum(int a, int b) {
+        Console.WriteLine("The sum of numbers is " + (a + b));
+    }
+
+    // method adds two double-type numbers
+    // totalSum() method is overloaded
+    void totalSum(double a, double b) {
+        Console.WriteLine("The sum of numbers is " + (a + b));
+    }
+}
+```
+
+In this example, the `totalSum()` method is overloaded. It performs different operations based on the parameter type².
+
+**Method Overriding (Run-Time Polymorphism)**:
+
+```csharp
+public class Shape {
+    public virtual double Area() {
+        return 0;
+    }
+}
+
+public class Circle : Shape {
+    private double _radius;
+
+    public Circle(double radius) {
+        _radius = radius;
+    }
+
+    public override double Area() {
+        return Math.PI * Math.Pow(_radius, 2);
+    }
+}
+```
+
+In this example, the `Area()` method in the `Shape` class is overridden in the `Circle` class to provide a specific implementation for the area of a circle².
+
+Polymorphism is a powerful tool in OOP that allows for increased flexibility and more intuitive design in your code¹.
+
+Source:  <br>
+(1) Polymorphism in C# with Examples - Dot Net Tutorials. https://dotnettutorials.net/lesson/polymorphism-csharp/.<br>
+(2) C# Polymorphism (With Examples) - Programiz. https://www.programiz.com/csharp-programming/polymorphism.<br>
+(3) What is Polymorphism in C# | CodeGuru.com. https://www.codeguru.com/csharp/c-sharp-polymorphism/.<br>
+(4) Understanding Polymorphism In C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/ff2f08/understanding-polymorphism-in-C-Sharp/.<br>
+</details>
+<summary>Explain operator overloading</summary>
+
+Operator overloading in C# allows a user-defined type to overload a predefined C# operator. This means a type can provide a custom implementation of an operation when one or both of the operands are of that type¹. 
+
+Here's an example of operator overloading in C# using a simplified structure to represent a rational number¹:
+
+```csharp
+public readonly struct Fraction  
+{
+    private readonly int num;
+    private readonly int den;
+
+    public Fraction(int numerator, int denominator) 
+    {
+        if (denominator == 0)  
+        { 
+            throw new ArgumentException ("Denominator cannot be zero.", nameof(denominator));  
+        }  
+        num = numerator;  
+        den = denominator;  
+    }
+
+    public static Fraction operator + (Fraction a) => a;
+    public static Fraction operator - (Fraction a) => new Fraction (-a.num, a.den);
+    public static Fraction operator + (Fraction a, Fraction b)  
+        => new Fraction (a.num * b.den + b.num * a.den, a.den * b.den);
+    public static Fraction operator - (Fraction a, Fraction b)  
+        => a + (-b);
+    public static Fraction operator * (Fraction a, Fraction b)  
+        => new Fraction (a.num * b.num, a.den * b.den);
+    public static Fraction operator / (Fraction a, Fraction b)  
+    {
+        if (b.num == 0)  
+        { 
+            throw new DivideByZeroException ();  
+        }
+        return new Fraction (a.num * b.den, a.den * b.num);  
+    }
+
+    public override string ToString() => $"{num} / {den}";
+}
+
+public static class OperatorOverloading 
+{
+    public static void Main() 
+    {
+        var a = new Fraction (5, 4);
+        var b = new Fraction (1, 2);  
+
+        Console.WriteLine (-a); // output: -5 / 4
+        Console.WriteLine (a + b); // output: 14 / 8
+        Console.WriteLine (a - b); // output: 6 / 8
+        Console.WriteLine (a * b); // output: 5 / 8
+        Console.WriteLine (a / b); // output: 10 / 4
+    }
+}
+```
+
+In this example, the `Fraction` structure overloads some of the arithmetic operators¹. The `operator` keyword is used to declare an operator¹. An operator declaration must satisfy the following rules¹:
+- It includes both a `public` and a `static` modifier.
+- A unary operator has one input parameter.
+- A binary operator has two input parameters.
+- In each case, at least one parameter must have type `T` or `T?` where `T` is the type that contains the operator declaration¹.
+
+Source: <br>
+(1) Operator overloading - Define unary, arithmetic, equality, and .... https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/operator-overloading.<br>
+(2) Operator Overloading in C# with Examples - Dot Net Tutorials. https://dotnettutorials.net/lesson/operator-overloading-in-csharp/.<br>
+(3) operator Overloading in C# - Stack Overflow. https://stackoverflow.com/questions/5966392/operator-overloading-in-c-sharp.<br>
+(4) c# - Examples of operator overloading, which make sense - Software .... https://softwareengineering.stackexchange.com/questions/136519/examples-of-operator-overloading-which-make-sense.<br>
+(5) github.com. https://github.com/KomarovaAA/Formatter/tree/f0b6fd01195408dea33d6a5c9556de68cb8bba2e/Formatter%2FSpaces.cs.<br>
+(6) github.com. https://github.com/longtenggenssupreme/linjietest/tree/882bd0205f268c375da3494e87f144f676d03578/EFCOREDB%2FProgram.cs.<br>
+(7) github.com. https://github.com/antewik/FindPrivateKey2/tree/c12767c1f954b889c246c7dfc8acfb4e880c1734/csharp%2Flanguage-reference%2Foperators%2FOperatorOverloading.cs.<br>
+(8) github.com. https://github.com/verseek/FUNPOO2021_1/tree/9fe0775aaaad62cdd5cbef61735f8128d332797d/_003_8_SobreCargaDeOperadores%2FOperatorOverloading.cs.<br>
+</details>
+
+
 </details>
 <details>
 <summary>Intermediate Questions</summary>
