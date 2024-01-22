@@ -1,11 +1,13 @@
-==== What is the difference between C# and .NET ?
-
+.What is the difference between C# and .NET ?
+[%collapsible]
+====
 * .NET is a Framework , C# is a programming language
 * .NET is a collection of libraries and it has a runtime
+====
 
-==== Differentiate between .NET Framework 4.x, .NET Core 3.x, .NET 5 and
-above>
-
+.Differentiate between .NET Framework 4.x, .NET Core 3.x, .NET 5 and above
+[%collapsible]
+====
 * .NET Framework is ONLY for Windows, it is slow as compared to .NET
 Core (packaged as one big framework), it is desktop based with WPF and
 Winforms, does not support microservices
@@ -17,10 +19,11 @@ unifies all .NET, it is multiplatform, developers no longer have to
 choose which platform they´re developing their applications
 
 NOTE: .NET and .NET Core have better performance because it has divided large DLLs (libraries) into smaller specialized libraries so that the program can run only what is really necessary; e.g. what was previously a big System.Collections now has a span of options: .Concurrent, .Specialized, .Immutable
+====
 
-
-==== What is IL and what is the use of JIT?
-
+.What is IL and what is the use of JIT?
+[%collapsible]
+====
 * Intermediate Language (IL): When you compile your C# code, the
 compiler reads your source code and produces Microsoft Intermediate
 Language (MSIL), sometimes abbreviated as IL. This is a CPU-independent
@@ -41,37 +44,30 @@ code execution and provide support for multiple platforms.
 
 NOTE: In summary, when you write and compile C# code in the .NET environment, the code is first turned into IL. Then, when the program is run, the JIT compiler turns the IL into machine code that can be executed by the computer’s processor. This two-step process allows .NET to provide a high level of abstraction and portability, while still achieving good performance.
 Because of IL, .NET supports multiple languagues: C#, F#, VB
+====
 
-
-==== What is CLR and why it is important ? 
-
+.What is CLR and why it is important ? 
+[%collapsible]
+====
 The Common Language Runtime (CLR) is a crucial component of the .NET Framework. It manages the execution of .NET applications and provides several important services
 
-* Managed Execution Environment: CLR provides a managed execution
-environment for .NET programs, regardless of the .NET programming
-language used12. This includes C#, VB.NET, F#, and others
-* Memory Management: CLR handles memory allocation and deallocation for
-.NET applications. It automatically manages object layout and releases
-objects when they’re no longer being used
+* Managed Execution Environment: CLR provides a managed execution environment for .NET programs, regardless of the .NET programming language used12. This includes C#, VB.NET, F#, and others
+* Memory Management: CLR handles memory allocation and deallocation for .NET applications. It automatically manages object layout and releases objects when they’re no longer being used
 * Garbage Collection: CLR includes a garbage collector that
-automatically reclaims memory occupied by unused objects, eliminating
-common programming errors like memory leaks
-* Type Safety: CLR ensures that code only accesses the memory locations
-it is authorized to access
-* Exception Handling: CLR provides a framework for exception handling,
-allowing errors to be caught and handled in a structured manner14.
-* Security: CLR provides a security model to protect resources from
-unauthorized access
+automatically reclaims memory occupied by unused objects, eliminating common programming errors like memory leaks
+* Type Safety: CLR ensures that code only accesses the memory locations it is authorized to access
+* Exception Handling: CLR provides a framework for exception handling, allowing errors to be caught and handled in a structured manner14.
+* Security: CLR provides a security model to protect resources from unauthorized access
 * Just-In-Time (JIT) Compilation: CLR compiles the Microsoft
-Intermediate Language (MSIL) code into machine code on the fly as the
-program runs, optimizing performance
-* Cross-Language Integration: CLR makes it easy to design components and
-applications whose objects interact across languages
+Intermediate Language (MSIL) code into machine code on the fly as the program runs, optimizing performance
+* Cross-Language Integration: CLR makes it easy to design components and applications whose objects interact across languages
 
 NOTE: The CLR is responsible for ensuring that .NET applications are executed in a safe, secure, and efficient manner, making it a fundamental aspect of .NET programming
+====
 
-==== What is managed and unmanaged code ? 
-
+.What is managed and unmanaged code ? 
+[%collapsible]
+====
 In the context of .NET and C#:
 
 * *Managed Code*: This is code that is written to be managed by the
@@ -105,9 +101,11 @@ https://learn.microsoft.com/en-us/dotnet/framework/interop/. +
 (4) Managed
 and Unmanaged Code - Key Differences - ParTech.
 https://www.partech.nl/en/publications/2021/03/managed-and-unmanaged-code—key-differences.
+====
 
-==== What is the importance of CTS ?
-
+.What is the importance of CTS ?
+[%collapsible]
+====
 The CTS ensures that data types defined in 2 different languages gets compiled to a common data type in IL
 
 The Common Type System (CTS) is a fundamental component of the .NET
@@ -148,9 +146,11 @@ https://www.c-sharpcorner.com/article/exploring-the-key-components-of-net-clr-ct
 https://www.c-sharpcorner.com/interview-question/what-is-cts-in-dot-net-core. +
 (5) What is Common Type System (CTS) In .Net - Medium.
 https://nalawadeshivani98.medium.com/what-is-common-type-system-cts-in-net-cf56ba82fef.
+====
 
-==== Explain the importance of CLS ?
-
+.Explain the importance of CLS ?
+[%collapsible]
+====
 NOTE: Basically: CLS is a set of rules or guidelines that a language has to follow in order to be consumed by .NET
 
 The Common Language Specification (CLS) is a key component of the .NET
@@ -196,9 +196,11 @@ Language Specification (CLS)) - Computer Notes.
 https://ecomputernotes.com/csharp/dotnet/common-language-specification. +
 (6) What are CTS and CLS In .NET? - Includehelp.com.
 https://bing.com/search?q=Importance+of+CLS+in+.NET.
+====
 
-==== What is the difference between STACK and HEAP ?
-
+.What is the difference between STACK and HEAP ?
+[%collapsible]
+====
 NOTE: Stack and Heap are memory types in an application. Stack memory stores datatypes like int, double, boolean etc.. while Heap store data types like strings, objects, arrays, etc..
 
 * `Things` declared with the following list of type declarations are
@@ -264,10 +266,11 @@ https://www.geeksforgeeks.org/c-sharp-boxing-unboxing/. +
 (3) Boxing and
 Unboxing in C# - C# Corner.
 https://www.c-sharpcorner.com/article/boxing-and-unboxing-in-C-Sharp/.
+====
 
-==== Explain casting, implicit casting and explicit casting in the context of
-.NET C# ? 
-
+.Explain casting, implicit casting and explicit casting in the context of .NET C# ? 
+[%collapsible]
+====
 In the context of .NET and C#, casting is the process of
 converting a value of one data type to another¹²³⁴⁵. There are two types
 of casting:
@@ -315,10 +318,12 @@ https://simple2code.com/csharp-tutorial/type-casting-in-csharp/. +
 (5)
 Understanding Type Casting in C# with Examples - Techieclues.
 https://www.techieclues.com/blogs/type-casting-in-c-sharp.
+====
 
-==== Explain Array vs ArrayList 
-
-Comparison table between `Array` and`ArrayList` in C#:
+.Explain Array vs ArrayList 
+[%collapsible]
+====
+Comparison table between `Array` and `ArrayList` in C#:
 [width="100%",cols="10%,38%,52%",options="header",]
 |===
 |Feature |Array |ArrayList
@@ -346,8 +351,10 @@ then an array may be the better choice.
 * If you need a dynamic collection that can grow or shrink in size and
 can hold elements of any data type, then an ArrayList may be a better
 choice.
-
-Generic Collections
+====
+.Generic Collections
+[%collapsible]
+====
 
 TIP: Provides the benefits of having a typed collection (no boxing and unboxing are necessary) and the benefits of being a dynamic collection with no fixed size
 
@@ -404,8 +411,11 @@ Generic Collections - .NET | Microsoft Learn.
 https://learn.microsoft.com/en-us/dotnet/standard/collections/when-to-use-generic-collections. +
 (5) Generic Collections in .NET - .NET | Microsoft Learn.
 https://learn.microsoft.com/en-us/dotnet/standard/generics/collections.
+====
 
-==== What is Threading (Multithreading) in C# and what is a Task ?
+.What is Threading (Multithreading) in C# and what is a Task ?
+[%collapsible]
+====
 
 TIP: Basically: If you want to run code parallely in a multicore processor...use Threads
 
@@ -481,9 +491,11 @@ https://www.c-sharpcorner.com/article/task-and-thread-in-c-sharp/. +
 (3)
 Difference Between Task and Thread - Net-Informations.Com.
 https://net-informations.com/csharp/language/task.htm.
+====
 
-==== Why to use OUT in C# ? 
-
+.Why to use OUT in C# ? 
+[%collapsible]
+====
 Usually a method has only one return type, with out, you can return multiple types
 
 [source,csharp]
@@ -509,7 +521,9 @@ class OutReturnExample
     }
 }
 ....
-
-==== What is the difference between Abstract class and Interface ? 
-
+====
+.What is the difference between Abstract class and Interface ? 
+[%collapsible]
+====
 Abstract class is a half defined parent class while interface is a contract.
+====
