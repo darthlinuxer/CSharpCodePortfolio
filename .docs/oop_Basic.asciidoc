@@ -338,16 +338,17 @@ The `virtual` keyword is essential for implementing polymorphism, one of
 the four fundamental principles of Object-Oriented Programming (OOP),
 alongside encapsulation, inheritance, and abstraction¹.
 
-Source: (1) virtual - C# Reference - C# | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/virtual.
+Source: +
+(1) virtual - C# Reference - C# | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/virtual. +
 (2) Understanding the `virtual' Keyword in C# - techieclues.com.
-https://www.techieclues.com/tutorials/csharp-keywords/virtual-keyword-in-csharp.
+https://www.techieclues.com/tutorials/csharp-keywords/virtual-keyword-in-csharp. +
 (3) .net - virtual keyword in c# - Stack Overflow.
-https://stackoverflow.com/questions/13856879/virtual-keyword-in-c-sharp.
+https://stackoverflow.com/questions/13856879/virtual-keyword-in-c-sharp. +
 (4) Virtual Keyword in C# | Learn How Virtual Keyword Functions in C# -
-EDUCBA. https://www.educba.com/virtual-keyword-in-c-sharp/. (5)
-Understanding Virtual, Override and New Keywords in C#.
-https://dev.to/nextpixel/understanding-virtual-override-and-new-keywords-in-c-2g0e.
+EDUCBA. https://www.educba.com/virtual-keyword-in-c-sharp/. +
+(5) Understanding Virtual, Override and New Keywords in C#.
+https://dev.to/nextpixel/understanding-virtual-override-and-new-keywords-in-c-2g0e. +
 (6) github.com.
 https://github.com/dotnet/docs/tree/4085baad57ae3bfc82c0a0a77898b0ad55faaad3/samples%2Fsnippets%2Fcsharp%2FVS_Snippets_VBCSharp%2FcsrefKeywordsModifiers%2FCS%2FcsrefKeywordsModifiers.cs.
 
