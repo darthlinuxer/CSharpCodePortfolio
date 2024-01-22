@@ -136,14 +136,16 @@ supports the complete implementation of many programming languages¹.
 NOTE: In summary, CTS is essential for ensuring language independence, type
 safety, and efficient code execution in the .NET environment¹²³⁴⁵.
 
-Source: (1) Common Type System - .NET | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/standard/base-types/common-type-system.
+Source: +
+(1) Common Type System - .NET | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/standard/base-types/common-type-system. +
 (2) What Are CTS And CLS In .NET - C# Corner.
-https://www.c-sharpcorner.com/blogs/what-are-cts-and-cls-in-net. (3)
+https://www.c-sharpcorner.com/blogs/what-are-cts-and-cls-in-net. +
+(3)
 Exploring The Key Components Of .NET - CLR, CTS, And CLS - C# Corner.
-https://www.c-sharpcorner.com/article/exploring-the-key-components-of-net-clr-cts-and-cls/.
+https://www.c-sharpcorner.com/article/exploring-the-key-components-of-net-clr-cts-and-cls/. +
 (4) What is CTS in Dot Net core - C# Corner.
-https://www.c-sharpcorner.com/interview-question/what-is-cts-in-dot-net-core.
+https://www.c-sharpcorner.com/interview-question/what-is-cts-in-dot-net-core. +
 (5) What is Common Type System (CTS) In .Net - Medium.
 https://nalawadeshivani98.medium.com/what-is-common-type-system-cts-in-net-cf56ba82fef.
 

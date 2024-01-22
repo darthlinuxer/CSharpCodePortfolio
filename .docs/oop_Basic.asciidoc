@@ -500,8 +500,8 @@ class.
 ==== What is Polimorphism ?
 
 *Polymorphism* is one of the fundamental concepts of Object-Oriented
-Programming (OOP). The term is derived from two Greek words: ``poly''
-meaning many, and ``morphs'' meaning forms¹. Therefore, polymorphism
+Programming (OOP). The term is derived from two Greek words: `poly`
+meaning many, and `morphs` meaning forms¹. Therefore, polymorphism
 means ``many forms'' or the ability to take more than one form¹.
 
 In programming, polymorphism refers to the ability of a single entity
