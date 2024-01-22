@@ -1,11 +1,13 @@
-==== What is a Delegate ? 
-
+.What is a Delegate ? 
+[%collapsible]
+====
 A Delegate is a Pointer to a Function, created to
 serve as callbacks which acts as a communication channel between
 concurrent async or parallel processes
-
-==== What is the need of Delegates ? 
-
+====
+.What is the need of Delegates ? 
+[%collapsible]
+====
 Delegates in C# are used for several reasons:
 
 [arabic]
@@ -175,9 +177,11 @@ https://www.programiz.com/csharp-programming/delegates. +
 (5) c# - what is
 the need of delegates? - Stack Overflow.
 https://stackoverflow.com/questions/36001027/what-is-the-need-of-delegates.
+====
 
-==== What is a Multicast Delegate ? 
-
+.What is a Multicast Delegate ? 
+[%collapsible]
+====
 A multicast delegate in C# is a delegate that holds the references of more than one function. When you invoke the multicast delegate, all the functions which are referenced by the delegate are going to be invoked. Here’s an example:
 
 [source,csharp]
@@ -197,9 +201,11 @@ void Main()
     mydelegate = null;
 }
 ----
+====
 
-==== What are events ? 
-
+.What are events ? 
+[%collapsible]
+====
 Events are encapsulation over delegates, they use delegates internally. Events helps you implement Publisher-Subscriber mode.
 
 Events in C# are a way for an object to notify other classes or objects
@@ -313,9 +319,12 @@ https://learn.microsoft.com/en-us/dotnet/csharp/events-overview. +
 https://github.com/nccasia/ncc-net-basic/tree/03d28a32af69216c72b701d22d2b9eebc12f1af6/CSharpAdvanced%2FEvents%2FREADME.md. +
 (9) github.com.
 https://github.com/ravuri-malleswari/.net-programming/tree/14c161f5bfe57b17641f2efc9e6c3cf78a222eb7/events.cs.
+====
 
-==== Events vs Delegates
-
+.Events vs Delegates
+[%collapsible]
+====
 * Events uses Delegates
 * Delegates are for callbacks, not encapsulated
 * Events are encapsulated Delegates to help implement Pub-Sub mode
+====

@@ -1,5 +1,6 @@
-==== Why do we need OOP?
-
+.Why do we need OOP?
+[%collapsible]
+====
 Object-Oriented Programming (OOP) is a programming paradigm that offers
 several benefits: 1. It forces the developer to think in terms of real
 world objects 2. *Encapsulation*: OOP allows you to bundle code into a
@@ -36,9 +37,10 @@ EnjoyAlgorithms.
 https://www.enjoyalgorithms.com/blog/why-should-we-learn-oops-concepts-in-programming/. +
 (5) Advantages and Disadvantages of OOP - GeeksforGeeks.
 https://www.geeksforgeeks.org/benefits-advantages-of-oop/. +
-
-==== What are the 4 pillars of OOP?
-
+====
+.What are the 4 pillars of OOP?
+[%collapsible]
+====
 [arabic]
 . *Abstraction*: Abstraction is the process of modeling the relevant
 attributes and interactions of entities as classes to define an abstract
@@ -217,8 +219,11 @@ https://github.com/biljanazivkovic/CSharp-Example18/tree/e8cf4865c5b4ffd899f995d
 https://github.com/YugalShrestha0/Binod-Sir/tree/2ca62869aced793bd74178536c91e2bb6de14382/Assignment%2FPolymorphism%2FPolymorphism%2FProgram.cs. +
 (7) github.com.
 https://github.com/sandeshvue/hello-world/tree/5a934f1a4b8905cc6c358a35837ff836a7ab8680/Polymorphism%2FPolymorphism%2FProgram.cs. +
+====
 
-==== What is a class and what is an object? 
+.What is a class and what is an object? 
+[%collapsible]
+====
 In programming, a class is a
 blueprint or template that defines what an object’s characteristics
 should be. It is a user-defined data type that holds its own data
@@ -228,9 +233,11 @@ An object, on the other hand, is an instance of a class. All data
 members and member functions of the class can be accessed with the help
 of objects. When a class is defined, no memory is allocated, but memory
 is allocated when it is instantiated (i.e., an object is created)
+====
 
-==== Abstraction vs Encapsulation
-
+.Abstraction vs Encapsulation
+[%collapsible]
+====
 [width="100%",cols="25%,25%,25%,25%",options="header",]
 |===
 |Concept |Definition |Phase |Implementation
@@ -248,9 +255,11 @@ Both abstraction and encapsulation complement each other. While
 abstraction happens during the design phase, encapsulation is executed
 during the coding phase. Encapsulation implements the thought process of
 abstraction.
+====
 
-Explain Inheritance?
-
+.Explain Inheritance?
+[%collapsible]
+====
 *Inheritance* is a key concept in Object-Oriented Programming (OOP) that
 allows a new class to inherit the properties and methods of an existing
 class. This establishes a parent-child relationship between two classes.
@@ -281,7 +290,11 @@ relationship.
 where the child class ``is a'' type of the parent class.
 |===
 
-==== Explain virtual keyword
+====
+
+.Explain virtual keyword
+[%collapsible]
+====
 
 In C# .NET, the `virtual` keyword is used to modify a method, property,
 indexer, or event declaration and allow it to be overridden in a derived
@@ -351,8 +364,11 @@ EDUCBA. https://www.educba.com/virtual-keyword-in-c-sharp/. +
 https://dev.to/nextpixel/understanding-virtual-override-and-new-keywords-in-c-2g0e. +
 (6) github.com.
 https://github.com/dotnet/docs/tree/4085baad57ae3bfc82c0a0a77898b0ad55faaad3/samples%2Fsnippets%2Fcsharp%2FVS_Snippets_VBCSharp%2FcsrefKeywordsModifiers%2FCS%2FcsrefKeywordsModifiers.cs.
+====
 
-==== What is overriding ?
+.What is overriding ?
+[%collapsible]
+====
 
 *Overriding* in C# is a feature of Object-Oriented Programming (OOP)
 that allows a derived class to provide a specific implementation of a
@@ -408,9 +424,11 @@ Overriding in C# - Code Maze.
 https://code-maze.com/csharp-method-overriding/. +
 (6) en.wikipedia.org.
 https://en.wikipedia.org/wiki/Method_overriding. +
+====
 
-==== Explain overloading
-
+.Explain overloading
+[%collapsible]
+====
 *Overloading* in C# is a feature of Object-Oriented Programming (OOP)
 that allows a class to have multiple methods with the same name but with
 a different signature¹². The methods can be overloaded based on the
@@ -462,8 +480,11 @@ Method Overloading and Method Overriding with Examples.
 https://www.tutlane.com/article/csharp/method-overloading-and-overriding-in-csharp.
 (5) Method Overloading In C# - C# Corner.
 https://www.c-sharpcorner.com/UploadFile/0c1bb2/method-oveloading-and-overriding-C-Sharp/.
+====
 
-==== Overloading vs Overriding
+.Overloading vs Overriding
+[%collapsible]
+====
 
 [width="100%",cols="34%,33%,33%",options="header",]
 |===
@@ -496,9 +517,11 @@ derived method must be marked with the `override` keyword.
 `public override void Display()` is an overridden method in the derived
 class.
 |===
+====
 
-==== What is Polimorphism ?
-
+.What is Polimorphism ?
+[%collapsible]
+====
 *Polymorphism* is one of the fundamental concepts of Object-Oriented
 Programming (OOP). The term is derived from two Greek words: `poly`
 meaning many, and `morphs` meaning forms¹. Therefore, polymorphism
@@ -581,9 +604,11 @@ https://www.codeguru.com/csharp/c-sharp-polymorphism/. +
 (4) Understanding
 Polymorphism In C# - C# Corner.
 https://www.c-sharpcorner.com/UploadFile/ff2f08/understanding-polymorphism-in-C-Sharp/.
+====
 
-==== Explain operator overloading
-
+.Explain operator overloading
+[%collapsible]
+====
 Operator overloading in C# allows a user-defined type to overload a
 predefined C# operator. This means a type can provide a custom
 implementation of an operation when one or both of the operands are of
@@ -673,3 +698,4 @@ https://github.com/longtenggenssupreme/linjietest/tree/882bd0205f268c375da3494e8
 https://github.com/antewik/FindPrivateKey2/tree/c12767c1f954b889c246c7dfc8acfb4e880c1734/csharp%2Flanguage-reference%2Foperators%2FOperatorOverloading.cs. +
 (8) github.com.
 https://github.com/verseek/FUNPOO2021_1/tree/9fe0775aaaad62cdd5cbef61735f8128d332797d/_003_8_SobreCargaDeOperadores%2FOperatorOverloading.cs.
+====
