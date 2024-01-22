@@ -6,17 +6,12 @@ Camilo Chaves
 
 == Collection of C# Codes in Fiddle
 
-.Details
-[%collapsible]
-====
-My Collection of `C#` Codes in
 https://dotnetfiddle.net/[Fiddle]
 
 TIP: Some complex projects are not on Fiddle, but only in the repository... so, clone the repo. https://github.com/darthlinuxer
 
 include::.docs/fiddleTable.asciidoc[Fiddle]
 
-====
 == Interview Questions in .NET C
 
 include::.docs/dotnet_Interview.asciidoc[dotnet]
