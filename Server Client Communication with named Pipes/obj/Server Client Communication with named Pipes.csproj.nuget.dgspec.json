@@ -1,36 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\Server Client Communication with named Pipes.csproj": {}
+    "/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/Server Client Communication with named Pipes.csproj": {}
   },
   "projects": {
-    "D:\\Dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\Server Client Communication with named Pipes.csproj": {
+    "/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/Server Client Communication with named Pipes.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\Server Client Communication with named Pipes.csproj",
+        "projectUniqueName": "/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/Server Client Communication with named Pipes.csproj",
         "projectName": "Server Client Communication with named Pipes",
-        "projectPath": "D:\\Dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\Server Client Communication with named Pipes.csproj",
-        "packagesPath": "C:\\Users\\chave\\.nuget\\packages\\",
-        "outputPath": "D:\\Dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\obj\\",
+        "projectPath": "/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/Server Client Communication with named Pipes.csproj",
+        "packagesPath": "/home/cchaves/.nuget/packages/",
+        "outputPath": "/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\"
-        ],
         "configFilePaths": [
-          "C:\\Users\\chave\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "/home/cchaves/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "netcoreapp3.1"
+          ".net8"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "netcoreapp3.1": {
-            "targetAlias": "netcoreapp3.1",
+          "net8.0": {
+            "targetAlias": ".net8",
             "projectReferences": {}
           }
         },
@@ -41,15 +35,16 @@
         }
       },
       "frameworks": {
-        "netcoreapp3.1": {
-          "targetAlias": "netcoreapp3.1",
+        "net8.0": {
+          "targetAlias": ".net8",
           "imports": [
             "net461",
             "net462",
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -58,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/cchaves/.dotnet/sdk/8.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

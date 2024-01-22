@@ -1,0 +1,15 @@
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/bin/Debug/.net8/Server Client Communication with named Pipes
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/bin/Debug/.net8/Server Client Communication with named Pipes.deps.json
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/bin/Debug/.net8/Server Client Communication with named Pipes.runtimeconfig.json
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/bin/Debug/.net8/Server Client Communication with named Pipes.dll
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/bin/Debug/.net8/Server Client Communication with named Pipes.pdb
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.GeneratedMSBuildEditorConfig.editorconfig
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.AssemblyInfoInputs.cache
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.AssemblyInfo.cs
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.csproj.CoreCompileInputs.cache
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.sourcelink.json
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.dll
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/refint/Server Client Communication with named Pipes.dll
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.pdb
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/Server Client Communication with named Pipes.genruntimeconfig.cache
+/home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/obj/Debug/.net8/ref/Server Client Communication with named Pipes.dll

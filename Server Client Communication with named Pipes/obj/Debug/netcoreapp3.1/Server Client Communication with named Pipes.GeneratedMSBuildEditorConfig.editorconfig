@@ -1,0 +1,5 @@
+is_global = true
+build_property.RootNamespace = Server_Client_Communication_with_named_Pipes
+build_property.ProjectDir = /home/cchaves/CSharpCodePortfolio/Server Client Communication with named Pipes/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
