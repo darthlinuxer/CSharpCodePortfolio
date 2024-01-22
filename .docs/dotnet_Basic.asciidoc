@@ -338,9 +338,10 @@ thread.Start();
 
 *Task*: 
 []
-- A Task represents some asynchronous operation¹. - Tasks are
-part of the Task Parallel Library, a set of APIs for running tasks asynchronously and in parallel². - Tasks can return a result¹. 
-- Tasks support cancellation through the use of cancellation tokens². 
+- A Task represents some asynchronous operation¹
+- Tasks are part of the Task Parallel Library, a set of APIs for running tasks asynchronously and in parallel²
+- Tasks can return a result¹
+- Tasks support cancellation through the use of cancellation tokens²
 
 Example of creating a task:
 
@@ -353,16 +354,16 @@ Console.WriteLine(obTask.result);
 *Key Differences*: +
 []
 - Tasks utilizes your multicore processor properly while Thread have CPU affinity 
-- A Task can have multiple processes happening at the same time, while Threads can only have one task running at a time². 
+- A Task can have multiple processes happening at the same time, while Threads can only have one task running at a time²
 - Tasks can return a result, while there is no direct mechanism to return the result from a thread². If you want to get a result from a thread you have to use delegates, events and so on. 
 - Tasks support cancellation through the use of cancellation tokens, but Threads don’t². 
-- Tasks are generally preferred over threads for IO-bound operations (like reading and writing to a database), while
-threads are typically used for CPU-bound operations (like
-computations)¹.
+- Tasks are generally preferred over threads for IO-bound operations (like reading and writing to a database), while threads are typically used for CPU-bound operations (like computations)¹.
 
 NOTE: A Task is a higher-level concept than a Thread. While a Thread represents a single sequence of instructions, a Task is an abstraction of a series of operations that will be executed¹². 
 
-In summary, because of the benefits of Tasks, always use the TPL (Task Parallel Library) whenever you have a chance … The TPL dynamically scales the degree of concurrency to use all the available processors most efficiently. It handles the partitioning of the work, the scheduling of threads on the ThreadPool, cancellation support, state management, and other low-level details. By using TPL, you can maximize the performance of your code while focusing on the work that your program is designed to accomplish.
+IMPORTANT: Because of the benefits of Tasks, always use the TPL (Task Parallel Library) whenever you have a chance … 
+
+The TPL dynamically scales the degree of concurrency to use all the available processors most efficiently. It handles the partitioning of the work, the scheduling of threads on the ThreadPool, cancellation support, state management, and other low-level details. By using TPL, you can maximize the performance of your code while focusing on the work that your program is designed to accomplish.
 
 Source: +
 (1) c# - What is the difference between task and thread? - Stack Overflow. https://stackoverflow.com/questions/4130194/what-is-the-difference-between-task-and-thread. +
