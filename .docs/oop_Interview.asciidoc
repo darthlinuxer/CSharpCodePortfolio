@@ -1,7 +1,0 @@
-=== Basic Questions
-
-include::oop_Basic.asciidoc[oopBasic]
-
-=== Intermediate Questions
-
-include::oop_Intermediate.asciidoc[oopIntermediate]

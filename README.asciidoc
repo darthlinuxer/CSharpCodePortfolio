@@ -4,19 +4,25 @@ Camilo Chaves
 :toc-title: Summary
 :toclevels: 4
 
-== Collection of C# Codes in Fiddle
-
-https://dotnetfiddle.net/[Fiddle]
+== Collection of C# Codes in https://dotnetfiddle.net/[Fiddle]
 
 TIP: Some complex projects are not on Fiddle, but only in the repository... so, clone the repo. https://github.com/darthlinuxer
 
+.EXAMPLES
+[%collapsible]
+====
 include::.docs/fiddleTable.asciidoc[Fiddle]
+====
 
 == Interview Questions in .NET C
 
-include::.docs/dotnet_Interview.asciidoc[dotnet]
+include::.docs/dotnet_Basic.asciidoc[dotnet]
+
+include::.docs/dotnet_Intermediate.asciidoc[dotnet]
 
 == Interview Questions in OOP
 
-include::.docs/oop_Interview.asciidoc[oop]
+include::.docs/oop_Basic.asciidoc[oop]
+
+include::.docs/oop_Intermediate.asciidoc[oop]
 
