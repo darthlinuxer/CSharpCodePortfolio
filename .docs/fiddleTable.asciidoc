@@ -1,0 +1,77 @@
+[width="100%",cols="^45%,^27%,^28%",options="header",]
+|===
+|C# Working Examples |Learning |Concepts
+|https://dotnetfiddle.net/HW6qZ7[Simplest .NET Google SMTP Sender]
+|https://dotnetfiddle.net/5JF1bE[Solid: Open Closed Principle]
+|https://dotnetfiddle.net/4Ksrjg[Expression Tree Example]
+
+|https://dotnetfiddle.net/wtyP9n[Dependency Injection .NET - Using
+Services] |https://dotnetfiddle.net/zKLjTo[Solid: Violation of Liskov
+Substitution Principle] |https://dotnetfiddle.net/SIGT3W[Culture Effect
+on String Manipulation]
+
+|https://dotnetfiddle.net/uBGf7N[.NET Zip Library]
+|https://dotnetfiddle.net/xfptVE[Design Pattern: Singleton]
+|https://dotnetfiddle.net/QMWI8b[Read/Write Binary data from/to
+File/Memory]
+
+|https://dotnetfiddle.net/uKCp83[Complete IRepository with InMemory
+EFCore] |https://dotnetfiddle.net/BZ807c[Design Pattern: Facade]
+|https://dotnetfiddle.net/k1Kv5G[Boxing and Unboxing]
+
+|https://dotnetfiddle.net/mV9HuX[InMemory EFCore without IRepository]
+|https://dotnetfiddle.net/rVjiGW[Design Pattern: Bridge]
+|https://dotnetfiddle.net/WdvMtE[Explicit and Implicit Operators]
+
+|https://dotnetfiddle.net/9tV0Vr[InMemory EFCore without IRepository
+with Services] |https://dotnetfiddle.net/QyynC4[Design Pattern:
+Strategy] |https://dotnetfiddle.net/AgclA6[Deconstruct Methods]
+
+|https://dotnetfiddle.net/lMu408[Dependency Inversion using Dependency
+Injection Services for Constructor and Property]
+|https://dotnetfiddle.net/MEukJ8[Design Pattern: Observer]
+|https://dotnetfiddle.net/I6u7Nz[Standard Interface Methods]
+
+|https://dotnetfiddle.net/cGTi5Z[UNIT Tests with Reflection and Moq]
+|https://dotnetfiddle.net/mg7hw3[Design Pattern: Observer using Events]
+|https://dotnetfiddle.net/lagX58[Using Async Main]
+
+|https://dotnetfiddle.net/SBFElN[Client/Server Socket Communication]
+|https://dotnetfiddle.net/sHWtDU[Solid: Dependency Inversion]
+|https://dotnetfiddle.net/LFHPPE[Using Ranges]
+
+|https://dotnetfiddle.net/7nk1JC[Using Anonymous Pipes for Communication
+between Threads] |https://dotnetfiddle.net/w717Kk[Solid: Interface
+Segregation Principle] |https://dotnetfiddle.net/DwSTrJ[Extension
+Methods combined with Base64 conversions]
+
+|https://dotnetfiddle.net/zBuJpV[Json Serializer and De-Serializer] |
+|https://dotnetfiddle.net/AX9w4W[Delegates and Events]
+
+|https://dotnetfiddle.net/pXB6i5[SQLite in .NET] |
+|https://dotnetfiddle.net/Z7JIJn[Secure Strings]
+
+|https://dotnetfiddle.net/4Fze9g[Convert List to DataTable] |
+|https://dotnetfiddle.net/GCVP7v[Exceptions]
+
+|https://dotnetfiddle.net/1ITBkw[Lambda Validators] |
+|https://dotnetfiddle.net/Z67LW8[Yield]
+
+|https://dotnetfiddle.net/bwA0sO[Creating string Pipes using reverse
+PipeBuilder recursion] | |https://dotnetfiddle.net/NGFV4g[Return
+Option<> for safe null checks]
+
+|https://dotnetfiddle.net/jIL2AQ[Replace If-Then-Else with Reflection
+and Attributes] | |
+
+|https://dotnetfiddle.net/MlyOqU[Replacing If-Then-Else using Pipe
+Builder structure (simple input types)] | |
+
+|https://dotnetfiddle.net/eUTwv4[Replacing If-Then-Else for complex
+objects using Pipe Structure] | |
+
+|https://dotnetfiddle.net/2ImjJD[Replace If-Then-Else for complex
+objects (using Reflection)] | |
+
+|! https://dotnetfiddle.net/tlz0Uz[BackgroundTasks with Timeout] | |
+|===
