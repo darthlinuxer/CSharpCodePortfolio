@@ -156,9 +156,10 @@ NOTE: Stack and Heap are memory types in an application. Stack memory stores dat
 
 |When wiped out ? |Local variables get wiped off once they loose the scope |when collected by the garbage collector
 |===
-
-What is the concept of boxing and unboxing ? In the context of C# and .NET:
-
+====
+.What is the concept of boxing and unboxing ? In the context of C# and .NET:
+[%collapsible]
+====
 * *Boxing*: Boxing is the process of converting a value type to a reference type¹². When the Common Language Runtime (CLR) boxes a value type, it wraps the value inside a System.Object instance and stores it on the managed heap¹². Boxing is an implicit conversion process¹².
 
 Here’s an example of boxing:
