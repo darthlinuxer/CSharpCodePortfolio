@@ -1,8 +1,8 @@
 = The C# KB
 Camilo Chaves
-:toc:
+:toc: left
 :toc-title: Summary
-:toc-level: 5
+:toclevels: 4
 
 == Collection of C# Codes in Fiddle
 

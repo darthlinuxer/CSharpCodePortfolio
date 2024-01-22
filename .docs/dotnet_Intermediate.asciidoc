@@ -1,0 +1,321 @@
+==== What is a Delegate ? 
+
+A Delegate is a Pointer to a Function, created to
+serve as callbacks which acts as a communication channel between
+concurrent async or parallel processes
+
+==== What is the need of Delegates ? 
+
+Delegates in C# are used for several reasons:
+
+[arabic]
+. *Encapsulate a method*: Delegates are objects that encapsulate a
+method¹². They allow methods to be passed as parameters¹²⁵, which can be
+useful when you want to pass a method as an argument to another method¹.
+
+[source,csharp]
+----
+public delegate void MyDelegate(string msg);  // declare a delegate
+
+// set the delegate to a method
+MyDelegate del = new MyDelegate(MethodA);
+
+// invoke the method through the delegate
+del("Hello World");
+
+public void MethodA(string message)
+{
+    Console.WriteLine("MethodA says: " + message);
+}
+----
+
+[arabic, start=2]
+. *Callback Mechanism*: Delegates can be used to define callback
+methods¹²⁴. This is useful in event-driven programming where you want a
+certain method to be called upon the occurrence of an event¹.
+
+[source,csharp]
+----
+public delegate void MyDelegate(string msg);  // declare a delegate
+
+public static void MethodWithCallback(int param1, int param2, MyDelegate callback)
+{
+    callback("The number is: " + (param1 + param2).ToString());
+}
+
+public static void DelegateMethod(string message)
+{
+    Console.WriteLine(message);
+}
+
+void Main()
+{
+    // Instantiate the delegate.
+    MyDelegate handler = DelegateMethod;
+
+    // Call the method with a callback
+    MethodWithCallback(1, 2, handler);
+}
+----
+
+[arabic, start=3]
+. *Abstract and Decouple Methods*: Delegates provide a way to abstract a
+method from the caller². This means the caller doesn’t need to know the
+details of the method being called².
+
+[source,csharp]
+----
+public delegate void MyDelegate(string msg);
+
+public class MyClass
+{
+    private MyDelegate del;
+
+    public MyClass(MyDelegate del)
+    {
+        this.del = del;
+    }
+
+    public void Run()
+    {
+        del("Hello World");
+    }
+}
+
+public void MethodA(string message)
+{
+    Console.WriteLine("MethodA says: " + message);
+}
+
+public void Main()
+{
+    MyClass myClass = new MyClass(new MyDelegate(MethodA));
+    myClass.Run();
+}
+----
+
+[arabic, start=4]
+. *Event Handling*: Delegates are the foundation of .NET event
+handling². The .NET event model is based on delegates and is used to
+respond to user actions like button clicks or menu selections².
+
+[source,csharp]
+----
+public delegate void MyDelegate(string msg);
+
+public class MyClass
+{
+    public event MyDelegate MyEvent;
+
+    public void Run()
+    {
+        MyEvent?.Invoke("Hello World");
+    }
+}
+
+public void MethodA(string message)
+{
+    Console.WriteLine("MethodA says: " + message);
+}
+
+void Main()
+{
+    MyClass myClass = new MyClass();
+    myClass.MyEvent += new MyDelegate(MethodA);
+    myClass.Run();
+}
+----
+
+[arabic, start=5]
+. *Asynchronous Programming*: Delegates are used in asynchronous
+programming to call methods asynchronously².
+
+[source,csharp]
+----
+using System.Threading.Tasks;
+
+public static async Task Main()
+{
+    Func<int, int, int> del = Sum;
+    var task = Task.Run(() => del(1, 2));
+
+    // You can do other work here while waiting
+
+    int result = await task;
+    Console.WriteLine("The result is: " + result);
+}
+
+public static int Sum(int num1, int num2)
+{
+    return num1 + num2;
+}
+----
+
+[arabic, start=6]
+. *LINQ and Lambda Expressions*: Delegates are used extensively in LINQ
+queries and lambda expressions².
+
+[source,csharp]
+----
+Func<int, bool> isEven = num => num % 2 == 0;
+int[] numbers = { 1, 2, 3, 4, 5, 6 };
+IEnumerable<int> evenNumbers = numbers.Where(isEven);
+evenNumbers.Dump(); //LinqPad execution
+----
+
+Source: +
+(1) c# - When & why to use delegates? - Stack Overflow.
+https://stackoverflow.com/questions/2019402/when-why-to-use-delegates. +
+(2) Why do we need C# delegates - Stack Overflow.
+https://stackoverflow.com/questions/4284493/why-do-we-need-c-sharp-delegates. +
+(3) Delegates - C# Programming Guide - C# | Microsoft Learn.
+https://learn.microsoft.com/en-US/dotnet/csharp/programming-guide/delegates/. +
+(4) C# delegates (With Examples) - Programiz.
+https://www.programiz.com/csharp-programming/delegates. +
+(5) c# - what is
+the need of delegates? - Stack Overflow.
+https://stackoverflow.com/questions/36001027/what-is-the-need-of-delegates.
+
+==== What is a Multicast Delegate ? 
+
+A multicast delegate in C# is a delegate that holds the references of more than one function. When you invoke the multicast delegate, all the functions which are referenced by the delegate are going to be invoked. Here’s an example:
+
+[source,csharp]
+----
+public delegate void MyDelegate(string msg);
+public MyDelegate mydelegate = null;
+
+void Main()
+{
+    mydelegate += PrintToConsole;
+    mydelegate += PrintToConsole;
+    
+    mydelegate("Hello World!");
+    
+    void PrintToConsole(string msg) => Console.WriteLine(msg);
+    
+    mydelegate = null;
+}
+----
+
+==== What are events ? 
+
+Events are encapsulation over delegates, they use delegates internally. Events helps you implement Publisher-Subscriber mode.
+
+Events in C# are a way for an object to notify other classes or objects
+when something of interest occurs¹². The class that sends (or raises)
+the event is called the publisher and the classes that receive (or
+handle) the event are called subscribers¹².
+
+Events are typically used to signal user actions such as button clicks
+or menu selections in graphical user interfaces². When an event has
+multiple subscribers, the event handlers are invoked synchronously when
+an event is raised².
+
+In C#, an event is an encapsulated delegate¹. It is dependent on the
+delegate. The delegate defines the signature for the event handler
+method of the subscriber class¹.
+
+Here are some examples of declaring, raising, and consuming an event in
+C#:
+
+*Declaring an Event*:
+
+[source,csharp]
+----
+public delegate void Notify(); // delegate
+
+public class ProcessBusinessLogic
+{
+    public event Notify ProcessCompleted; // event
+}
+----
+
+In this example, a delegate `Notify` is declared and then an event
+`ProcessCompleted` of delegate type `Notify` is declared using the
+`event` keyword in the `ProcessBusinessLogic` class¹.
+
+*Raising an Event*:
+
+[source,csharp]
+----
+public delegate void Notify(); // delegate
+
+public class ProcessBusinessLogic
+{
+    public event Notify ProcessCompleted; // event
+
+    public void StartProcess()
+    {
+        Console.WriteLine("Process Started!");
+
+        // some code here..
+
+        OnProcessCompleted();
+    }
+
+    protected virtual void OnProcessCompleted() //protected virtual method
+    {
+        //if ProcessCompleted is not null then call delegate
+        ProcessCompleted?.Invoke();
+    }
+}
+----
+
+In this example, the `StartProcess()` method calls the method
+`OnProcessCompleted()` at the end, which raises an event¹.
+
+*Consuming an Event*:
+
+[source,csharp]
+----
+class Program
+{
+    public static void Main()
+    {
+        ProcessBusinessLogic bl = new ProcessBusinessLogic();
+
+        bl.ProcessCompleted += bl_ProcessCompleted; // register with an event
+
+        bl.StartProcess();
+    }
+
+    // event handler
+    public static void bl_ProcessCompleted()
+    {
+        Console.WriteLine("Process Completed!");
+    }
+}
+----
+
+In this example, the subscriber class registers to `ProcessCompleted`
+event and handles it with the method `bl_ProcessCompleted` whose
+signature matches `Notify` delegate¹.
+
+Source: +
+(1) Events in C# - TutorialsTeacher.com.
+https://www.tutorialsteacher.com/csharp/csharp-event. +
+(2) Events - C#
+Programming Guide - C# | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/events/. +
+(3) Events in C# - javatpoint.
+https://www.javatpoint.com/events-in-c-sharp. +
+(4) C# - Events - Online
+Tutorials Library.
+https://www.tutorialspoint.com/csharp/csharp_events.htm. +
+(5) Events,
+Delegates and Event Handler in C# - Dot Net Tutorials.
+https://dotnettutorials.net/lesson/events-delegates-and-event-handler-in-csharp/. +
+(6) Events in C# - Code Maze. https://code-maze.com/csharp-events/. +
+(7) Introduction to events - C# | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/csharp/events-overview. +
+(8) github.com.
+https://github.com/nccasia/ncc-net-basic/tree/03d28a32af69216c72b701d22d2b9eebc12f1af6/CSharpAdvanced%2FEvents%2FREADME.md. +
+(9) github.com.
+https://github.com/ravuri-malleswari/.net-programming/tree/14c161f5bfe57b17641f2efc9e6c3cf78a222eb7/events.cs.
+
+==== Events vs Delegates
+
+* Events uses Delegates
+* Delegates are for callbacks, not encapsulated
+* Events are encapsulated Delegates to help implement Pub-Sub mode

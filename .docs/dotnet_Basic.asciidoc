@@ -1,0 +1,513 @@
+==== What is the difference between C# and .NET ?
+
+* .NET is a Framework , C# is a programming language
+* .NET is a collection of libraries and it has a runtime
+
+==== Differentiate between .NET Framework 4.x, .NET Core 3.x, .NET 5 and
+above>
+
+* .NET Framework is ONLY for Windows, it is slow as compared to .NET
+Core (packaged as one big framework), it is desktop based with WPF and
+Winforms, does not support microservices
+* .NET Core 3.x is Cross Platform, has better performance (libraries are
+more modular and smaller in sizes, delivered via nuget), it is not
+desktop based, supports microservices, Full CLI command supported .NET
+5> is the evolution of .NET Core , provides a uniform platform that
+unifies all .NET, it is multiplatform, developers no longer have to
+choose which platform they´re developing their applications
+
+NOTE: .NET and .NET Core have better performance because it has divided large DLLs (libraries) into smaller specialized libraries so that the program can run only what is really necessary; e.g. what was previously a big System.Collections now has a span of options: .Concurrent, .Specialized, .Immutable
+
+
+==== What is IL and what is the use of JIT?
+
+* Intermediate Language (IL): When you compile your C# code, the
+compiler reads your source code and produces Microsoft Intermediate
+Language (MSIL), sometimes abbreviated as IL. This is a CPU-independent
+set of instructions that can be efficiently converted to native code. IL
+is a lower-level language than C#, but it’s still higher-level than
+machine code. It’s used by the .NET Framework to generate
+machine-independent code as the output of the compilation of the source
+code written in any .NET programming language.
+* Just-In-Time (JIT) Compiler: The JIT compiler is a part of the Common
+Language Runtime (CLR) in .NET, which is responsible for managing the
+execution of .NET programs. The JIT compiler translates the MSIL code of
+an assembly into native code, specific to the computer environment that
+the JIT compiler runs on. This translation is done on a requirement
+basis, meaning the JIT compiler compiles the MSIL as required rather
+than compiling all of it at once. The compiled MSIL is stored so that it
+is available for subsequent calls. This process helps to speed up the
+code execution and provide support for multiple platforms.
+
+NOTE: In summary, when you write and compile C# code in the .NET environment, the code is first turned into IL. Then, when the program is run, the JIT compiler turns the IL into machine code that can be executed by the computer’s processor. This two-step process allows .NET to provide a high level of abstraction and portability, while still achieving good performance.
+Because of IL, .NET supports multiple languagues: C#, F#, VB
+
+
+==== What is CLR and why it is important ? 
+
+The Common Language Runtime (CLR) is a crucial component of the .NET Framework. It manages the execution of .NET applications and provides several important services
+
+* Managed Execution Environment: CLR provides a managed execution
+environment for .NET programs, regardless of the .NET programming
+language used12. This includes C#, VB.NET, F#, and others
+* Memory Management: CLR handles memory allocation and deallocation for
+.NET applications. It automatically manages object layout and releases
+objects when they’re no longer being used
+* Garbage Collection: CLR includes a garbage collector that
+automatically reclaims memory occupied by unused objects, eliminating
+common programming errors like memory leaks
+* Type Safety: CLR ensures that code only accesses the memory locations
+it is authorized to access
+* Exception Handling: CLR provides a framework for exception handling,
+allowing errors to be caught and handled in a structured manner14.
+* Security: CLR provides a security model to protect resources from
+unauthorized access
+* Just-In-Time (JIT) Compilation: CLR compiles the Microsoft
+Intermediate Language (MSIL) code into machine code on the fly as the
+program runs, optimizing performance
+* Cross-Language Integration: CLR makes it easy to design components and
+applications whose objects interact across languages
+
+NOTE: The CLR is responsible for ensuring that .NET applications are executed in a safe, secure, and efficient manner, making it a fundamental aspect of .NET programming
+
+==== What is managed and unmanaged code ? 
+
+In the context of .NET and C#:
+
+* *Managed Code*: This is code that is written to be managed by the
+Common Language Runtime (CLR) in the .NET Framework¹². Managed code is
+compiled into an intermediate language (MSIL), which is then executed by
+the CLR¹². The CLR provides various services to the managed code such as
+garbage collection, type checking, exception handling, bounds checking,
+and more². Managed code provides platform independence, improved
+security, automatic memory management, and easier debugging¹².
+* *Unmanaged Code*: This is code that is directly executed by the
+operating system¹². Unmanaged code is compiled to native code that is
+specific to the architecture². It provides low-level access to the
+programmer and direct access to system resources¹². However, unmanaged
+code does not provide runtime services like garbage collection,
+exception handling, etc., and memory management is handled by the
+programmer¹². Debugging unmanaged code can be harder due to the lack of
+debugging tools¹.
+
+In summary, managed code is controlled by the CLR and provides various
+benefits like automatic memory management and improved security, while
+unmanaged code is executed directly by the operating system and provides
+low-level access to the programmer¹².
+
+Source: + 
+(1) Difference between Managed and Unmanaged code in .NET.
+https://www.geeksforgeeks.org/difference-between-managed-and-unmanaged-code-in-net/. +
+(2) Managed code and Unmanaged code in .NET - GeeksforGeeks.
+https://www.geeksforgeeks.org/managed-code-and-unmanaged-code-in-net/. +
+(3) Interoperating with unmanaged code - .NET Framework.
+https://learn.microsoft.com/en-us/dotnet/framework/interop/. +
+(4) Managed
+and Unmanaged Code - Key Differences - ParTech.
+https://www.partech.nl/en/publications/2021/03/managed-and-unmanaged-code—key-differences.
+
+==== What is the importance of CTS ?
+
+The CTS ensures that data types defined in 2 different languages gets compiled to a common data type in IL
+
+The Common Type System (CTS) is a fundamental component of the .NET
+framework and plays a crucial role in ensuring interoperability between
+different programming languages that target the .NET framework¹²³⁴⁵.
+Here are some key points about its importance:
+
+[arabic]
+. *Cross-Language Integration*: CTS establishes a framework that enables
+cross-language integration¹. It ensures that objects written in
+different languages can interact with each other¹.
+. *Type Safety*: CTS provides a set of rules that all programming
+languages must follow when creating data types³. This ensures type
+safety, meaning that the code only accesses the memory locations it is
+authorized to access¹.
+. *High-Performance Code Execution*: By defining how types are declared,
+used, and managed in the runtime, CTS facilitates high-performance code
+execution².
+. *Standard Set of Data Types*: CTS represents a standard set of data
+types that can be used across all programming languages running on the
+.NET Framework³. This ensures that all languages using the .NET
+Framework can communicate and understand the same data types³.
+. *Object-Oriented Model*: CTS provides an object-oriented model that
+supports the complete implementation of many programming languages¹.
+
+NOTE: In summary, CTS is essential for ensuring language independence, type
+safety, and efficient code execution in the .NET environment¹²³⁴⁵.
+
+Source: (1) Common Type System - .NET | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/standard/base-types/common-type-system.
+(2) What Are CTS And CLS In .NET - C# Corner.
+https://www.c-sharpcorner.com/blogs/what-are-cts-and-cls-in-net. (3)
+Exploring The Key Components Of .NET - CLR, CTS, And CLS - C# Corner.
+https://www.c-sharpcorner.com/article/exploring-the-key-components-of-net-clr-cts-and-cls/.
+(4) What is CTS in Dot Net core - C# Corner.
+https://www.c-sharpcorner.com/interview-question/what-is-cts-in-dot-net-core.
+(5) What is Common Type System (CTS) In .Net - Medium.
+https://nalawadeshivani98.medium.com/what-is-common-type-system-cts-in-net-cf56ba82fef.
+
+==== Explain the importance of CLS ?
+
+NOTE: Basically: CLS is a set of rules or guidelines that a language has to follow in order to be consumed by .NET
+
+The Common Language Specification (CLS) is a key component of the .NET
+framework and plays a vital role in ensuring interoperability between
+different programming languages that target the .NET framework¹²⁴⁵⁶.
+Here are some key points about its importance:
+
+[arabic]
+. *Interoperability*: CLS defines a set of rules that every .NET
+language must follow, which enables smooth communication between
+different .NET supported programming languages¹²⁴⁵⁶.
+. *Cross-Language Integration*: CLS ensures that language specifications
+defined in two different languages get compiled into a common language
+specification¹. This allows for cross-language integration or
+interoperability²⁴⁵⁶.
+. *Common Rules*: CLS defines some set of rules that must be followed by
+each .NET language to be a .NET compliant language²³⁵. These rules
+enable different .NET languages to use each other’s framework class
+library for application development³⁵.
+. *Language Independence*: The language specification of CLR is common
+for all programming languages and this is known as Common Language
+Specifications (CLS)¹. This helps in supporting language independence in
+.NET².
+
+In summary, CLS is essential for ensuring language independence,
+interoperability, and efficient code execution in the .NET
+environment¹²⁴⁵⁶.
+
+Source: +
+(1) Common Language Specification in .NET - Dot Net Tutorials.
+https://dotnettutorials.net/lesson/common-language-specification/. +
+(2)
+What Are CTS And CLS In .NET - C# Corner.
+https://www.c-sharpcorner.com/blogs/what-are-cts-and-cls-in-net. +
+(3) CLS
+in .Net Framework: What is Common Language Specification?.
+https://www.webtrainingroom.com/dotnetframework/cls. +
+(4) What are CTS
+and CLS In .NET? - Includehelp.com.
+https://www.includehelp.com/dot-net/define-cls-and-cts.aspx. +
+(5) Common
+Language Specification (CLS)) - Computer Notes.
+https://ecomputernotes.com/csharp/dotnet/common-language-specification. +
+(6) What are CTS and CLS In .NET? - Includehelp.com.
+https://bing.com/search?q=Importance+of+CLS+in+.NET.
+
+==== What is the difference between STACK and HEAP ?
+
+NOTE: Stack and Heap are memory types in an application. Stack memory stores datatypes like int, double, boolean etc.. while Heap store data types like strings, objects, arrays, etc..
+
+* `Things` declared with the following list of type declarations are
+Value Types (because they are from System.ValueType): bool, byte, char,
+decimal, double, enum, float, int, long, sbyte, short, struct, uint,
+ulong, ushort
+* `Things` declared with following list of type declarations are
+Reference Types (and inherit from System.Object… except, of course, for
+object which is the System.Object object): class, interface, delegate,
+object, string
+
+[width="100%",cols="13%,43%,44%",options="header",]
+|===
+|Category |Stack |Heap
+|Memory Allocation |Static, stored directly, variables can´t be resized,
+fast access |Dynamic, stored indirectly, variables can be resized, slow
+access
+
+|Visibility |visible to the owner thread only |visible to all threads
+
+|When wiped out ? |Local variables get wiped off once they loose the
+scope |when collected by the garbage collector
+|===
+
+What is the concept of boxing and unboxing ? In the context of C# and
+.NET:
+
+* *Boxing*: Boxing is the process of converting a value type to a
+reference type¹². When the Common Language Runtime (CLR) boxes a value
+type, it wraps the value inside a System.Object instance and stores it
+on the managed heap¹². Boxing is an implicit conversion process¹².
+Here’s an example of boxing:
+
+[source,csharp]
+----
+int i = 123; // The following line boxes i.
+object o = i;
+----
+
+* *Unboxing*: Unboxing is the process of converting a reference type
+back into a value type¹². Unboxing extracts the value type from the
+object¹². Unboxing is an explicit conversion process¹². Here’s an
+example of unboxing:
+
+[source,csharp]
+----
+object o = 123;
+int i = (int)o; // unboxing
+----
+
+In summary, boxing and unboxing allow value types to be treated as
+objects, providing a unified view of the type system¹². However, they
+are computationally expensive processes. When a value type is boxed, a
+new object must be allocated and constructed. The cast required for
+unboxing is also computationally expensive¹.
+
+Source: +
+(1) Boxing and Unboxing - C# Programming Guide - C# | Microsoft
+Learn.
+https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing.+
+(2) C# | Boxing And Unboxing - GeeksforGeeks.
+https://www.geeksforgeeks.org/c-sharp-boxing-unboxing/. +
+(3) Boxing and
+Unboxing in C# - C# Corner.
+https://www.c-sharpcorner.com/article/boxing-and-unboxing-in-C-Sharp/.
+
+==== Explain casting, implicit casting and explicit casting in the context of
+.NET C# ? 
+
+In the context of .NET and C#, casting is the process of
+converting a value of one data type to another¹²³⁴⁵. There are two types
+of casting:
+
+* *Implicit Casting*: This is automatically performed by the compiler
+when the conversion is safe and no data will be lost¹²³⁴⁵. For example,
+converting a smaller type to a larger type size (char -> int -> long ->
+float -> double) is an implicit cast¹²³⁴⁵. Here’s an example of implicit
+casting:
+
+[source,csharp]
+----
+int i = 123;
+long l = i; // Implicit casting from int to long
+----
+
+* *Explicit Casting*: This is performed manually by the programmer using
+the cast operator¹²³⁴⁵. Explicit casting is required when the conversion
+could lose data or when the conversion might not succeed for other
+reasons¹²³⁴⁵. For example, converting a larger type to a smaller size
+type (double -> float -> long -> int -> char) is an explicit cast¹²³⁴⁵.
+Here’s an example of explicit casting:
+
+[source,csharp]
+----
+double d = 123.45;
+int i = (int)d; // Explicit casting from double to int
+----
+
+In summary, implicit casting is done automatically when the conversion
+is safe and no data will be lost, while explicit casting is done
+manually when there’s a risk of data loss¹²³⁴⁵.
+
+Source: +
+(1) Casting and type conversions - C# Programming Guide - C#.
+https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/casting-and-type-conversions. +
+(2) c# - What is the difference between explicit and implicit type casts
+….
+https://stackoverflow.com/questions/1584293/what-is-the-difference-between-explicit-and-implicit-type-casts. +
+(3) C# Type Casting - W3Schools.
+https://www.w3schools.com/cs/cs_type_casting.php. +
+(4) Type Casting in C#
+- Simple2Code.
+https://simple2code.com/csharp-tutorial/type-casting-in-csharp/. +
+(5)
+Understanding Type Casting in C# with Examples - Techieclues.
+https://www.techieclues.com/blogs/type-casting-in-c-sharp.
+
+==== Explain Array vs ArrayList 
+
+Comparison table between `Array` and`ArrayList` in C#:
+[width="100%",cols="10%,38%,52%",options="header",]
+|===
+|Feature |Array |ArrayList
+|*Type Safety* |Strongly-typed (can only store elements of the same data
+type) |Not strongly-typed (can store elements of any data type)
+
+|*Size* |Fixed (determined at creation) |Dynamic (can grow or shrink at
+runtime)
+
+|*Access Speed* |Fast (due to contiguous memory allocation) |Slower (due
+to non-contiguous memory allocation)
+
+|*Flexibility* |Less flexible (due to fixed size and type safety) |More
+flexible (due to dynamic size and ability to store different data types)
+
+|*Namespace* |System.Array |System.Collections
+
+|*Example*
+|`int[] intArray = new int[] {2}; intArray[0] = 1; intArray[2] = 2;`
+|`ArrayList Arrlst = new ArrayList(); Arrlst.Add("Sagar"); Arrlst.Add(1); Arrlst.Add(null);`
+|===
+
+* If you need a fixed-size collection of elements of the same data type,
+then an array may be the better choice.
+* If you need a dynamic collection that can grow or shrink in size and
+can hold elements of any data type, then an ArrayList may be a better
+choice.
+
+Generic Collections
+
+TIP: Provides the benefits of having a typed collection (no boxing and unboxing are necessary) and the benefits of being a dynamic collection with no fixed size
+
+List of some of the most used generic collections in .NET C#, when they
+should be used, and an example of each:
+
+[width="100%",cols="10%,33%,19%,38%",options="header",]
+|===
+|Collection |Description |When to Use |Example
+|*List* |A generic list that contains elements of a specified type. It
+grows automatically as you add elements in it¹. |When you need a
+dynamic-size, ordered collection of elements¹.
+|`List<int> numbers = new List<int>(); numbers.Add(1); numbers.Add(2); numbers.Add(3);`
+
+|*Dictionary<TKey,TValue>* |Contains key-value pairs¹. |When you need a
+collection of key-value pairs¹.
+|`Dictionary<string, int> dict = new Dictionary<string, int>(); dict.Add("apple", 1); dict.Add("banana", 2);`
+
+|*SortedList<TKey,TValue>* |Stores key and value pairs. It automatically
+adds the elements in ascending order of key by default¹. |When you need
+a sorted collection of key-value pairs¹.
+|`SortedList<int, string> sortedList = new SortedList<int, string>(); sortedList.Add(1, "apple"); sortedList.Add(2, "banana");`
+
+|*Queue* |Stores the values in FIFO style (First In First Out). It keeps
+the order in which the values were added¹. |When you need a first-in,
+first-out collection of objects¹.
+|`Queue<int> queue = new Queue<int>(); queue.Enqueue(1); queue.Enqueue(2); queue.Enqueue(3);`
+
+|*Stack* |Stores the values as LIFO (Last In First Out)¹. |When you need
+a last-in, first-out collection of objects¹.
+|`Stack<int> stack = new Stack<int>(); stack.Push(1); stack.Push(2); stack.Push(3);`
+
+|*HashSet* |Contains non-duplicate elements. It eliminates duplicate
+elements¹. |When you need a collection of unique elements¹.
+|`HashSet<int> set = new HashSet<int>(); set.Add(1); set.Add(2); set.Add(3);`
+|===
+
+These generic collections are recommended to use over non-generic
+collections because they perform faster and also minimize exceptions by
+giving compile-time errors¹. They are more type-safe, meaning you can’t
+insert an element of the wrong type into a collection by mistake, and
+you don’t have to cast elements to the correct type when you retrieve
+them².
+
+Source: +
+(1) Generic List Collection in C# with Examples - Dot Net
+Tutorials. https://dotnettutorials.net/lesson/list-collection-csharp/. +
+(2) List Class (System.Collections.Generic) | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1?view=net-8.0. +
+(3) 6 Generic Collections in C# with Examples - DotNetCrunch.
+https://dotnetcrunch.in/generic-collections-in-csharp/. +
+(4) When to Use
+Generic Collections - .NET | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/standard/collections/when-to-use-generic-collections. +
+(5) Generic Collections in .NET - .NET | Microsoft Learn.
+https://learn.microsoft.com/en-us/dotnet/standard/generics/collections.
+
+==== What is Threading (Multithreading) in C# and what is a Task ?
+
+TIP: Basically: If you want to run code parallely in a multicore processor...use Threads
+
+[source,csharp]
+....
+using System.Threading;
+
+Thread newThread = new Thread(() =>
+{
+    // Code to be executed by the new thread
+});
+
+newThread.Start();
+....
+
+In C#, a *Thread* and a *Task* are both used to create parallel
+programs, but they serve different purposes and have different use
+cases¹².
+
+*Thread*: - A Thread is a single sequence of instructions that a process
+can execute¹. - The `System.Threading.Thread` class is used for creating
+and manipulating a thread in Windows². - Threads are used to perform
+multiple operations at the same time². - Example of creating a thread:
+
+[source,csharp]
+----
+Thread thread = new Thread(new ThreadStart(getMyName));
+thread.Start();
+----
+
+*Task*: - A Task represents some asynchronous operation¹. - Tasks are
+part of the Task Parallel Library, a set of APIs for running tasks
+asynchronously and in parallel². - Tasks can return a result¹. - Tasks
+support cancellation through the use of cancellation tokens². - Example
+of creating a task:
+
+[source,csharp]
+----
+Task<string> obTask = Task.Run(() => (return "Hello"));
+Console.WriteLine(obTask.result);
+----
+
+*Key Differences*: - Tasks utilizes your multicore processor properly
+while Thread have CPU affinity - A Task can have multiple processes
+happening at the same time, while Threads can only have one task running
+at a time². - Tasks can return a result, while there is no direct
+mechanism to return the result from a thread². If you want to get a
+result from a thread you have to use delegates, events and so on. -
+Tasks support cancellation through the use of cancellation tokens, but
+Threads don’t². - Tasks are generally preferred over threads for
+IO-bound operations (like reading and writing to a database), while
+threads are typically used for CPU-bound operations (like
+computations)¹.
+
+In summary, a Task is a higher-level concept than a Thread. While a
+Thread represents a single sequence of instructions, a Task is an
+abstraction of a series of operations that will be executed¹². In
+summary, because of the benefits of Tasks, always use the TPL (Task
+Parallel Library) whenever you have a chance … The TPL dynamically
+scales the degree of concurrency to use all the available processors
+most efficiently. It handles the partitioning of the work, the
+scheduling of threads on the ThreadPool, cancellation support, state
+management, and other low-level details. By using TPL, you can maximize
+the performance of your code while focusing on the work that your
+program is designed to accomplish.
+
+Source: +
+(1) c# - What is the difference between task and thread? - Stack
+Overflow.
+https://stackoverflow.com/questions/4130194/what-is-the-difference-between-task-and-thread. +
+(2) Task And Thread In C# - C# Corner.
+https://www.c-sharpcorner.com/article/task-and-thread-in-c-sharp/. +
+(3)
+Difference Between Task and Thread - Net-Informations.Com.
+https://net-informations.com/csharp/language/task.htm.
+
+==== Why to use OUT in C# ? 
+
+Usually a method has only one return type, with out, you can return multiple types
+
+[source,csharp]
+....
+class OutReturnExample
+{
+    static void Method(out int i, out string s1, out string s2)
+    {
+        i = 44;
+        s1 = "I've been returned";
+        s2 = null;
+    }
+
+    static void Main()
+    {
+        int value;
+        string str1, str2;
+        Method(out value, out str1, out str2);
+
+        // value is now 44
+        // str1 is now "I've been returned"
+        // str2 is (still) null;
+    }
+}
+....
+
+==== What is the difference between Abstract class and Interface ? 
+
+Abstract class is a half defined parent class while interface is a contract.
