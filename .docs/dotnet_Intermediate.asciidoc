@@ -330,3 +330,23 @@ https://github.com/ravuri-malleswari/.net-programming/tree/14c161f5bfe57b17641f2
 * Delegates are for callbacks, not encapsulated
 * Events are encapsulated Delegates to help implement Pub-Sub mode
 ====
+.Why multiple class inheritance is not allowed on C#? What was the problems it was trying to avoid ?
+[%collapsible]
+====
+Multiple inheritance is not supported in C# due to the complexity and issues it can introduce¹²³⁴⁵. Here are some of the problems it was trying to avoid:
+
+1. **Diamond Problem**: This occurs when a class inherits from two or more classes that have a common base class². If a method is overridden in both of these classes, it becomes ambiguous which version of the method the derived class should inherit².
+
+2. **Increased Complexity**: Multiple inheritance can make the implementation more complex, impacting casting, layout, dispatch, field access, serialization, identity comparisons, verifiability, reflection, generics, and many other areas⁴⁵.
+
+3. **Conflicting Base Class Members**: If there is a method or property with the same name in two base classes and both are doing different things, it can lead to confusion and unexpected behavior³.
+
+To avoid these issues, C# supports single class inheritance and multiple interface implementation¹²³⁴⁵. This approach provides much of the flexibility of multiple inheritance while avoiding its pitfalls¹²³⁴⁵.
+
+Source: +
+(1) Does C# support multiple inheritance? - Stack Overflow. https://stackoverflow.com/questions/2456154/does-c-sharp-support-multiple-inheritance. +
+(2) Why C# doesn’t support multiple inheritance? - Dot Net For All. https://www.dotnetforall.com/why-c-sharp-doesnt-support-multiple-inheritance/. +
+(3) Why multiple inheritance not allowed in C#? - CodeHunger | Blog. https://blog.codehunger.in/why-multiple-inheritance-not-allowed-in-c/. +
+(4) Why no multiple inheritance allowed in C#?. https://social.msdn.microsoft.com/Forums/vstudio/en-US/4af95fb4-fa94-43c6-a611-723389350267/why-no-multiple-inheritance-allowed-in-c?forum=csharpgeneral. +
+(5) c# - Why can't I inherit from multiple classes? - Stack Overflow. https://stackoverflow.com/questions/45950324/why-cant-i-inherit-from-multiple-classes. +
+====

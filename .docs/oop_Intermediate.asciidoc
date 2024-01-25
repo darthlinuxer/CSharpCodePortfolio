@@ -1,2 +1,231 @@
 === Intermediate Questions
 
+.Why do we need Abstract Classes?
+[%collapsible]
+====
+TIP: Abstract class is a half defined parent class, that cannot be instantiated BECAUSE it is partially defined. You deffered the implementation of the abstract methods to the children
+
+In .NET C#, abstract classes serve several important purposes:
+
+1. **Abstraction and Reuse**: Abstract classes allow you to write a common piece of code that will defer specific implementations to derived classes
+
+2. **Blueprint for Derived Classes**: They provide a blueprint for derived classes and set some rules that the derived classes must implement when they inherit an abstract class³⁴.
+
+3. **Base Class**: They can be used as a base class, and all derived classes must implement abstract definitions³.
+
+4. **Inheritance Tree**: You may need abstract classes when you create an inheritance tree, with a single ancestor that cannot be instantiated, simply because it is unknown how some methods could be implemented¹.
+
+Source: +
+(1) c# - Why abstract classes necessary? - Stack Overflow. https://stackoverflow.com/questions/2713308/why-abstract-classes-necessary. +
+(2) Why Do We Use Abstract Class? - C# Corner. https://www.c-sharpcorner.com/article/why-do-we-use-abstract-class2/. +
+(3) C# | Abstract Classes - GeeksforGeeks. https://www.geeksforgeeks.org/c-sharp-abstract-classes/. +
+(4) Abstract and Sealed Classes and Class Members - C# Programming Guide - C#. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/abstract-and-sealed-classes-and-class-members. +
+
+====
+
+.Are Abstract methods virtual?
+[%collapsible]
+====
+Yes. + 
+[]
+* If you define a method virtual, you *HAVE* to implement it immediatelly, but you *MIGHT* choose to override it in the descendents. 
+* If you define the method abstract, you *CAN'T* implement it in the same class, and you *HAVE* to override it in the descendents.
+====
+
+.Can we create an instance of an Abstract class?
+[%collapsible]
+====
+*NO*. The Compiler with throw an exception
+====
+
+.Is it compulsory to implement Abstract methods?
+[%collapsible]
+====
+*YES*. It is compulsory!
+====
+
+.Why simple base class can replace Abstract class?
+[%collapsible]
+====
+NOTE: A simple base class cannot be defined in a PURE HALF WAY. 
+
+You might make it work by using virtual methods and throw not implemented exceptions on these methods that are going to be overridden later, but then, you are enabling the possibility to create a base class with a method that if called will throw an exception because it was not supposed to be defined there.
+====
+
+.Explain interfaces and why do we need it?
+[%collapsible]
+====
+NOTE: Interface is a contract
+
+In .NET C#, interfaces are a powerful tool that serve several important purposes:
+
+1. **Common Functionality**: Interfaces allow different objects to expose common functionality. This allows the programmer to write simpler, shorter code that programs to an interface, then as long as the objects implement that interface it will work².
+
+2. **Extensibility**: We can satisfy extensibility using interfaces. In C#, you can easily extend the interfaces to create new classes that implement the same contract functionalities¹.
+
+3. **Loose Coupling**: Using interface-based design concepts provides loose coupling, component-based programming, easier maintainability, makes your code base more scalable and makes code reuse much more accessible because the implementation is separated from the interface⁴.
+
+4. **Multiple Inheritance**: C# doesn't support multiple inheritance of classes. However, by using interfaces, you can include behavior from multiple sources in a class³.
+
+Here's an example of an interface in C#:
+
+```csharp
+public interface IAnimal 
+{
+    void Eat();
+    void Sleep();
+}
+```
+
+In this example, `IAnimal` is an interface that declares two methods: `Eat` and `Sleep`. Any class that implements this interface must provide an implementation for these two methods².
+
+Source: +
+(1) c# - Why I need Interface? - Stack Overflow. https://stackoverflow.com/questions/9451868/why-i-need-interface. +
+(2) Why We Use Interfaces in C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/vikie4u/why-do-we-use-interfaces-in-C-Sharp/. +
+(3) C# Interfaces, What Are They and Why Use Them - DZone. https://dzone.com/articles/c-interfaces-what-are-they-and. +
+(4) Interfaces - define behavior for multiple types - C#. https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/interfaces. +
+====
+
+.Can we write logic in interfaces?
+[%collapsible]
+====
+
+Yes, we can write some logic inside interfaces in .NET. This feature is known as **default interface methods**². It was introduced in **C# 8.0** and **.NET Core 3.0**². This feature allows an interface to define a method with a default implementation that will be used if a class implementing the interface does not provide an implementation for that method¹².
+
+Here's an example:
+
+```csharp
+public interface IExampleInterface
+{
+    // Property declaration
+    string Name { get; set; }
+
+    void RegularMethod();
+
+    // Default interface method
+    void DefaultMethod()
+    {
+        Console.WriteLine("Default implementation of the method.");
+    }
+}
+```
+In this example, `ISampleInterface` is an interface that declares a property Name. Any class that implements this interface must provide an implementation for this property.
+
+In this example, `DefaultMethod` is a default interface method. If a class implements `IExampleInterface` and does not provide an implementation for `DefaultMethod`, the default implementation is used².
+
+Moreover, starting with **C# 11** and **.NET 6**, interfaces can declare **static abstract** and **static virtual** members¹. This feature enables interfaces to declare that implementing types must define operators or other static members¹.
+
+As for the rules of default methods defined in interfaces:
+
+. *Compatibility*: Default interface methods were introduced to allow adding new methods to an interface without breaking existing implementations.
+. *Access Modifiers*: Default interface members can have public, internal, protected, or private modifiers, just like any other class implementation.
+. *Static or Non-static*: The default interface members themselves can be either static or non-static.
+. *Virtual Members*: The members can be virtual, allowing any derived interface or class to extend the member.
+. *No Instance State*: Interfaces may not contain instance state. While static fields are now permitted, instance fields are not permitted in interfaces. Instance auto-properties are not supported in interfaces, as they would implicitly declare a hidden field.
+
+Source: +
+(1) Default implementations in interfaces - .NET Blog. https://devblogs.microsoft.com/dotnet/default-implementations-in-interfaces/. +
+(2) Interfaces - define behavior for multiple types - C#. https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/interfaces. +
+(3) Adding operator support to interfaces (Preview Feature in .NET 6). https://stackoverflow.com/questions/69238213/adding-operator-support-to-interfaces-preview-feature-in-net-6. +
+(4) Can we add variables and properties in interfaces in C#.NET?. https://stackoverflow.com/questions/1944432/can-we-add-variables-and-properties-in-interfaces-in-c-net. +
+(5) interface - C# Reference - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interface. +
+(6) c# - How to implement a property in an interface - Stack Overflow. https://stackoverflow.com/questions/1593413/how-to-implement-a-property-in-an-interface. +
+(7) C# Interface - W3Schools. https://www.w3schools.com/cs/cs_interface.php. +
+
+====
+
+.Can we define private methods in Interfaces?
+[%collapsible]
+====
+*Yes*
+====
+
+.What is the best practice if you want to change an Interface?
+[%collapsible]
+====
+Changing an interface in .NET C# requires careful consideration due to the potential impact on all classes and structs that implement that interface³. Here are some best practices:
+
+1. **Avoid Breaking Changes**: If possible, avoid making changes that would break existing implementations¹²³.
+
+2. **Use Default Interface Methods**: Starting from C# 8.0 and .NET Core 3.0, you can add new methods to an interface without breaking existing implementations by using default interface methods³.
+
+3. **Interface Segregation**: If the changes are significant, consider creating a new interface. This aligns with the Interface Segregation Principle (ISP), which suggests having many small, specific interfaces instead of one large, general interface¹².
+
+4. **Interface Inheritance**: You can also use interface inheritance to extend the interface¹.
+
+5. **Versioning**: Another approach is to create a new version of the interface and slowly deprecate the old one³.
+
+Remember, any change to an interface should be carefully considered due to the widespread impact it can have on your codebase¹²³.
+
+Source: +
+(1) Safely update interfaces using default interface methods in C# - C# .... https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/interface-implementation/default-interface-methods-versions. +
+(2) c# - Best practices when using an interface - Stack Overflow. https://stackoverflow.com/questions/5744927/best-practices-when-using-an-interface. +
+(3) C# Interface: Definition, Examples, Best Practices, and Pitfalls. https://blog.submain.com/c-interface-definition-examples/. +
+(4) c# - How can I avoid constantly having to change an interface when .... https://stackoverflow.com/questions/52196060/how-can-i-avoid-constantly-having-to-change-an-interface-when-adding-new-feature. +
+====
+
+.Explain ISP (Interface Segregation Principle) ?
+[%collapsible]
+====
+
+The Interface Segregation Principle (ISP) is one of the five principles of SOLID in object-oriented programming¹². It states that no class should be forced to implement any methods of an interface they don’t use¹²³. Instead of creating large interfaces, it's better to create multiple smaller interfaces, each serving a specific purpose¹².
+
+This principle ensures that the classes and the whole application are robust, easy to maintain, and expand if required³. It promotes the idea of creating small and cohesive interfaces that are specific to the client’s needs². This way, the clients only need to know about the methods that are of interest to them¹.
+
+Here's an example of violating the ISP:
+
+```csharp
+public interface IVehicle 
+{
+    void Run();
+    void Fly();
+}
+
+public class Car: IVehicle 
+{
+    public void Run() => Console.Write("Running");
+    public void Fly() => throw new NotImplementedException();
+}
+```
+
+In this example, the `Car` class is forced to implement the `Fly` method, which it doesn't need. This violates the ISP². To adhere to the ISP, we could create separate interfaces for `IRunnable` and `IFlyable`, and have `Car` implement only `IRunnable`².
+
+Source: +
+(1) Interface Segregation Principle in C# - Dot Net Tutorials. https://dotnettutorials.net/lesson/interface-segregation-principle/. +
+(2) C# Interface Segregation Principle - C# Tutorial. https://www.csharptutorial.net/csharp-design-patterns/csharp-interface-segregation-principle/. +
+(3) SOLID Principles In C# - Interface Segregation Principle - C# Corner. https://www.c-sharpcorner.com/article/solid-principles-in-c-sharp-interface-segregation-principle/. +
+====
+
+.Can we create an instance of an Interface ?
+[%collapsible]
+====
+*NO*
+====
+
+.Can we do Multiple Inheritance with Abstract classes?
+[%collapsible]
+====
+*NO*
+====
+
+.Abstract classes vs Interfaces ?
+[%collapsible]
+====
+TIP: To compare Abstract classes vs Interfaces is like a comparison between apples and oranges. Just because they might have some similar behaviour they are not the same.
+
+NOTE: Interfaces are implemented, Abstract classes are inherited
+[]
+* Interfaces enables pure abstraction. It happens during design phase and you worry about implementation later. Classes implement the abstractions. When we start writing concrete classes, we don´t worry about abstractions anymore, we try to follow the abstractions that was already planned before.
+
+* Abstract class is a half defined class. Because some of the code you can define, you are already coding, therefore, you are not in the design phase anymore, you are in the execution phase (coding)... 
+
+
+There are, some logic that you can use for better programming:
+[]
+1. Define the interfaces in the Planning, Design Phase (Abstractions)
+2. After Design Phase finishes, extract the common logic to abstract classes
+3. Define the concrete classes
+
+
+WARNING: You can of course explore a technical loophole and create an abstract class with fully abstract methods and properties so that it now everything behaves as a contract. You can implement concrete classes from this abstract class, but you end up in a nasty situation up ahead if descendants does not need one the methods from the base abstract class. C# does not allow multiple inheritance and you end up being forced use an interface.
+====
