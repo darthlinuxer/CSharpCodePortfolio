@@ -401,8 +401,191 @@ class OutReturnExample
 }
 ....
 ====
-.What is the difference between Abstract class and Interface ? 
+.Why do we need constructors ?
 [%collapsible]
 ====
-Abstract class is a half defined parent class while interface is a contract.
+A constructor is a special method of a class that get´s called automatically when an instance of class is created.
+====
+
+.Which constructor fires first in a Parent-Child relationship ?
+[%collapsible]
+====
+In a parent-child relationship in .NET C#, the constructor of the parent class is called first. This is because when a child class is initialized, it may need to use members of the parent class. Therefore, the parent class constructor is called first to initialize all the inherited members⁴. 
+
+Here's a simple example:
+
+```csharp
+public class Parent
+{
+    public Parent()
+    {
+        Console.WriteLine("Parent Constructor.");
+    }
+}
+
+public class Child : Parent
+{
+    public Child()
+    {
+        Console.WriteLine("Child Constructor.");
+    }
+}
+```
+
+When you create an instance of `Child`, the output will be:
+
+```
+Parent Constructor.
+Child Constructor.
+```
+
+This shows that the `Parent` constructor is called before the `Child` constructor².
+
+Source: +
+(1) Order Of Constructors Calling With Inheritance In C# - C# Corner. https://www.c-sharpcorner.com/article/order-of-constructors-calling-with-inheritance-in-c-sharp/. +
+(2) c# - Which constructor will called first in the below example - Stack .... https://stackoverflow.com/questions/6479098/which-constructor-will-called-first-in-the-below-example. +
+(3) Enforcing parent-child relationship in C# and .Net. https://stackoverflow.com/questions/982796/enforcing-parent-child-relationship-in-c-sharp-and-net. +
+(4) Constructor and Inheritance in C# | by Tam H. Doan | Medium. https://nhoxbypass.medium.com/constructor-and-inheritance-in-c-4a43ef68582. +
+
+====
+
+.Which field initializers fires first in a Parent-Child relationship ?
+[%collapsible]
+====
+Consider the following
+``` csharp
+void Main()
+{
+	var child = new Child();
+
+}
+
+public class Parent
+{
+	public string parentField = Log("Parent Field Initialization");
+
+	public Parent()
+	{
+		Log("Parent Constructor");
+	}
+
+	public static string Log(string message)
+	{
+		Console.WriteLine(message);
+		return message;
+	}
+}
+
+public class Child : Parent
+{
+	public string childField = Log("Child Field Initialization");
+
+	public Child()
+	{
+		Log("Child Constructor");
+	}
+}
+```
+
+The output is:
+```
+Child Field Initialization
+Parent Field Initialization
+Parent Constructor
+Child Constructor
+```
+====
+
+.How are static constructors executed in Parent-Child relationship?
+[%collapsible]
+====
+
+Static constructors fire whenever any other static method of the class is called or when the class is instantiated.
+
+``` csharp
+void Main()
+{
+	var child = new Child();
+
+}
+
+public class Parent
+{
+	public string parentField = Log("Parent Field Initialization");
+
+	public Parent()
+	{
+		Log("Parent Constructor");
+	}
+	
+	static Parent()
+	{
+		Log("STATIC Parent Constructor");
+	}
+
+	public static string Log(string message)
+	{
+		Console.WriteLine(message);
+		return message;
+	}
+}
+
+public class Child : Parent
+{
+	public string childField = Log("Child Field Initialization");
+
+	public Child()
+	{
+		Log("Child Constructor");
+	}
+	
+	static Child()
+	{
+		Log("STATIC Child Constructor");
+	}
+}
+```
+OUTPUT:
+```
+STATIC Parent Constructor
+STATIC Child Constructor
+Child Field Initialization
+Parent Field Initialization
+Parent Constructor
+Child Constructor
+```
+
+Another example:
+``` csharp
+void Main()
+{
+	Child.Hello();
+}
+
+public class Parent
+{
+	public string parentField = Log("Parent Field Initialization");
+	public Parent() => Log("Parent Constructor");
+	static Parent() => Log("STATIC Parent Constructor");
+	public static string Log(string message)
+	{
+		Console.WriteLine(message);
+		return message;
+	}
+}
+
+public class Child: Parent {
+	static Child() => Log("STATIC Child Constructor");
+	public static void Hello() => Log("Static Hello method called!");
+}
+```
+
+OUTPUT
+```
+STATIC Parent Constructor
+STATIC Child Constructor
+Static Hello method called!
+```
+
+
 ====

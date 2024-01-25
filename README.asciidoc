@@ -16,13 +16,15 @@ include::.docs/fiddleTable.asciidoc[Fiddle]
 
 == Interview Questions in .NET C#
 
-include::.docs/dotnet_Basic.asciidoc[dotnet]
+include::.docs/dotnet_Basic.asciidoc[dotnetBasic]
 
-include::.docs/dotnet_Intermediate.asciidoc[dotnet]
+include::.docs/dotnet_Intermediate.asciidoc[dotnetIntermediate]
 
 == Interview Questions in OOP
 
-include::.docs/oop_Basic.asciidoc[oop]
+include::.docs/oop_Basic.asciidoc[oopBasic]
 
-include::.docs/oop_Intermediate.asciidoc[oop]
+include::.docs/oop_Intermediate.asciidoc[oopIntermediate]
+
+include::.docs/oop_Advanced.asciidoc[oopAdvanced]
 

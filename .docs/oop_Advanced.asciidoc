@@ -1,0 +1,293 @@
+=== Advanced Questions
+
+
+.What is Shadowing or Method Hiding ?
+[%collapsible]
+====
+NOTE: Shadowing is when the child methods/properties will be hidden from the parent during polymorphism using the new keywork in c#
+
+Shadowing, also known as method hiding in C#, is a concept in Object-Oriented Programming (OOP) where a method or property in a derived class shares the same name as a method or property in its base class¹². In this case, the derived class's method or property shadows the base class's method or property¹².
+
+This means that the original implementation of the base class member gets shadowed (hidden) with the new implementation of the base class member provided in the derived class¹³. The shadowed element is not available for reference; instead, when the code uses the element name, the compiler resolves it to the shadowing element¹⁴.
+
+Here's an example in C#:
+
+```csharp
+public class BaseClass
+{
+    public string GetMethodOwnerName()
+    {
+        return "Base Class";
+    }
+}
+
+public class ChildClass : BaseClass
+{
+    public new string GetMethodOwnerName()
+    {
+        return "Child Class";
+    }
+}
+
+public static void Main(string[] args)
+{
+    ChildClass c = new ChildClass();
+    Console.WriteLine(c.GetMethodOwnerName());
+}
+```
+
+In this example, the `GetMethodOwnerName` method in the `ChildClass` shadows the `GetMethodOwnerName` method in the `BaseClass`. When the `GetMethodOwnerName` method is called on an instance of `ChildClass`, it prints "Child Class", not "Base Class"¹.
+
+Source: +
+(1) Overriding Vs Shadowing in C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/ff2f08/overriding-vs-shadowing-in-C-Sharp/.+
+(2) c# - What is Shadowing? - Stack Overflow. https://stackoverflow.com/questions/673779/what-is-shadowing.+
+(3) Difference Between Shadowing And Overriding In OOP Using C# - C# Corner. https://www.c-sharpcorner.com/article/difference-between-shadowing-and-overriding-in-oop/.+
+(4) Overriding Vs Shadowing in C# - Online Tutorials Library. https://www.tutorialspoint.com/Overriding-Vs-Shadowing-in-Chash.+
+(5) OOP Difference between Shadowing and Overriding - CodeProject. https://www.codeproject.com/articles/1081861/oop-difference-between-shadowing-and-overriding.+
+
+====
+.Shadowing vs Overriding ?
+[%collapsible]
+====
+[options="header"]
+|===
+| | Shadowing | Overriding
+| Keyword | `new` | `override`
+| Purpose | Hides the base class method in the derived class | Changes the base class method's implementation in the derived class
+| Base Class Method Call | Calls the base class method | Calls the derived class method
+|===
+
+
+This table shows that the `new` keyword is used for Shadowing and the `override` keyword is used for Overriding. Shadowing hides the base class method in the derived class, while Overriding changes the base class method's implementation in the derived class. When a method is called on the base class, Shadowing calls the base class method, while Overriding calls the derived class method.
+====
+.When should you use Shadowing ?
+[%collapsible]
+====
+TIP: Shadowing is a hack which developers use when the child class does not implement all the methods of the parent
+
+NOTE: This is also termed as LISKOV Problem and it happens due to wrong abstractions. "It looks like a duck, quacks like a Duck, but needs batteries.. you probably have the wrong abstraction", in other words, a Parent should always be able to execute all the methods of its child seamlessly. 
+
+Shadowing in C# can be useful in several scenarios:
+
+1. **Protecting Class Definitions**: Shadowing can protect the definitions of class members. If the base class undergoes a change that creates a member with the same name as one already defined in the child class, shadowing ensures that the child class's version is called¹³.
+
+2. **Maintaining Existing Functionality**: If a method in a class library is being used by various modules in a project and you want to change it, doing so might break existing functionality. By shadowing the method using the `new` keyword, you can introduce new functionality without breaking the old one².
+
+3. **Customizing Classes**: Shadowing can be a useful tool for customizing classes when you want to keep some properties hidden from a third party, but allow your own developers access to specific regions of an inherited class⁴.
+
+4. **Overriding Non-Virtual Methods**: If you want to "override" a non-virtual method, you can't actually override it, so instead you shadow it. It's not a perfect solution because it doesn't act like an overridden virtual method in all cases, but when called from the derived class, it will work as expected¹.
+
+Remember, while shadowing can be useful, it should be used judiciously as it can lead to confusion and unexpected behavior if not handled carefully.
+
+Source: C+
+(1) c# - What is Shadowing? - Stack Overflow. https://stackoverflow.com/questions/673779/what-is-shadowing. +
+(2) Shadowing | Method Hiding in C# - Tech Point Fundamentals. https://www.techpointfunda.com/2020/11/shadowing-or-method-hiding-csharp.html. +
+(3) c# - What's the purpose of Shadowing? - Stack Overflow. https://stackoverflow.com/questions/31714881/whats-the-purpose-of-shadowing. +
+(4) Using Shadowing in C# - CodeProject. https://www.codeproject.com/tips/231002/using-shadowing-in-csharp. +
+
+====
+.Explain Sealed Classes ?
+[%collapsible]
+====
+
+In C#, a sealed class is a class that cannot be inherited by other classes¹²³⁵. Once a class is marked as sealed, it cannot be used as a base class for any other class¹²³⁵. Any attempt to derive a new class from a sealed class will result in a compile-time error¹²³⁵.
+
+Sealed classes are often used for security purposes to prevent the derived class from unwanted users⁴. They are also used to limit the extensibility of the classes⁴.
+
+Here's an example of a sealed class in C#:
+
+```csharp
+sealed class SealedClass
+{
+    public int x;
+    public int y;
+}
+
+class SealedTest2
+{
+    static void Main()
+    {
+        var sc = new SealedClass();
+        sc.x = 110;
+        sc.y = 150;
+        Console.WriteLine($"x = {sc.x}, y = {sc.y}");
+    }
+}
+```
+
+In this example, `SealedClass` is a sealed class. It can be instantiated, but no class can inherit from it¹²³⁵. If you try to inherit from the sealed class (e.g., `class MyDerivedC: SealedClass {}`), you will get a compile-time error².
+
+It's important to note that structs in C# are implicitly sealed, meaning they cannot be inherited².
+
+Source: +
+(1) C# | Sealed Class - GeeksforGeeks. https://www.geeksforgeeks.org/c-sharp-sealed-class/. +
+(2) sealed modifier - C# Reference - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/sealed. +
+(3) C# Sealed Class: Everything you need to know - Josip Miskovic. https://josipmisko.com/posts/c-sharp-sealed-class. +
+(4) What is a Sealed Class? - Definition from Techopedia. https://www.techopedia.com/definition/25637/sealed-class-c. +
+(5) Sealed Class in C# | Sealed Methods in C# with Programming Codes - EDUCBA. https://www.educba.com/sealed-class-in-c-sharp/. +
+(6) github.com. https://github.com/DunyaELBASAN/.net_art/tree/f27054b4516d1e6e5ad00bc0ea518534c0028afe/snippets%2Fcsharp%2FVS_Snippets_VBCSharp%2FcsrefKeywordsModifiers%2FCS%2FcsrefKeywordsModifiers.cs. +
+====
+.What are nested classes ? When to use them ?
+[%collapsible]
+====
+In C#, a nested class is a class that is defined within another class¹²³. A nested class can be either a static class or a non-static class¹. A nested class can have access to the private members of the outer class, which makes it useful for encapsulation and information hiding¹.
+
+Here's an example of a nested class in C#:
+
+```csharp
+public class OuterClass
+{
+    public class InnerClass
+    {
+        public void Display()
+        {
+            Console.WriteLine("This is a nested class method.");
+        }
+    }
+}
+```
+
+In this example, `InnerClass` is a nested class inside `OuterClass`. You can create an instance of `InnerClass` and call its `Display` method like this:
+
+```csharp
+OuterClass.InnerClass inner = new OuterClass.InnerClass();
+inner.Display();
+```
+
+Nested classes are typically used in the following scenarios:
+
+1. **Encapsulation**: Nested classes can be used to increase encapsulation¹⁴. They can access the private members of the outer class, which helps in hiding the information¹⁴.
+
+2. **Logical Grouping**: Nested classes allow you to logically group classes that are only used in one place¹⁴. This can lead to more readable and maintainable code¹⁴.
+
+3. **To Support the Outer Class**: If a class is useful only within a certain class, then it is a good idea to make it a nested class⁴.
+
+4. **To Reduce Name Clashes**: If a class is of no use for other classes and is being used by a single class only, then we can define it as a nested class⁴.
+
+Remember, while nested classes can be useful, they should be used judiciously as they can lead to complex and hard-to-read code if not handled carefully⁴.
+
+Source: +
+(1) Nested Classes in C# - GeeksforGeeks. https://www.geeksforgeeks.org/nested-classes-in-c-sharp/. +
+(2) Nested Types - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types. +
+(3) C# Nested Classes: What They Are and How to Use Them. https://www.programdoc.com/csharp/nested-class. +
+(4) . https://bing.com/search?q=When+to+use+nested+classes+in+C%23. +
+(5) Why/when should you use nested classes in .net? Or shouldn't you?. https://stackoverflow.com/questions/48872/why-when-should-you-use-nested-classes-in-net-or-shouldnt-you. +
+(6) Nested Types - Framework Design Guidelines | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/nested-types. +
+(7) C# Nested Class (With Examples) - Programiz. https://www.programiz.com/csharp-programming/nested-class. +
+(8) https://softwareengineering.stackexchange.com/questions/314043/when-and-why-to-use-nested-classes.
+====
+.Can nested classes access outer class variables ?
+[%collapsible]
+====
+Yes, in C#, a nested class can access the private members of the outer class¹⁴. This includes variables, methods, and properties¹⁴. This is one of the key features of nested classes and is useful for encapsulation and information hiding¹⁴.
+
+However, it's important to note that the nested class does not have an inherent reference to an instance of the outer class¹². If you want to access a non-static member of the outer class, you need to have an instance of the outer class¹².
+
+Here's an example:
+
+```csharp
+public class OuterClass
+{
+    private int outerVariable = 10;
+
+    public class NestedClass
+    {
+        public void Display()
+        {
+            OuterClass outer = new OuterClass();
+            Console.WriteLine("Outer Variable: " + outer.outerVariable);
+        }
+    }
+}
+```
+
+In this example, `NestedClass` is able to access the private variable `outerVariable` of `OuterClass` by creating an instance of `OuterClass`¹².
+
+Source: +
+(1) c# - Can i access outer class objects in inner class - Stack Overflow. https://stackoverflow.com/questions/2957900/can-i-access-outer-class-objects-in-inner-class. +
+(2) Nested Classes in C# - GeeksforGeeks. https://www.geeksforgeeks.org/nested-classes-in-c-sharp/. +
+(3) C# Member Access from Nested Class to Containing Class. https://stackoverflow.com/questions/2373068/c-sharp-member-access-from-nested-class-to-containing-class. +
+(4) Nested Types - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types. +
+====
+.Can we have public, protected access modifiers in nested classes ?
+[%collapsible]
+====
+Yes, in C#, nested classes can have various access modifiers¹²:
+
+- **Public**: The nested class can be accessed by any other code in the same assembly or another assembly that references it¹.
+- **Protected**: The nested class can be accessed only by code in the same class, or in a class that is derived from that class¹.
+- **Internal**: The nested class can be accessed by any code in the same assembly, but not from another assembly¹.
+- **Protected Internal**: The nested class can be accessed by any code in the assembly in which it's declared, or from within a derived class in another assembly¹.
+- **Private Protected**: The nested class can be accessed by types derived from the class that are declared within its containing assembly¹.
+- **Private**: The nested class can be accessed only by code in the same class or struct¹.
+
+Here's an example of a public nested class in C#:
+
+```csharp
+public class OuterClass
+{
+    public class NestedClass
+    {
+        public void Display()
+        {
+            Console.WriteLine("This is a public nested class method.");
+        }
+    }
+}
+```
+
+In this example, `NestedClass` is a public nested class inside `OuterClass`. You can create an instance of `NestedClass` and call its `Display` method like this:
+
+```csharp
+OuterClass.NestedClass inner = new OuterClass.NestedClass();
+inner.Display();
+```
+
+This will output: "This is a public nested class method."
+
+Remember, while nested classes can be useful, they should be used judiciously as they can lead to complex and hard-to-read code if not handled carefully¹².
+
+Source: +
+(1) Access Modifiers - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers.+
+(2) Nested Types - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types.+
+(3) C# access modifier - controlling visibility of methods and ... - ZetCode. https://zetcode.com/csharp/access-modifier/.+
+
+====
+.Explain partial classes
+[%collapsible]
+====
+In C#, a partial class is a feature that allows you to split the definition of a class, struct, or interface over two or more source files¹². Each source file contains a section of the type or method definition, and all parts are combined when the application is compiled¹².
+
+Here's an example:
+
+```csharp
+public partial class Employee
+{
+    public void DoWork()
+    {
+    }
+}
+
+public partial class Employee
+{
+    public void GoToLunch()
+    {
+    }
+}
+```
+
+In this example, the `Employee` class is split into two files. One file contains the `DoWork` method, and the other file contains the `GoToLunch` method¹.
+
+Partial classes are useful in several situations:
+
+1. **Large Projects**: When working on large projects, spreading a class over separate files enables multiple programmers to work on it at the same time¹.
+2. **Automatically Generated Source**: Code can be added to the class without having to recreate the source file. Visual Studio uses this approach when it creates Windows Forms, Web service wrapper code, and so on¹.
+3. **Source Generators**: When using source generators to generate additional functionality in a class¹.
+
+Remember, all the parts of a partial class must use the `partial` keyword and must be available at compile time to form the final type¹. All the parts must have the same accessibility, such as public, private, and so on¹. If any part is declared abstract, then the whole type is considered abstract. If any part is declared sealed, then the whole type is considered sealed¹.
+
+Source: +
+(1) Partial Classes and Methods - C# Programming Guide - C#. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods. +
+(2) Partial Classes in C# - GeeksforGeeks. https://www.geeksforgeeks.org/partial-classes-in-c-sharp/. +
+(3) Partial Class and Partial Methods in C# - Dot Net Tutorials. https://dotnettutorials.net/lesson/partial-classes-partial-methods-csharp/. +
+====

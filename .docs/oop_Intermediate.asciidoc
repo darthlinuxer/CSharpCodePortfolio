@@ -137,14 +137,64 @@ Source: +
 .Can we define private methods in Interfaces?
 [%collapsible]
 ====
-*Yes*
+*Yes* 
+
+In C#, prior to version 8.0, you could not define private methods in interfaces. An interface was considered a contract for public methods¹⁴⁵.
+
+However, starting with C# 8.0, you can define private methods in interfaces, but they must be default methods, meaning they must have an implementation¹². This change allows for useful refactoring and organization of code used to implement the interface's public API².
+
+Here's an example:
+
+```csharp
+public interface IExample
+{
+    void PublicMethod()
+    {
+        // Call the private method
+        PrivateMethod();
+    }
+
+    private void PrivateMethod()
+    {
+        Console.WriteLine("Private method in interface");
+    }
+}
+```
+
+In this example, `PrivateMethod` is a private method in the `IExample` interface. It's called by `PublicMethod`, which is a public method in the same interface².
+
+Please note that private methods in interfaces are a feature of C# 8.0 and later, so you'll need to be using a compatible version of the .NET framework². Also, remember that private methods in interfaces cannot be accessed in the implementing class¹². They are only for use within the interface itself².
+
+Source: +
+(1) c# - How can I make a method private in an interface? - Stack Overflow. https://stackoverflow.com/questions/1383434/how-can-i-make-a-method-private-in-an-interface. +
+(2) c# interface public private - Stack Overflow. https://stackoverflow.com/questions/25033751/c-sharp-interface-public-private. +
+(3) c# - Private class method or interface? - Stack Overflow. https://stackoverflow.com/questions/72228471/private-class-method-or-interface. +
+(4) c# - private members in interface - Stack Overflow. https://stackoverflow.com/questions/59455727/private-members-in-interface. +
+(5) c# - Private members of the interface - Stack Overflow. https://stackoverflow.com/questions/23545232/private-members-of-the-interface. +
 ====
 
-.What is the best practice if you want to change an Interface?
+.What is the purpose of a private method within an Interface ?
 [%collapsible]
 ====
-Changing an interface in .NET C# requires careful consideration due to the potential impact on all classes and structs that implement that interface³. Here are some best practices:
+Private methods in interfaces, introduced in C# 8.0, serve a couple of important purposes:
 
+1. **Code Organization and Reusability**: Private methods in interfaces allow you to organize and reuse code within the interface itself¹. They can be used to break down complex default methods into smaller, more manageable pieces¹.
+
+2. **Encapsulation**: Private methods in interfaces help encapsulate implementation details that are not meant to be exposed to the classes implementing the interface¹³. They help reduce the size of an object’s API and indicate what’s safe to refactor⁵.
+
+Remember, private methods in interfaces are only for use within the interface itself¹². They are not accessible in the implementing class¹². This helps to maintain the abstraction that interfaces provide¹²³.
+
+Source: +
+(1) c# - How can I make a method private in an interface? - Stack Overflow. https://stackoverflow.com/questions/1383434/how-can-i-make-a-method-private-in-an-interface.+
+(2) c# – Why can't an interface's implemented methods be private?. https://yeahexp.com/why-cant-an-interfaces-implemented-methods-be-private/.+
+(3) The purpose of private methods and when to use them. https://www.codewithjason.com/purpose-private-methods-use/.+
+(4) c# - What is a private interface? - Stack Overflow. https://stackoverflow.com/questions/792908/what-is-a-private-interface.+
+(5) c# interface public private - Stack Overflow. https://stackoverflow.com/questions/25033751/c-sharp-interface-public-private.+
+====
+
+.What are best practices to change an Interface ?
+[%collapsible]
+====
 1. **Avoid Breaking Changes**: If possible, avoid making changes that would break existing implementations¹²³.
 
 2. **Use Default Interface Methods**: Starting from C# 8.0 and .NET Core 3.0, you can add new methods to an interface without breaking existing implementations by using default interface methods³.
@@ -211,7 +261,7 @@ Source: +
 .Abstract classes vs Interfaces ?
 [%collapsible]
 ====
-TIP: To compare Abstract classes vs Interfaces is like a comparison between apples and oranges. Just because they might have some similar behaviour they are not the same.
+TIP: To compare Abstract classes vs Interfaces is a comparison between different entities that serves different purposes. Just because they might have some similar behaviour they are not the same and are meant to fill different roles in OOP.
 
 NOTE: Interfaces are implemented, Abstract classes are inherited
 []
