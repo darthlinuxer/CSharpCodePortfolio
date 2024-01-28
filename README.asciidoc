@@ -20,6 +20,8 @@ include::.docs/dotnet_Basic.asciidoc[dotnetBasic]
 
 include::.docs/dotnet_Intermediate.asciidoc[dotnetIntermediate]
 
+include::.docs/dotnet_Advanced.asciidoc[dotnetAdvanced]
+
 == Interview Questions in OOP
 
 include::.docs/oop_Basic.asciidoc[oopBasic]
