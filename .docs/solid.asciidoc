@@ -1,0 +1,503 @@
+.What is the goal of SOLID ?
+[%collapsible]
+====
+TIP: SOLID minimize dependencies
+
+SOLID is an acronym for the first five object-oriented design (OOD) principles by Robert C. Martin, also known as Uncle Bob¹². The main goal of SOLID is to make object-oriented designs more understandable, flexible, and maintainable². These principles establish practices that lend to developing software with considerations for maintaining and extending as the project grows¹. Here's what each letter in SOLID stands for:
+
+- **S** - Single-responsibility Principle: A class should have one and only one reason to change, meaning that a class should have only one job¹.
+- **O** - Open-closed Principle: Software entities should be open for extension, but closed for modification².
+- **L** - Liskov Substitution Principle: Functions that use pointers or references to base classes must be able to use objects of derived classes without knowing it².
+- **I** - Interface Segregation Principle: Clients should not be forced to depend upon interfaces that they do not use².
+- **D** - Dependency Inversion Principle: Depend upon abstractions, not concretes².
+
+Adopting these practices can also contribute to avoiding code smells, refactoring code, and Agile or Adaptive software development¹.
+
+Source: +
+(1) SOLID: The First 5 Principles of Object Oriented Design. https://www.digitalocean.com/community/conceptual-articles/s-o-l-i-d-the-first-five-principles-of-object-oriented-design. +
+(2) SOLID - Wikipedia. https://en.wikipedia.org/wiki/SOLID. +
+(3) Discover the 5 Main Objectives of the National Solid Waste Policy. https://ambipar.com/en/noticias/discover-the-5-main-objectives-of-the-national-solid-waste-policy/. +
+(4) The SOLID Principles of Object-Oriented Programming Explained in Plain .... https://www.freecodecamp.org/news/solid-principles-explained-in-plain-english/. +
+====
+
+
+.(SRP) Single Responsibility Principle
+[%collapsible]
+====
+Suppose we have a `Document` class that has two responsibilities: managing the document's properties and saving the document to a file. This would violate the Single-responsibility Principle.
+
+```csharp
+public class Document
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+
+    public void SaveToFile(string filename)
+    {
+        // Code to save the document to a file
+    }
+}
+```
+
+To adhere to the Single-responsibility Principle, we can create a separate `DocumentStorage` class that handles saving the document:
+
+```csharp
+public class Document
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+}
+
+public class DocumentStorage
+{
+    public void SaveToFile(Document document, string filename)
+    {
+        // Code to save the document to a file
+    }
+}
+```
+
+Now, the `Document` class only manages the document's properties, and the `DocumentStorage` class handles saving the document. Each class has a single responsibility, adhering to the Single-responsibility Principle. This makes the code more maintainable and flexible for future extensions. For instance, if we want to change the way we save the document, we only need to modify the `DocumentStorage` class without touching the `Document` class. This is the essence of the Single-responsibility Principle.
+
+====
+
+.(OCP) Open Closed Principle
+[%collapsible]
+====
+
+let's consider a C# example in a .NET context where the Open-closed Principle (OCP) is violated.
+
+Suppose we have a `Shape` class and an `AreaCalculator` class that calculates the area of different shapes:
+
+```csharp
+public class Shape
+{
+    public int Type { get; set; } // 1 for square, 2 for circle
+    public double Length { get; set; } // Length for square, Radius for circle
+}
+
+public class AreaCalculator
+{
+    public double TotalArea(Shape[] arrShapes)
+    {
+        double total = 0;
+        foreach (var shape in arrShapes)
+        {
+            if (shape.Type == 1)
+            {
+                total += shape.Length * shape.Length; // Area of square
+            }
+            else if (shape.Type == 2)
+            {
+                total += shape.Length * shape.Length * Math.PI; // Area of circle
+            }
+        }
+        return total;
+    }
+}
+```
+
+In this example, if we want to add a new shape, like a rectangle, we would need to modify the `AreaCalculator` class:
+
+```csharp
+public class AreaCalculator
+{
+    public double TotalArea(Shape[] arrShapes)
+    {
+        double total = 0;
+        foreach (var shape in arrShapes)
+        {
+            if (shape.Type == 1)
+            {
+                total += shape.Length * shape.Length; // Area of square
+            }
+            else if (shape.Type == 2)
+            {
+                total += shape.Length * shape.Length * Math.PI; // Area of circle
+            }
+            else if (shape.Type == 3)
+            {
+                total += shape.Length * shape.Width; // Area of rectangle
+            }
+        }
+        return total;
+    }
+}
+```
+
+This violates the Open-closed Principle because the `AreaCalculator` class is not closed for modification. Every time we add a new shape, we have to modify the `AreaCalculator` class. This can introduce bugs in existing code and makes the system harder to maintain. This is why it's important to adhere to the Open-closed Principle in object-oriented design.
+
+
+====
+
+.(LSP) LISKOV Substitution Principle
+[%collapsible]
+====
+
+TIP: LSP says that a base class object should be able to be replaced by any of its descendendants during polymorphism. 
+
+NOTE: LSP happens due of problems with Family abstractions, usually because requirements are not clear. LISKOV is more related to inheritance where we have grouped classes in the wrong family
+
+WARNING: If LISKOV issue is already present, then you will need to refactor the class
+
+let's consider a C# example in a .NET context where the Liskov Substitution Principle (LSP) is violated.
+
+Suppose we have a `Bird` class and a `Penguin` class that inherits from `Bird`:
+
+```csharp
+public class Bird
+{
+    public virtual void Fly()
+    {
+        // Code to make the bird fly
+    }
+}
+
+public class Penguin : Bird
+{
+    public override void Fly()
+    {
+        throw new NotSupportedException("Penguins can't fly");
+    }
+}
+```
+
+In this example, the `Penguin` class is a subtype of `Bird`. However, penguins can't fly, so the `Fly` method in the `Penguin` class throws a `NotSupportedException`. This violates the Liskov Substitution Principle because we can't use a `Penguin` wherever we expect a `Bird`.
+
+The Liskov Substitution Principle states that if a program is using a base class, it should be able to use any of its subclasses without the program knowing it. In other words, the subclasses should be substitutable for their base class. But in this case, if we try to make a `Penguin` fly, the program will crash, so `Penguin` is not truly substitutable for `Bird`.
+
+To adhere to the Liskov Substitution Principle, we could refactor the classes to separate the `Fly` behavior into a different class or interface, and only give that behavior to the birds that can fly. This way, we ensure that we can use any bird wherever a bird is expected, without running into unexpected errors or behavior. This is the essence of the Liskov Substitution Principle. It promotes the robustness and flexibility of the software, making it easier to add new features without breaking existing ones.
+====
+
+.(ISP) Interface Seggregation Principle
+[%collapsible]
+====
+
+NOTE: ISP in simple terms = No code should be forced to depend on methods/properties which it doesn´t use/need/require, while LISKOV is about inheritance issues where a child class is forced to implement a method which it should not! ISP is more broad!
+
+let's consider a C# example in a .NET context where the Interface Segregation Principle (ISP) is violated.
+
+Suppose we have an `IWorker` interface and a `HumanWorker` class that implements `IWorker`:
+
+```csharp
+public interface IWorker
+{
+    void Work();
+    void Eat();
+}
+
+public class HumanWorker : IWorker
+{
+    public void Work()
+    {
+        // Code for working
+    }
+
+    public void Eat()
+    {
+        // Code for eating
+    }
+}
+```
+
+Now, if we have a `RobotWorker` class that also implements `IWorker`, we run into a problem because robots don't eat:
+
+```csharp
+public class RobotWorker : IWorker
+{
+    public void Work()
+    {
+        // Code for working
+    }
+
+    public void Eat()
+    {
+        throw new NotSupportedException("Robots don't eat");
+    }
+}
+```
+
+This violates the Interface Segregation Principle because the `IWorker` interface has a method (`Eat`) that doesn't always apply to all classes that implement it. The `RobotWorker` class is forced to depend on an interface (`IWorker`) that has methods it doesn't use (`Eat`), which is exactly what the Interface Segregation Principle tells us to avoid.
+
+To adhere to the Interface Segregation Principle, we could refactor the interfaces to separate the `Work` and `Eat` behaviors:
+
+```csharp
+public interface IWorker
+{
+    void Work();
+}
+
+public interface IEater
+{
+    void Eat();
+}
+
+public class HumanWorker : IWorker, IEater
+{
+    public void Work()
+    {
+        // Code for working
+    }
+
+    public void Eat()
+    {
+        // Code for eating
+    }
+}
+
+public class RobotWorker : IWorker
+{
+    public void Work()
+    {
+        // Code for working
+    }
+}
+```
+
+Now, each class only needs to implement the interfaces that apply to it. This is the essence of the Interface Segregation Principle. It promotes the robustness and flexibility of the software, making it easier to add new features without breaking existing ones.
+
+
+====
+
+.(DI) Dependency Inversion
+[%collapsible]
+====
+NOTE: Higher level modules (callers) should depend on lower level modules (calees) directly, but via abstractions. If you don´t do that, any change in the lower level module will impact the higher level module.
+
+Let's consider a simple example of an email notification system. Without using the Dependency Inversion Principle (DIP), you might have a class `EmailNotification` that directly depends on another class `SmtpClient` to send the email. This design has a problem: the `EmailNotification` class is tightly coupled to the `SmtpClient` class. If you decide to change the email sending mechanism, you'll need to modify the `EmailNotification` class².
+
+Here's how it might look:
+
+```csharp
+public class SmtpClient
+{
+    public void Send(string email, string subject, string body)
+    {
+        // Code to send email
+    }
+}
+
+public class EmailNotification
+{
+    private SmtpClient _client;
+
+    public EmailNotification()
+    {
+        _client = new SmtpClient();
+    }
+
+    public void Notify(string email, string subject)
+    {
+        string body = "This is a notification email";
+        _client.Send(email, subject, body);
+    }
+}
+```
+
+To implement the Dependency Inversion Principle, you'll introduce an abstraction (an interface) that both the `EmailNotification` class and the `SmtpClient` class will depend on². This way, `EmailNotification` is not directly dependent on `SmtpClient`, but on the abstraction, making it easier to switch out the email sending mechanism in the future.
+
+Here's how you can refactor the above code to adhere to DIP:
+
+```csharp
+public interface IEmailSender
+{
+    void SendEmail(string email, string subject, string body);
+}
+
+public class SmtpClient : IEmailSender
+{
+    public void SendEmail(string email, string subject, string body)
+    {
+        // Code to send email
+    }
+}
+
+public class EmailNotification
+{
+    private IEmailSender _sender;
+
+    public EmailNotification(IEmailSender sender)
+    {
+        _sender = sender;
+    }
+
+    public void Notify(string email, string subject)
+    {
+        string body = "This is a notification email";
+        _sender.SendEmail(email, subject, body);
+    }
+}
+```
+
+In the refactored code, both `EmailNotification` and `SmtpClient` depend on the `IEmailSender` interface. This is a simple example of how to implement the Dependency Inversion Principle in C#².
+
+
+Source: +
+(1) Learn Dependency Inversion Principle in C# (+ Examples) - ByteHide Blog. https://www.bytehide.com/blog/dependency-inversion-principle-in-csharp-solid-principles.
+(2) Dependency Inversion Principle in C# - Dot Net Tutorials. https://dotnettutorials.net/lesson/dependency-inversion-principle/.+
+(3) Real-Time Examples of Dependency Inversion Principle in C#. https://dotnettutorials.net/lesson/real-time-examples-of-dependency-inversion-principle-in-csharp/.+
+(4) SOLID Principles - Dependency Inversion Principle in C# With Code .... https://www.shekhali.com/dependency-inversion-principle-in-csharp/.+
+(5) C# Dependency Inversion Principle - C# Tutorial. https://www.csharptutorial.net/csharp-design-patterns/csharp-dependency-inversion-principle/.+
+(6) Dependency Inversion Principle VS Dependency Injection in C# - C# Corner. https://www.c-sharpcorner.com/article/dependency-inversion-principle-vs-dependency-injection-in-c-sharp/.+
+
+====
+
+.What is IOC (Inversion of Control)?
+[%collapsible]
+====
+NOTE: IOC happens when we invert the object creation control outside of the higher module.
+
+Let's consider a simple example of a logging system. In this system, we have a `Logger` class that logs messages to a file. But what if we want to change the logging mechanism to log to a database or an external service? This is where Dependency Injection (DI) and Inversion of Control (IoC) come into play¹².
+
+First, we define an interface `ILogger` that represents the abstraction of a logger¹²:
+
+```csharp
+public interface ILogger
+{
+    void Log(string message);
+}
+```
+
+Then, we create two concrete classes `FileLogger` and `DatabaseLogger` that implement this interface¹²:
+
+```csharp
+public class FileLogger : ILogger
+{
+    public void Log(string message)
+    {
+        // Code to log message to a file
+    }
+}
+
+public class DatabaseLogger : ILogger
+{
+    public void Log(string message)
+    {
+        // Code to log message to a database
+    }
+}
+```
+
+Next, we have a `UserController` class that depends on the `ILogger` interface, not on the concrete classes. The `UserController` doesn't know if the log is written to a file or a database. It just knows that it can log the message¹²:
+
+```csharp
+public class UserController
+{
+    private ILogger _logger;
+
+    public UserController(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public void ChangePassword(string newPassword)
+    {
+        // Code to change the password
+
+        _logger.Log("Password has been changed.");
+    }
+}
+```
+
+Finally, we create instances of `UserController` by providing either a `FileLogger` or a `DatabaseLogger`. This is where the IoC comes into play. The control of which logger to use is inverted from the `UserController` class to the main program¹²:
+
+```csharp
+class Program
+{
+    static void Main(string[] args)
+    {
+        ILogger logger = new FileLogger();
+        UserController userController = new UserController(logger);
+        userController.ChangePassword("newPassword");
+
+        logger = new DatabaseLogger();
+        userController = new UserController(logger);
+        userController.ChangePassword("newPassword");
+    }
+}
+```
+
+In this example, the `UserController` class is not responsible for creating the `ILogger` object. Instead, the `ILogger` object is created outside of the class and passed in through the constructor. This is an example of constructor injection, one of the types of Dependency Injection¹². The `UserController` class is now more flexible and easier to test because the logging mechanism can be easily changed¹²..
+
+Source: +
+(1) Inversion of Control using Dependency Injection in C# - Dot Net Tutorials. https://dotnettutorials.net/lesson/dependency-injection-design-pattern/. +
+(2) Dependency Injection (DI) and Inversion of Control (IOC) - C# Corner. https://www.c-sharpcorner.com/UploadFile/cda5ba/dependency-injection-di-and-inversion-of-control-ioc/. +
+(3) Inversion of Control in C# with Examples - Dot Net Tutorials. https://dotnettutorials.net/lesson/introduction-to-inversion-of-control/. +
+(4) en.wikipedia.org. https://en.wikipedia.org/wiki/Dependency_injection. +
+
+====
+
+.What is Dependency Injection ?
+[%collapsible]
+====
+TIP: Dependency Injection is a process where we inject dependent object from outside
+
+Let's modify the previous example to use Dependency Injection (DI). In this case, we'll use a simple IoC container to manage our dependencies.
+
+First, we'll need an IoC container. There are many available for .NET, such as Unity, Ninject, and Autofac, but for simplicity, we'll use a very basic one here:
+
+```csharp
+public class SimpleIocContainer
+{
+    private Dictionary<Type, Type> _typeMap = new Dictionary<Type, Type>();
+
+    public void Register<TContract, TImplementation>()
+    {
+        _typeMap[typeof(TContract)] = typeof(TImplementation);
+    }
+
+    public T Resolve<T>()
+    {
+        return (T)Resolve(typeof(T));
+    }
+
+    public object Resolve(Type contract)
+    {
+        Type implementation = _typeMap[contract];
+        ConstructorInfo constructor = implementation.GetConstructors()[0];
+        ParameterInfo[] constructorParameters = constructor.GetParameters();
+        if (constructorParameters.Length == 0)
+        {
+            return Activator.CreateInstance(implementation);
+        }
+
+        List<object> parameters = new List<object>(constructorParameters.Length);
+        foreach (ParameterInfo parameterInfo in constructorParameters)
+        {
+            parameters.Add(Resolve(parameterInfo.ParameterType));
+        }
+
+        return constructor.Invoke(parameters.ToArray());
+    }
+}
+```
+
+This simple IoC container allows you to register and resolve dependencies.
+
+Next, we modify the `Main` method to use the IoC container to manage dependencies:
+
+```csharp
+class Program
+{
+    static void Main(string[] args)
+    {
+        var container = new SimpleIocContainer();
+        container.Register<ILogger, FileLogger>();
+        container.Register<UserController, UserController>();
+
+        var userController = container.Resolve<UserController>();
+        userController.ChangePassword("newPassword");
+
+        container.Register<ILogger, DatabaseLogger>();
+        userController = container.Resolve<UserController>();
+        userController.ChangePassword("newPassword");
+    }
+}
+```
+
+In this example, the `UserController` class is not responsible for creating the `ILogger` object. Instead, the `ILogger` object is created by the IoC container and passed to the `UserController` through the constructor. This is an example of constructor injection, one of the types of Dependency Injection. The `UserController` class is now more flexible and easier to test because the logging mechanism can be easily changed.
+
+Source: +
+(1) github.com. https://github.com/WulframIII/wulfram3/tree/576bd41162887866971faf6481944e9f9149a8c2/Assets%2FWulfram3%2FScripts%2FInternalApis%2FDepenencyInjector.cs. +
+(2) github.com. https://github.com/nminh18898/IocContainer/tree/b0c8e1895d0d1b0773cdeed8cb8fdfccc8fff408/IocContainer%2FTest.cs. +
+====

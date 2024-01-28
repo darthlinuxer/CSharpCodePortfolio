@@ -28,3 +28,6 @@ include::.docs/oop_Intermediate.asciidoc[oopIntermediate]
 
 include::.docs/oop_Advanced.asciidoc[oopAdvanced]
 
+== Interview Questions in SOLID
+
+include::.docs/solid.asciidoc[solid]

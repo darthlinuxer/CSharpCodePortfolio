@@ -1,0 +1,40 @@
+.Explain Garbage Collector
+[%collapsible]
+====
+NOTE: It is a background process which runs undeterministically and it cleans unreferenced managed objects from the HEAP memory
+
+* When the objects goes out of scope, GC reclaims the memory and gives it back to operating system
+
+* We can analyze GC using performance counters in Perfmon or in Visual Studio, Debug Menu -> Performance Profiler
+
+
+====
+.What is the difference between Managed and UnManaged resource ?
+[%collapsible]
+====
+
+* Managed resources are those which are pure .NET objects and these objects are controlled by .NET CLR
+* UnManaged resources are not controlled by .NET CLR: File handle, COM Objects, Connection objects, etc.
+
+NOTE: Garbage Collector *CAN ONLY CLEAN* Managed Objects
+====
+.Explain Generators and Why it is needed ?
+[%collapsible]
+====
+. GC0: Short Lived Objects. Local Objects
+. GC1: Intermediate lived objects; buffers
+. GC2: Long lived objects; Static objects
+
+It is needed to improve GC performance; GC makes an assumption that if objects are needed longer then it should be visited less
+
+====
+
+.Explain the Dispose Pattern using IDisposable?
+[%collapsible]
+====
+
+====
+.
+[%collapsible]
+====
+====
