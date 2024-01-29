@@ -1,3 +1,5 @@
+=== Garbage Collectors
+
 .Explain Garbage Collector
 [%collapsible]
 ====
@@ -27,14 +29,208 @@ NOTE: Garbage Collector *CAN ONLY CLEAN* Managed Objects
 
 It is needed to improve GC performance; GC makes an assumption that if objects are needed longer then it should be visited less
 
+WARNING: If an object has a destructor, the 1st time GC visits the object, if it sees a destructor, it executes and the object will be promoted to upper generations to allow more time for the destructor code to finish, and ony during the upper generation check, it cleans the object from the memory; therefore, destructors will put more pressure on the memory because objects will live longer in the memory. SOLUTION: Inform GC that you will take care of cleaning unmanaged code by implementing IDispose pattern
+
+NOTE: Never use empty destructors
+
 ====
 
 .Explain the Dispose Pattern using IDisposable?
 [%collapsible]
 ====
 
+The Dispose Pattern in .NET C# is a design pattern used for releasing unmanaged resources¹². Here's a detailed explanation:
+
+**Why it is needed:**
+.NET applications often operate on system resources like memory, system handles, or database connections. While the .NET garbage collector (GC) automatically manages memory allocated using the C# `new` operator, it does not manage unmanaged resources². These unmanaged resources, such as file and pipe handles, registry handles, wait handles, or pointers to blocks of unmanaged memory, need to be released explicitly¹². If not properly released, these resources can lead to memory leaks and other performance issues².
+
+**What it is:**
+The Dispose Pattern is used for objects that implement the `IDisposable` interface¹. The `Dispose` method is primarily implemented to release unmanaged resources¹. When working with instance members that are `IDisposable` implementations, it's common to cascade `Dispose` calls¹. The pattern imposes order on the lifetime of an object¹.
+
+**How it works:**
+The class implementing the `IDisposable` interface encapsulates resources that need explicit clean-up³. The `Dispose(bool disposing)` method is the core of the disposal pattern. It is responsible for releasing both managed and unmanaged resources³. A `Dispose` method should be idempotent, meaning it's callable multiple times without throwing an exception¹.
+
+Here's a basic example of how to implement the Dispose pattern:
+
+```csharp
+public class Resource : IDisposable
+{
+     // To detect redundant calls
+    private bool _disposedValue;
+
+    public void Dispose()
+    {
+        Dispose(true);
+       //Tells GC: Do not execute the finalizer (Destructor), meaning, you already cleaned everything in the Dispose
+        GC.SuppressFinalize(this); 
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {               
+                // TODO: dispose managed state (managed objects) calling their dispose methods
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+            // TODO: set large fields to null.
+
+            _disposedValue = true;
+        }
+        
+        //If a class is inherited and base classe has a dispose method
+        //base.Dispose(disposing);
+    }
+
+    // TODO: In case you forget to call Dispose, GC will execute this destructor
+    ~Resource()
+    {
+        // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        Dispose(false);
+    }
+}
+```
+This code ensures that resources are always cleaned up appropriately, whether by the developer calling `Dispose` or by the garbage collector calling the finalizer¹.
+
+Source:+
+(1) Implement a Dispose method - .NET | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose. +
+(2) Dispose Pattern - Framework Design Guidelines | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern. +
+(3) The Disposal Pattern in .NET: Managing Unmanaged Resources and .... https://dev.to/waelhabbal/the-disposal-pattern-in-net-managing-unmanaged-resources-and-implementing-clean-up-30ce. +
+(4) From Dispose Pattern to Auto-disposable Objects in .NET. https://codinghelmet.com/articles/from-dispose-pattern-to-auto-disposable-objects-in-net. +
+(5) The Dispose Pattern Step by Step - Vasil Kosturski. https://vkontech.com/the-dispose-pattern-step-by-step/. +
+(6) github.com. https://github.com/ZeusPlugins/ZplBackupPlugin/tree/cb650cb8ca568bfe3f8ec3f606d4016b5aeb299d/ZplBackupPlugin%2FZplBackupPluginCommand.cs. +
+(7) github.com. https://github.com/Hqtruong27/Knowledge/tree/ea0853df781ea949ce8c64cbcd849e308c90ae89/src%2FKnowledge.Data%2FUOW%2FUnitOfWork.cs. +
+(8) github.com. https://github.com/ngates87/WPF-Projection-Tool/tree/eab20753b5a1f4099b9972c0ed850df99224d8ea/ProjectionMapping%2FCommunication.cs. +
+(9) github.com. https://github.com/jessegranger/Shiv/tree/e934b7a11740d652526223de9e8c334ea1aa2a7f/Game%2FNativeMemory.cs. +
+
 ====
-.
+.Explain GC.SuppressFinalize(this)
 [%collapsible]
 ====
+
+`GC.SuppressFinalize(this)` is a method call in C# that informs the .NET Garbage Collector (GC) that it doesn't need to call the finalizer (also known as the destructor) for the specified object¹².
+
+Here's a detailed explanation:
+
+- **Purpose**: The purpose of `GC.SuppressFinalize(this)` is to prevent the GC from calling the finalizer of an object that has already been cleaned up¹². This can improve the performance of your application by reducing the overhead of finalization³.
+
+- **When to use**: `GC.SuppressFinalize(this)` is typically called within the `Dispose` method of a class that implements the `IDisposable` interface¹². After the `Dispose` method has been called, it's safe to assume that all resources have been cleaned up properly. Therefore, there's no need for the GC to call the finalizer again, which is why `GC.SuppressFinalize(this)` is used¹².
+
+- **Effect on GC**: Normally, the CLR keeps tabs on objects with a finalizer when they are created, making them more expensive to create¹. `GC.SuppressFinalize(this)` tells the GC that the object was cleaned up properly and doesn't need to go onto the finalizer queue¹. This can be a significant optimization, as your objects can live a long time waiting on the finalizer queue¹.
+
+- **Caution**: It's important to note that `GC.SuppressFinalize(this)` should only be called on an object (`this`) that has a finalizer¹. Calling `GC.SuppressFinalize(this)` on an object that doesn't have a finalizer is equivalent to `GC.KeepAlive(this)`⁴. It will not only disable the class's own finalizer from running, but will ensure that the finalizers of any objects to which it holds references won't get scheduled for execution until disposal is complete⁴.
+
+Source: +
+(1) c# - When should I use GC.SuppressFinalize()? - Stack Overflow. https://stackoverflow.com/questions/151051/when-should-i-use-gc-suppressfinalize. +
+(2) GC.SuppressFinalize(Object) Method (System) | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/api/system.gc.suppressfinalize?view=net-8.0. +
+(3) When to use GC.SuppressFinalize() in C#? - iDiTect.com. https://www.iditect.com/faq/csharp/when-to-use-gcsuppressfinalize-in-c.html. +
+(4) c# - Why use GC.SuppressFinalize() when there is no Finalizer? - Stack .... https://stackoverflow.com/questions/19078536/why-use-gc-suppressfinalize-when-there-is-no-finalizer. +
+====
+.What is the using statement in C# ?
+[%collapsible]
+====
+`*using*` define a scope and at the end of the scope Dispose() will be called automatically!
+====
+
+.Can you force GC to run ?
+[%collapsible]
+====
+Yes, you can force the Garbage Collector (GC) to run in C# by using the `GC.Collect()` method¹⁴. This method forces the GC to spin through all unused objects and de-allocate them⁴. However, it's important to note that forcing a garbage collection is generally not recommended¹². The GC in .NET is designed to be self-tuning and to perform garbage collection automatically when needed².
+
+Here's how you can force the GC to run:
+
+```csharp
+GC.Collect();
+```
+
+In addition, if you want to wait for all finalizers to run after forcing a collection, you can use `GC.WaitForPendingFinalizers()`¹:
+
+```csharp
+GC.Collect();
+GC.WaitForPendingFinalizers();
+```
+
+This code will block until all objects in the finalization queue have been finalized¹. If you want a chance for those objects to be collected then you need another call to `Collect` after calling `WaitForPendingFinalizers`¹.
+
+However, keep in mind that forcing a garbage collection can lead to performance issues². The GC is usually more efficient when it's allowed to run on its own schedule². Therefore, it's generally better to let the GC handle memory management, and only force a collection in specific, rare scenarios where it's necessary².
+
+Source: +
+(1) c# - How to force garbage collector to run? - Stack Overflow. https://stackoverflow.com/questions/4257372/how-to-force-garbage-collector-to-run. +
+(2) C# Tip: Forcing Garbage Collection in .NET | Developer.com. https://www.developer.com/microsoft/c-sharp/c-tip-forcing-garbage-collection-in-net/. +
+(3) Best Practice for Forcing Garbage Collection in C#. https://stackoverflow.com/questions/233596/best-practice-for-forcing-garbage-collection-in-c-sharp. +
+(4) c# - How to Force Disposal of Objects / GC - Stack Overflow. https://stackoverflow.com/questions/8783318/how-to-force-disposal-of-objects-gc. +
+(5) http://msdn.microsoft.com/en-us/library/66x5fx1b.aspx.+
+====
+
+.Explain WeakReference and StrongReference 
+[%collapsible]
+====
+**Strong References**: A strong reference is a typical object reference¹³⁴⁵. If an object is reachable (meaning there's a path of strong references from the roots to the object), it's considered "in use" and won't be collected by the garbage collector (GC)⁴⁵. This is the default type of reference for all .NET objects¹³⁴⁵.
+
+**Weak References**: A weak reference, on the other hand, still references an object but allows that object to be reclaimed by garbage collection¹²⁴. It does not create a "countable" reference, thus you can keep a sort-of-reference to it, but still let it be eligible for garbage collection if your `WeakReference` is the only thing left looking at it¹. They are useful when you want to keep a reference to an object, but don't want that reference to prevent the GC from collecting the object¹²⁴. They can be useful for holding on to large objects that are expensive to initialize, but should be available for garbage collection if they are not actively in use².
+
+**Usage**: If your objects aren't being garbage collected when you want them to then you've made an error in your book keeping, something's still holding a reference that you forgot to remove¹. Using weak references can ease the pain of such book keeping, since you don't have to worry about them keeping an object "alive" and un-garbage-collected, but you don't have to use them¹. A good question to ask when considering use of a `WeakReference` is how one would feel if the weak reference were invalidated the instant no strong references existed to the object. If that would make the `WeakReference` less useful, then a `WeakReference` is probably not the best thing to use¹.
+
+``` csharp
+class Program
+{
+    static WeakReference weakRef = new WeakReference(null);
+
+    static void Main(string[] args)
+    {
+	    Fun1();
+	    Console.WriteLine("Waiting GC to run and clean the memory of my weakRef target");
+	    while (weakRef.IsAlive)
+	    {
+
+	    }
+	    Console.WriteLine($"Object is cleared from memory = {!weakRef.IsAlive}");
+    }
+
+    static void Fun1()
+    {
+        SomeClass t = new();
+        weakRef.Target = t;
+    } 
+    //t is out of scope here.
+    //t is marked to be Garbage Collected 
+    //between the time it is marked and actually Garbage Collected, we can use the weak reference to it
+}
+```
+In this example, as long as the strongReference exists, the Data object won’t be collected by the GC. However, once we remove the strongReference, the Data object is eligible for collection because the weakReference doesn’t prevent collection.
+
+Source: +
+(1) c# - When should weak references be used? - Stack Overflow. https://stackoverflow.com/questions/1640889/when-should-weak-references-be-used. +
+(2) Deciding When to Use Weak References in .NET | CodeGuru. https://www.codeguru.com/dotnet/deciding-when-to-use-weak-references-in-net/. +
+(3) WeakReference<T> Class (System) | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/api/system.weakreference-1?view=net-8.0. +
+(4) Weak Reference Lists (WeakLists) in C# - ChrisWirz.com. https://www.chriswirz.com/software/weak-reference-lists-in-c-sharp. +
+(5) c# - Weak reference benefits - Stack Overflow. https://stackoverflow.com/questions/310685/weak-reference-benefits. +
+====
+.When should we use WeakReferences?
+[%collapsible]
+====
+
+Here are some guidelines for when to use weak references:
+
+1. **Large Objects**: Weak references are useful for objects that use a lot of memory but can be recreated easily if they are reclaimed by garbage collection². For example, if a tree view in a Windows Forms application displays a complex hierarchical choice of options to the user and the underlying data is large, keeping the tree in memory is inefficient when the user is involved with something else in the application².
+
+2. **Cache Management**: You can use the `WeakReference` class to create a weak reference to the tree and destroy all strong references when the user switches away to another part of the application². When the user switches back to the tree, the application attempts to obtain a strong reference to the tree and, if successful, avoids reconstructing the tree².
+
+3. **Breaking Reference Cycles**: Weak references can be used to break reference cycles in your application³.
+
+However, there are also some cautions to keep in mind when using weak references²⁴:
+
+- Use long weak references only when necessary as the state of the object is unpredictable after finalization²⁴.
+- Avoid using weak references to small objects because the pointer itself may be as large or larger²⁴.
+- Avoid using weak references as an automatic solution to memory management problems²⁴.
+
+Remember, the use of weak references should be carefully considered as they add complexity to your code²⁴. They should be used judiciously and not as a default solution to memory management issues²⁴.
+
+Source: +
+(1) Weak References - .NET | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/weak-references. +
+(2) c# - WeakReference understanding - Stack Overflow. https://stackoverflow.com/questions/10928329/weakreference-understanding. +
+(3) C# Language Tutorial => Weak References. https://riptutorial.com/csharp/example/19680/weak-references. +
+(4) WeakReference Class (System) | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/api/system.weakreference?view=net-8.0. +
 ====
