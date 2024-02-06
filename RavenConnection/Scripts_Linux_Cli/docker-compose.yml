@@ -1,0 +1,23 @@
+# docker-compose.yml
+version: '3'
+services:
+  ravendb:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: raven1
+    ports:
+      - "8080:8080"
+      - "38888:38888"
+    volumes:
+      - "data_raven1:/opt/RavenDB/Server/RavenData"
+      - "./Shared/license.json:/opt/RavenDB/Server/license.json"
+      - "./Shared/settingsSecure.json:/opt/RavenDB/Server/settings.json"
+      - "./Shared/certificate.pfx:/opt/RavenDB/Server/certificate.pfx"
+    networks:
+      - raven_net
+networks:
+  raven_net:
+
+volumes:
+  data_raven1:

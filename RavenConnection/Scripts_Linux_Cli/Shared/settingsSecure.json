@@ -1,0 +1,13 @@
+{
+  "ServerUrl": "https://raven1:8080",
+  "ServerUrl.Tcp": "tcp://raven1:38888",
+  "DataDir": "/opt/RavenDB/Server/RavenData",
+  "License.Eula.Accepted": true,
+  "License.Path": "/opt/RavenDB/Server",
+  "Setup.Mode": "None",
+  "Logs.Mode": "Information",
+  "Security.Certificate": {
+    "Path": "/opt/RavenDB/Server/certificate.pfx",
+    "Password": "test"
+  }
+}

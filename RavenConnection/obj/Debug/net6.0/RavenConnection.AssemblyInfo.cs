@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RavenConnection")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5e29b26128017b0a3024f382916105da8bce5536")]
 [assembly: System.Reflection.AssemblyProductAttribute("RavenConnection")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RavenConnection")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

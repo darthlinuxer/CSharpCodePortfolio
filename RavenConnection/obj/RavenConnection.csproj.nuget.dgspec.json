@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {}
+    "/home/cchaves/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {}
   },
   "projects": {
-    "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {
+    "/home/cchaves/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
+        "projectUniqueName": "/home/cchaves/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
         "projectName": "RavenConnection",
-        "projectPath": "/home/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/home/CSharpCodePortfolio/RavenConnection/obj/",
+        "projectPath": "/home/cchaves/CSharpCodePortfolio/RavenConnection/RavenConnection.csproj",
+        "packagesPath": "/home/cchaves/.nuget/packages/",
+        "outputPath": "/home/cchaves/CSharpCodePortfolio/RavenConnection/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/home/cchaves/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -32,9 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "default"
         }
       },
       "frameworks": {
@@ -61,6 +58,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.26, 6.0.26]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-x64",
+              "version": "[6.0.26, 6.0.26]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.26, 6.0.26]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -69,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/root/.dotnet/sdk/8.0.100-preview.7.23376.3/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/cchaves/.dotnet/sdk/8.0.101/RuntimeIdentifierGraph.json"
         }
       }
     }
