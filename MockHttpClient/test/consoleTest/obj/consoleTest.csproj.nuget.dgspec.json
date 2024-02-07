@@ -1,0 +1,146 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/cchaves/CSharpCodePortfolio/MockHttpClient/test/consoleTest/consoleTest.csproj": {}
+  },
+  "projects": {
+    "/home/cchaves/CSharpCodePortfolio/MockHttpClient/src/console/console.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/src/console/console.csproj",
+        "projectName": "console",
+        "projectPath": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/src/console/console.csproj",
+        "packagesPath": "/home/cchaves/.nuget/packages/",
+        "outputPath": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/src/console/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/cchaves/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/cchaves/.dotnet/sdk/8.0.101/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/cchaves/CSharpCodePortfolio/MockHttpClient/test/consoleTest/consoleTest.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/test/consoleTest/consoleTest.csproj",
+        "projectName": "consoleTest",
+        "projectPath": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/test/consoleTest/consoleTest.csproj",
+        "packagesPath": "/home/cchaves/.nuget/packages/",
+        "outputPath": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/test/consoleTest/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/cchaves/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/cchaves/CSharpCodePortfolio/MockHttpClient/src/console/console.csproj": {
+                "projectPath": "/home/cchaves/CSharpCodePortfolio/MockHttpClient/src/console/console.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.6.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.70, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/cchaves/.dotnet/sdk/8.0.101/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
