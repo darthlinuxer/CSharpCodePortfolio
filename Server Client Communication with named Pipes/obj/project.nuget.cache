@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tZgjYPNMHVSFuuMAVhfeQsqGUL3SPWsP9qQP9c7EDzroGm/GAcwqta7e7Dc3QfBPPLsN1DBOZPH7B/91+sVHNA==",
+  "dgSpecHash": "NEPjGRjb/7b4v0sU/MHJ/st8NPShDErhGgTATNz1awa0e41YYrhccHoEO05HbvajQrnv2w1ay1iMcGDwi4zZdg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\cchaves\\dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\Server Client Communication with named Pipes.csproj",
+  "projectFilePath": "C:\\Users\\cchaves\\Dev\\CSharpCodePortfolio\\Server Client Communication with named Pipes\\Server Client Communication with named Pipes.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Server_Client_Communication_with_named_Pipes
-build_property.ProjectDir = C:\Users\cchaves\dev\CSharpCodePortfolio\Server Client Communication with named Pipes\
+build_property.ProjectDir = C:\Users\cchaves\Dev\CSharpCodePortfolio\Server Client Communication with named Pipes\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

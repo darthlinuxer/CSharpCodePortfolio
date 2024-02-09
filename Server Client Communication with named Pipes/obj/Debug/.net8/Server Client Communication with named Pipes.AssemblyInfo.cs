@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Server Client Communication with named Pipes")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5dfe3c846d9b746cc8e0f0f480f15dd6fb927440")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f548c23f489324b6e76ccf4f6319ccf76f5a0564")]
 [assembly: System.Reflection.AssemblyProductAttribute("Server Client Communication with named Pipes")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Server Client Communication with named Pipes")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

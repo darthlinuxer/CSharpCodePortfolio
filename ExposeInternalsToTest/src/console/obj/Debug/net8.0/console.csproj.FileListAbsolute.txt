@@ -1,0 +1,15 @@
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\bin\Debug\net8.0\console.exe
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\bin\Debug\net8.0\console.deps.json
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\bin\Debug\net8.0\console.runtimeconfig.json
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\bin\Debug\net8.0\console.dll
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\bin\Debug\net8.0\console.pdb
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.AssemblyInfoInputs.cache
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.AssemblyInfo.cs
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.csproj.CoreCompileInputs.cache
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.sourcelink.json
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.dll
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\refint\console.dll
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.pdb
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\console.genruntimeconfig.cache
+C:\Users\cchaves\Dev\CSharpCodePortfolio\ExposeInternalsToTest\src\console\obj\Debug\net8.0\ref\console.dll

@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "XHP8rpbGbNWjRrkPgwxgqJ/uHuHjJxwi4yX0h1Ia1RPdD6ctBVuUlETstl1IRW7CwDiTqFyHAWcXyrBaskl/Lw==",
+  "dgSpecHash": "CC6Rtql7dixHn4iLzCS7nEL1Kw9gzz885Z20nAuqmlSsRMXvOS8Stb+0wL4KddZhV9SSQ6ZlsvmFMbrdSP2qVw==",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Using Anonymous Pipes for Communication between Threads\\Using Anonymous Pipes for Communication between Threads.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\cchaves\\Dev\\CSharpCodePortfolio\\Using Anonymous Pipes for Communication between Threads\\Using Anonymous Pipes for Communication between Threads.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\cchaves\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\cchaves\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\cchaves\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "C:\\Users\\cchaves\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.32\\microsoft.netcore.app.host.win-x64.3.1.32.nupkg.sha512"
+  ],
   "logs": []
 }
