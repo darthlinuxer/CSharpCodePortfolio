@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EFCore10.App/EFCore10.App.csproj" />
+    <Project Path="src/EFCore10.Shared/EFCore10.Shared.csproj" />
+    <Project Path="src/EFCore10.Tutorials.Abstractions/EFCore10.Tutorials.Abstractions.csproj" />
+    <Project Path="src/EFCore10.Tutorials.Tutorial01/EFCore10.Tutorials.Tutorial01.csproj" />
+    <Project Path="src/EFCore10.Tutorials.Tutorial02/EFCore10.Tutorials.Tutorial02.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EFCore10.Shared.Tests/EFCore10.Shared.Tests.csproj" />
+  </Folder>
+</Solution>

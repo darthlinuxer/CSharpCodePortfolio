@@ -1,0 +1,4 @@
+{
+  "dotnet.defaultSolution": "EFCore10.slnx",
+  "omnisharp.defaultLaunchSolution": "EFCore10.slnx"
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "EFCore10",
+  "classifications": [
+    "EF Core",
+    "Tutorial",
+    "Library"
+  ],
+  "identity": "EFCore10.Templates.Tutorial",
+  "name": "EFCore10 Tutorial",
+  "shortName": "efcore10-tutorial",
+  "sourceName": "EFCore10.Tutorials.TutorialTemplate",
+  "defaultName": "EFCore10.Tutorials.Tutorial00",
+  "preferNameDirectory": true,
+  "description": "Creates an EFCore10 tutorial class library with TutorialAttribute boilerplate.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "tutorialId": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial id",
+      "description": "Identifier shown in the tutorial menu, such as 03.",
+      "defaultValue": "00",
+      "replaces": "TutorialId"
+    },
+    "slug": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial slug",
+      "description": "Slug used by the CLI run command, such as compiled-models.",
+      "defaultValue": "new-tutorial",
+      "replaces": "TutorialSlug"
+    },
+    "title": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial title",
+      "description": "Human-readable title shown in the tutorial menu.",
+      "defaultValue": "New EF Core Tutorial",
+      "replaces": "TutorialTitle"
+    },
+    "className": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial class name",
+      "description": "Name of the generated tutorial class.",
+      "defaultValue": "TutorialClass",
+      "replaces": "TutorialClass",
+      "fileRename": "TutorialClass"
+    }
+  }
+}

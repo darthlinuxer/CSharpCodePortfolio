@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\EFCore10.Shared\EFCore10.Shared.csproj" />
+    <ProjectReference Include="..\EFCore10.Tutorials.Abstractions\EFCore10.Tutorials.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
