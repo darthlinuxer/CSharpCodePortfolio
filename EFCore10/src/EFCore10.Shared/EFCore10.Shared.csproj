@@ -5,6 +5,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="SourceGear.sqlite3" />
+    <PackageReference Include="Spectre.Console" />
     <PackageReference Include="SQLitePCLRaw.config.e_sqlite3" />
   </ItemGroup>
 

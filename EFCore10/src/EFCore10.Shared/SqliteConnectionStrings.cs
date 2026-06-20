@@ -40,6 +40,35 @@ public static class SqliteConnectionStrings
         return builder.ToString();
     }
 
+    /// <summary>
+    /// Gets a display-friendly SQLite data source from a connection string.
+    /// </summary>
+    public static string GetDisplayDataSource(
+        string connectionString,
+        string? relativeToDirectory = null)
+    {
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("The SQLite connection string cannot be empty.", nameof(connectionString));
+
+        var builder = new SqliteConnectionStringBuilder(connectionString);
+        var dataSource = builder.DataSource;
+
+        if (string.IsNullOrWhiteSpace(dataSource)
+            || dataSource == ":memory:"
+            || string.IsNullOrWhiteSpace(relativeToDirectory)
+            || !Path.IsPathRooted(dataSource))
+        {
+            return dataSource;
+        }
+
+        var relativePath = Path.GetRelativePath(relativeToDirectory, dataSource);
+
+        return relativePath.StartsWith("..", StringComparison.Ordinal)
+            || Path.IsPathRooted(relativePath)
+                ? dataSource
+                : relativePath;
+    }
+
     private static bool ShouldResolveAgainstBaseDirectory(string dataSource)
     {
         return !string.IsNullOrWhiteSpace(dataSource)

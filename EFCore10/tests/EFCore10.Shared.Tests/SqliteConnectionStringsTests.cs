@@ -54,6 +54,42 @@ public sealed class SqliteConnectionStringsTests
         Assert.IsFalse(Directory.Exists(baseDirectory));
     }
 
+    [TestMethod]
+    public void GetDisplayDataSourceReturnsRelativePathWhenDatabaseIsUnderBaseDirectory()
+    {
+        var baseDirectory = CreateUniqueDirectoryPath();
+        var databasePath = Path.Combine(baseDirectory, "EFCore10.Tutorials.Tutorial03", "Factory.db");
+
+        var displayPath = SqliteConnectionStrings.GetDisplayDataSource(
+            $"Data Source={databasePath}",
+            baseDirectory);
+
+        Assert.AreEqual(Path.Combine("EFCore10.Tutorials.Tutorial03", "Factory.db"), displayPath);
+    }
+
+    [TestMethod]
+    public void GetDisplayDataSourceReturnsAbsolutePathWhenDatabaseIsOutsideBaseDirectory()
+    {
+        var baseDirectory = CreateUniqueDirectoryPath();
+        var databasePath = Path.Combine(CreateUniqueDirectoryPath(), "outside.db");
+
+        var displayPath = SqliteConnectionStrings.GetDisplayDataSource(
+            $"Data Source={databasePath}",
+            baseDirectory);
+
+        Assert.AreEqual(databasePath, displayPath);
+    }
+
+    [TestMethod]
+    public void GetDisplayDataSourcePreservesInMemoryDataSource()
+    {
+        var displayPath = SqliteConnectionStrings.GetDisplayDataSource(
+            "Data Source=:memory:",
+            CreateUniqueDirectoryPath());
+
+        Assert.AreEqual(":memory:", displayPath);
+    }
+
     private static IConfiguration CreateConfiguration(string connectionString)
     {
         return new ConfigurationBuilder()

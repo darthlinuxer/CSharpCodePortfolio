@@ -1,26 +1,25 @@
-﻿using EFCore10.Tutorials.Abstractions;
-using Microsoft.EntityFrameworkCore;
+﻿using EFCore10.Shared;
+using EFCore10.Tutorials.Abstractions;
 
 namespace EFCore10.Tutorials.Tutorial01;
 
-[Tutorial("01", "simple-modeling", "Simple EF Core Modeling")]
+[Tutorial("01", "simple-modeling", "Modelagem simples com EF Core")]
 public sealed class FirstTutorial : ITutorial
 {
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("Tutorial 01 - Simple EFCore Modeling");
-        string multiline = @"
-            Steps: 
-            1. dotnet add src/EFCore10.Tutorials.Tutorial01 package Microsoft.EntityFrameworkCore.Sqlite
-            2. Created the models and the dbcontext 
-            3. Created the Database : 
-                - dotnet tool install --global dotnet-ef
-                - dotnet add src/EFCore10.Tutorials.Tutorial01 package Microsoft.EntityFrameworkCore.Design
-                - dotnet ef migrations --project src/EFCore10.Tutorials.Tutorial01 add InitialCreate
-                - dotnet ef database --project src/EFCore10.Tutorials.Tutorial01 update
-        ";
+        TutorialConsole.WriteHeader("01", "Modelagem simples com EF Core");
+        TutorialConsole.WriteContext(
+            ("Provider", "SQLite"),
+            ("Configuração", "OnConfiguring no DbContext"),
+            ("Schema", "Migration InitialCreate"));
 
-        Console.WriteLine(multiline);
-        await CRUD.ExecuteAsync();        
+        TutorialConsole.WriteQuestion(
+            "Qual é o fluxo mínimo para modelar Blog/Post e executar CRUD com EF Core?");
+        TutorialConsole.WriteHypothesis(
+            "Com modelos CLR, DbContext e migration aplicada, o EF Core consegue mapear tabelas e persistir objetos.",
+            "O Change Tracker detecta alterações no blog e nos posts durante a unidade de trabalho.");
+
+        await CRUD.ExecuteAsync(cancellationToken).ConfigureAwait(false);
     }
 }

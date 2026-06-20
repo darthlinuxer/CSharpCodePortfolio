@@ -13,6 +13,7 @@
     <PackageVersion Include="MSTest.TestAdapter" Version="4.0.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="4.0.1" />
     <PackageVersion Include="SourceGear.sqlite3" Version="3.50.4.5" />
+    <PackageVersion Include="Spectre.Console" Version="0.55.0" />
     <PackageVersion Include="Spectre.Console.Cli" Version="0.55.0" />
     <PackageVersion Include="SQLitePCLRaw.config.e_sqlite3" Version="3.0.3" />
   </ItemGroup>

@@ -1,3 +1,4 @@
+using EFCore10.Shared;
 using EFCore10.Tutorials.Tutorial04.Context;
 using EFCore10.Tutorials.Tutorial04.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +12,18 @@ internal sealed class PooledDynamicStateDemo(
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        TutorialConsole.WriteQuestion(
+            "Por que estado dinâmico, como tenant, não deve ser configurado em OnConfiguring com contexto pooled?");
+        TutorialConsole.WriteHypothesis(
+            "Como o mesmo DbContext pode voltar do pool, estado que muda por operação precisa ser aplicado em cada lease.",
+            "Se esse estado for carregado só na inicialização da instância, ele pode ficar obsoleto quando o contexto for reaproveitado.");
+
         await ResetDatabaseAsync(cancellationToken).ConfigureAwait(false);
         await SeedTenantDataAsync(cancellationToken).ConfigureAwait(false);
+        TutorialConsole.WritePreparation(
+            "O schema do banco foi recriado.",
+            "Foram inseridos um blog para tenant-a e um blog para tenant-b.");
+
         await DemonstrateBadOnConfiguringTenantStateAsync(cancellationToken).ConfigureAwait(false);
         await DemonstrateTenantAwareFactorySolutionAsync(cancellationToken).ConfigureAwait(false);
         await CleanupDatabaseAsync(cancellationToken).ConfigureAwait(false);
@@ -20,13 +31,9 @@ internal sealed class PooledDynamicStateDemo(
 
     private async Task ResetDatabaseAsync(CancellationToken cancellationToken)
     {
-        PrintSection("Setup");
-
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         await context.Database.EnsureDeletedAsync(cancellationToken).ConfigureAwait(false);
         await context.Database.EnsureCreatedAsync(cancellationToken).ConfigureAwait(false);
-
-        Console.WriteLine("Database schema was recreated.");
     }
 
     private async Task SeedTenantDataAsync(CancellationToken cancellationToken)
@@ -62,12 +69,14 @@ internal sealed class PooledDynamicStateDemo(
             });
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        Console.WriteLine("Seeded one blog for tenant-a and one blog for tenant-b.");
     }
 
     private async Task DemonstrateBadOnConfiguringTenantStateAsync(CancellationToken cancellationToken)
     {
-        PrintSection("Failure: dynamic state in OnConfiguring");
+        TutorialConsole.WriteExperiment(
+            1,
+            "OnConfiguring mantém estado dinâmico obsoleto?",
+            "Usar um contexto ruim que lê o tenant ambiente em OnConfiguring; depois mudar o ambiente de tenant-a para tenant-b.");
 
         try
         {
@@ -76,7 +85,8 @@ internal sealed class PooledDynamicStateDemo(
             {
                 _ = tenantAContext.Database.ProviderName;
                 var tenantABlogCount = await tenantAContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
-                Console.WriteLine($"Ambient tenant: tenant-a, context tenant: {tenantAContext.CurrentTenantId}, visible blogs: {tenantABlogCount}");
+                TutorialConsole.WriteObservation(
+                    $"Primeiro uso: tenant ambiente tenant-a, tenant guardado no contexto {tenantAContext.CurrentTenantId}, blogs visíveis {tenantABlogCount}.");
             }
 
             AmbientTenantState.CurrentTenantId = TenantIds.TenantB;
@@ -84,11 +94,16 @@ internal sealed class PooledDynamicStateDemo(
             {
                 _ = tenantBContext.Database.ProviderName;
                 var tenantBBlogCount = await tenantBContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
-                Console.WriteLine($"Ambient tenant: tenant-b, context tenant: {tenantBContext.CurrentTenantId}, visible blogs: {tenantBBlogCount}");
+                TutorialConsole.WriteObservation(
+                    $"Segundo uso: tenant ambiente tenant-b, tenant guardado no contexto {tenantBContext.CurrentTenantId}, blogs visíveis {tenantBBlogCount}.");
 
-                Console.WriteLine(tenantBContext.CurrentTenantId == TenantIds.TenantB
-                    ? "Unexpected: OnConfiguring refreshed the tenant for the reused context."
-                    : "Failure: OnConfiguring kept tenant-a while ambient tenant changed to tenant-b");
+                TutorialConsole.WriteConclusion(
+                    tenantBContext.CurrentTenantId == TenantIds.TenantB
+                        ? "Resultado inesperado: OnConfiguring atualizou o tenant no contexto reaproveitado."
+                        : "Falha demonstrada: OnConfiguring manteve tenant-a enquanto o tenant ambiente mudou para tenant-b.",
+                    tenantBContext.CurrentTenantId == TenantIds.TenantB
+                        ? TutorialConclusionKind.Warning
+                        : TutorialConclusionKind.Failure);
             }
         }
         finally
@@ -99,7 +114,10 @@ internal sealed class PooledDynamicStateDemo(
 
     private async Task DemonstrateTenantAwareFactorySolutionAsync(CancellationToken cancellationToken)
     {
-        PrintSection("Solution: tenant-aware factory");
+        TutorialConsole.WriteExperiment(
+            2,
+            "Factory tenant-aware aplica o tenant por lease?",
+            "Usar TenantAwareBloggingContextFactory para aplicar o tenant no início de cada lease e limpar o estado no descarte.");
 
         List<string> tenantABlogs;
         await using (var tenantALease = await tenantAwareFactory
@@ -109,7 +127,8 @@ internal sealed class PooledDynamicStateDemo(
             tenantABlogs = await ReadBlogUrlsAsync(tenantALease.Context, cancellationToken).ConfigureAwait(false);
         }
 
-        Console.WriteLine($"Tenant-aware factory for tenant-a returned: {FormatUrls(tenantABlogs)}");
+        TutorialConsole.WriteObservation(
+            $"Factory tenant-aware para tenant-a retornou: {FormatUrls(tenantABlogs)}.");
 
         List<string> tenantBBlogs;
         await using (var tenantBLease = await tenantAwareFactory
@@ -119,20 +138,23 @@ internal sealed class PooledDynamicStateDemo(
             tenantBBlogs = await ReadBlogUrlsAsync(tenantBLease.Context, cancellationToken).ConfigureAwait(false);
         }
 
-        Console.WriteLine($"Tenant-aware factory for tenant-b returned: {FormatUrls(tenantBBlogs)}");
+        TutorialConsole.WriteObservation(
+            $"Factory tenant-aware para tenant-b retornou: {FormatUrls(tenantBBlogs)}.");
 
-        Console.WriteLine(tenantBBlogs.Count == 1 && tenantBBlogs[0].Contains("tenant-b", StringComparison.Ordinal)
-            ? "Solution: tenant-aware factory returned tenant-b data"
-            : "Unexpected: tenant-aware factory did not isolate tenant-b data.");
+        TutorialConsole.WriteConclusion(
+            tenantBBlogs.Count == 1 && tenantBBlogs[0].Contains("tenant-b", StringComparison.Ordinal)
+                ? "Solução demonstrada: a factory tenant-aware retornou dados de tenant-b quando o lease foi criado para tenant-b."
+                : "Resultado inesperado: a factory tenant-aware não isolou os dados de tenant-b.",
+            tenantBBlogs.Count == 1 && tenantBBlogs[0].Contains("tenant-b", StringComparison.Ordinal)
+                ? TutorialConclusionKind.Success
+                : TutorialConclusionKind.Failure);
     }
 
     private async Task CleanupDatabaseAsync(CancellationToken cancellationToken)
     {
-        PrintSection("Cleanup");
-
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         await context.Database.EnsureDeletedAsync(cancellationToken).ConfigureAwait(false);
-        Console.WriteLine("Deleted the demo SQLite database.");
+        TutorialConsole.WriteCleanup("O banco SQLite de demonstração foi removido.");
     }
 
     private static async Task<List<string>> ReadBlogUrlsAsync(
@@ -150,13 +172,8 @@ internal sealed class PooledDynamicStateDemo(
     private static string FormatUrls(IReadOnlyCollection<string> urls)
     {
         return urls.Count == 0
-            ? "(none)"
+            ? "(nenhum)"
             : string.Join(", ", urls);
     }
 
-    private static void PrintSection(string title)
-    {
-        Console.WriteLine();
-        Console.WriteLine($"== {title} ==");
-    }
 }

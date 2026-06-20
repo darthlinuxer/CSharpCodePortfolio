@@ -1,4 +1,4 @@
-# Tutorial03 - Pooled DbContext Factory
+# Tutorial03 - Factory pooled de DbContext
 
 Este tutorial demonstra o uso de `AddPooledDbContextFactory<TContext>` com
 SQLite. O foco é entender o ciclo de vida do `DbContext` criado por uma factory
@@ -15,6 +15,15 @@ visível. Ele cria um contexto, executa uma consulta, descarta a instância e
 cria outro contexto. Quando o hash da instância se repete, isso indica que o
 contexto voltou ao pool e foi reutilizado.
 
+A saída do console usa uma estrutura guiada com painéis e separadores:
+
+- `Contexto`: provider, banco SQLite e tamanho do pool.
+- `Pergunta central`: qual dúvida o tutorial responde.
+- `Hipótese`: qual comportamento esperamos observar.
+- `Preparação`: dados criados antes dos experimentos.
+- `Experimento N`: ação executada, observações e conclusão.
+- `Limpeza`: remoção dos artefatos criados pelo tutorial.
+
 ## Onde falha
 
 Um contexto criado pela factory não é gerenciado por um escopo de DI. O código
@@ -22,10 +31,11 @@ que chama `CreateDbContextAsync` também é responsável por chamar
 `DisposeAsync`.
 
 Quando um contexto não é descartado, ele continua fora do pool. Nesse caso, a
-próxima chamada da factory precisa criar outra instância. O tutorial imprime:
+próxima chamada da factory precisa criar ou entregar outra instância. O tutorial
+mostra essa falha com uma conclusão explícita:
 
 ```text
-Failure: context was not returned to the pool because it was not disposed
+Conclusão O contexto não descartado não voltou ao pool; por isso a factory precisou entregar outra instância.
 ```
 
 ## Solução

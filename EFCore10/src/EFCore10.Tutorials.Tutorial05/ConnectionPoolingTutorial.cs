@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EFCore10.Tutorials.Tutorial05;
 
-[Tutorial("05", "connection-pooling", "DbContext Pooling vs Connection Pooling")]
+[Tutorial("05", "connection-pooling", "DbContext pooling vs connection pooling")]
 public sealed class ConnectionPoolingTutorial : ITutorial
 {
     private const string ConnectionStringName = "TutorialDatabase";
@@ -19,9 +19,11 @@ public sealed class ConnectionPoolingTutorial : ITutorial
             ConnectionStringName,
             tutorialConfiguration.DirectoryPath);
 
-        Console.WriteLine("05 - DbContext Pooling vs Connection Pooling");
-        Console.WriteLine($"SQLite connection string: {connectionString}");
-        Console.WriteLine($"DbContext pool size: {DemoPoolSize}");
+        TutorialConsole.WriteHeader("05", "DbContext pooling vs connection pooling");
+        TutorialConsole.WriteContext(
+            ("Provider", "SQLite"),
+            ("Banco", SqliteConnectionStrings.GetDisplayDataSource(connectionString, AppContext.BaseDirectory)),
+            ("Pool de DbContext", DemoPoolSize.ToString()));
 
         var services = new ServiceCollection();
         services.AddSqlitePooledDbContextFactory<PoolingContext>(connectionString, DemoPoolSize);

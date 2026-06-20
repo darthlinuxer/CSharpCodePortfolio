@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EFCore10.Tutorials.Tutorial03;
 
-[Tutorial("03", "Factory", "Pooled DbContext with Factory")]
+[Tutorial("03", "pooled-dbcontext-factory", "Factory pooled de DbContext")]
 public sealed class Tutorial03 : ITutorial
 {
     private const string ConnectionStringName = "TutorialDatabase";
@@ -19,11 +19,11 @@ public sealed class Tutorial03 : ITutorial
             ConnectionStringName,
             tutorialConfiguration.DirectoryPath);
 
-        Console.WriteLine("Tutorial 03 - Pooled DbContext Factory");
-        Console.WriteLine($"SQLite connection string: {connectionString}");
-        Console.WriteLine($"DbContext pool size: {DemoPoolSize}");
-        Console.WriteLine("Each operation creates and disposes a context through IDbContextFactory.");
-        Console.WriteLine("With a pool size of 1, the same instance can be reused after disposal.");
+        TutorialConsole.WriteHeader("03", "Factory pooled de DbContext");
+        TutorialConsole.WriteContext(
+            ("Provider", "SQLite"),
+            ("Banco", SqliteConnectionStrings.GetDisplayDataSource(connectionString, AppContext.BaseDirectory)),
+            ("Pool de DbContext", DemoPoolSize.ToString()));
 
         var services = new ServiceCollection();
         services.AddSqlitePooledDbContextFactory<BloggingContext>(connectionString, DemoPoolSize);

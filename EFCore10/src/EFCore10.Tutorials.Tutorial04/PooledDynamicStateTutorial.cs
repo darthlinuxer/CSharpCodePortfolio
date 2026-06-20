@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EFCore10.Tutorials.Tutorial04;
 
-[Tutorial("04", "pooled-dynamic-state", "Pooled Contexts and Dynamic State")]
+[Tutorial("04", "pooled-dynamic-state", "Estado dinâmico em DbContext pooled")]
 public sealed class PooledDynamicStateTutorial : ITutorial
 {
     private const string ConnectionStringName = "TutorialDatabase";
@@ -19,9 +19,11 @@ public sealed class PooledDynamicStateTutorial : ITutorial
             ConnectionStringName,
             tutorialConfiguration.DirectoryPath);
 
-        Console.WriteLine("04 - Pooled Contexts and Dynamic State");
-        Console.WriteLine($"SQLite connection string: {connectionString}");
-        Console.WriteLine($"DbContext pool size: {DemoPoolSize}");
+        TutorialConsole.WriteHeader("04", "Estado dinâmico em DbContext pooled");
+        TutorialConsole.WriteContext(
+            ("Provider", "SQLite"),
+            ("Banco", SqliteConnectionStrings.GetDisplayDataSource(connectionString, AppContext.BaseDirectory)),
+            ("Pool de DbContext", DemoPoolSize.ToString()));
 
         var services = new ServiceCollection();
         services.AddSqlitePooledDbContextFactory<BloggingContext>(connectionString, DemoPoolSize);
