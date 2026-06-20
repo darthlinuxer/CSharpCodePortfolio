@@ -21,5 +21,30 @@ public sealed class ServiceCollectionExtensionsTests
         Assert.AreEqual("Microsoft.EntityFrameworkCore.Sqlite", context.Database.ProviderName);
     }
 
+    [TestMethod]
+    public async Task AddSqlitePooledDbContextFactoryRegistersFactoryWithSqliteProvider()
+    {
+        var services = new ServiceCollection();
+
+        services.AddSqlitePooledDbContextFactory<TestDbContext>("Data Source=:memory:", poolSize: 1);
+
+        using var serviceProvider = services.BuildServiceProvider(validateScopes: true);
+        var factory = serviceProvider.GetRequiredService<IDbContextFactory<TestDbContext>>();
+        await using var context = await factory.CreateDbContextAsync();
+
+        Assert.AreEqual("Microsoft.EntityFrameworkCore.Sqlite", context.Database.ProviderName);
+    }
+
+    [TestMethod]
+    public void AddSqlitePooledDbContextFactoryRejectsInvalidPoolSize()
+    {
+        var services = new ServiceCollection();
+
+        var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => services.AddSqlitePooledDbContextFactory<TestDbContext>("Data Source=:memory:", poolSize: 0));
+
+        Assert.AreEqual("poolSize", exception.ParamName);
+    }
+
     private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options);
 }

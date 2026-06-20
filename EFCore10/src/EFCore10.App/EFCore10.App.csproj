@@ -4,6 +4,7 @@
     <ProjectReference Include="..\EFCore10.Tutorials.Abstractions\EFCore10.Tutorials.Abstractions.csproj" />
     <ProjectReference Include="..\EFCore10.Tutorials.Tutorial01\EFCore10.Tutorials.Tutorial01.csproj" />
     <ProjectReference Include="..\EFCore10.Tutorials.Tutorial02\EFCore10.Tutorials.Tutorial02.csproj" />
+    <ProjectReference Include="..\EFCore10.Tutorials.Tutorial03\EFCore10.Tutorials.Tutorial03.csproj" />
   </ItemGroup>
 
   <ItemGroup>
