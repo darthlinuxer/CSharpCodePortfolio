@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "gNNVldASxxoEciAPEaH5a/5y3IxrguVZV6zvMcnlpDBIBoXkySPz2rGLf6A8ytoBE4Z8Rx2c/sCNQXJQFK8gqw==",
+  "dgSpecHash": "A9VTzpqrOLg=",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Replace If-Then-Else with Reflection and Attributes\\Replace If-Then-Else with Reflection and Attributes.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/darthlinuxer/CSharpCodePortfolio/Replace If-Then-Else with Reflection and Attributes/Replace If-Then-Else with Reflection and Attributes.csproj",
+  "expectedPackageFiles": [
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.ref/3.1.0/microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.aspnetcore.app.ref/3.1.10/microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.host.linux-x64/3.1.32/microsoft.netcore.app.host.linux-x64.3.1.32.nupkg.sha512"
+  ],
   "logs": []
 }

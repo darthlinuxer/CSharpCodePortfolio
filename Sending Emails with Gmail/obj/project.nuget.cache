@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "EyVTvn3zuT5BzrCzp4WlIQpg8HyacU7XmzxZH0+OPNYJxMDTbbejJ8txEBjdJwGDS7G2cQ59npFU0NRbpfUE1g==",
+  "dgSpecHash": "VmmY3TFof3Y=",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Sending Emails with Gmail\\GmailSendingEmail.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/darthlinuxer/CSharpCodePortfolio/Sending Emails with Gmail/GmailSendingEmail.csproj",
+  "expectedPackageFiles": [
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.ref/3.1.0/microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.aspnetcore.app.ref/3.1.10/microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.host.linux-x64/3.1.32/microsoft.netcore.app.host.linux-x64.3.1.32.nupkg.sha512"
+  ],
   "logs": []
 }

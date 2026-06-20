@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "1IkyPNHea3X96CUUnJuokpigmGrm8869x2e4MEvQpwMJV9uPQeD/tyr4HXbVzv9WNPYMjWcb+g/MZz6i13T2Mg==",
+  "dgSpecHash": "w3fcsZnCZNU=",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Lambda Validators\\Lambda Validators.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/darthlinuxer/CSharpCodePortfolio/Lambda Validators/Lambda Validators.csproj",
+  "expectedPackageFiles": [
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.ref/3.1.0/microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.aspnetcore.app.ref/3.1.10/microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.host.linux-x64/3.1.32/microsoft.netcore.app.host.linux-x64.3.1.32.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "dVYs0VcuxyG664Yow1TDN+E4EzsPUQiGalmnWKSaBZMu7oGTINGGuMC7pW/LTbmvruArFW1T1er9MhiThC87CA==",
+  "dgSpecHash": "Z6Rq/v0/tIA=",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Replacing If-Then-Else for complex objects using Pipe Structure\\Replacing If-Then-Else for complex objects using Pipe Structure.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/darthlinuxer/CSharpCodePortfolio/Replacing If-Then-Else for complex objects using Pipe Structure/Replacing If-Then-Else for complex objects using Pipe Structure.csproj",
+  "expectedPackageFiles": [
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.ref/3.1.0/microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.aspnetcore.app.ref/3.1.10/microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.host.linux-x64/3.1.32/microsoft.netcore.app.host.linux-x64.3.1.32.nupkg.sha512"
+  ],
   "logs": []
 }

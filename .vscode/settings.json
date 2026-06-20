@@ -2,9 +2,9 @@
 	"DockerRun.DisableAutoGenerateConfig": true,
 	"omnisharp.enableAsyncCompletion": true,
 	"omnisharp.enableRoslynAnalyzers": true,
-	"omnisharp.organizeImportsOnFormat": true,
 	"razor.devmode": true,
 	"razor.languageServer.debug": true,
 	"razor.trace": "Messages",
-	"asciidoc.antora.enableAntoraSupport": true
+	"asciidoc.antora.enableAntoraSupport": true,
+	"dotnet.formatting.organizeImportsOnFormat": true
 }

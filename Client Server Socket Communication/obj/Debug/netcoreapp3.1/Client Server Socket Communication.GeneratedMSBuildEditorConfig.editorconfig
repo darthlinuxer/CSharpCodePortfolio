@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = Client_Server_Socket_Communication
+build_property.ProjectDir = /home/darthlinuxer/CSharpCodePortfolio/Client Server Socket Communication/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

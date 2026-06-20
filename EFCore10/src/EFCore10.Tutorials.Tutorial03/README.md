@@ -1,53 +1,50 @@
 # Tutorial03 - Pooled DbContext Factory
 
-Este tutorial demonstra `AddPooledDbContextFactory<TContext>` com SQLite e um
-modelo simples de blogs e posts.
+Este tutorial demonstra o uso de `AddPooledDbContextFactory<TContext>` com
+SQLite. O foco é entender o ciclo de vida do `DbContext` criado por uma factory
+pooled.
 
-## O que muda
+## O que está sendo demonstrado
 
-`AddDbContext<TContext>` registra o contexto para ser resolvido diretamente pelo
-container, normalmente com ciclo de vida scoped. Esse e o caminho comum quando
-cada operacao precisa de um unico `DbContext` ligado ao escopo atual.
+`IDbContextFactory<TContext>` cria contextos sob demanda. Quando usamos
+`AddPooledDbContextFactory<TContext>`, o EF Core pode reutilizar uma instância de
+`DbContext` depois que ela é descartada.
 
-`AddDbContextPool<TContext>` mantem o mesmo formato de injecao direta, mas
-permite que o EF Core reutilize instancias de `DbContext` depois que elas sao
-descartadas. Isso reduz alocacoes e o custo repetido de configurar servicos
-internos do contexto.
+O tutorial configura o pool com tamanho `1` para tornar esse comportamento
+visível. Ele cria um contexto, executa uma consulta, descarta a instância e
+cria outro contexto. Quando o hash da instância se repete, isso indica que o
+contexto voltou ao pool e foi reutilizado.
 
-`AddPooledDbContextFactory<TContext>` combina pooling com factory. Em vez de
-receber o `DbContext` diretamente, o codigo recebe `IDbContextFactory<TContext>`
-e cria contextos sob demanda. Cada contexto criado pela factory deve ser
-descartado explicitamente; ao ser descartado, ele volta para o pool.
+## Onde falha
 
-## Por que usar factory pooled
+Um contexto criado pela factory não é gerenciado por um escopo de DI. O código
+que chama `CreateDbContextAsync` também é responsável por chamar
+`DisposeAsync`.
 
-Factory e util quando o codigo precisa controlar o ciclo de vida do contexto,
-criar mais de um contexto dentro do mesmo escopo ou executar uma unidade de
-trabalho curta sem prender o `DbContext` ao ciclo de vida do servico que foi
-injetado.
+Quando um contexto não é descartado, ele continua fora do pool. Nesse caso, a
+próxima chamada da factory precisa criar outra instância. O tutorial imprime:
 
-O pooling e especialmente interessante em caminhos de alta frequencia, onde o
-custo de criar e inicializar muitos contextos pequenos aparece no perfil de
-performance. Com pooling, o custo de setup tende a ser pago uma vez e a mesma
-instancia pode ser limpa e reutilizada em operacoes posteriores.
+```text
+Failure: context was not returned to the pool because it was not disposed
+```
 
-## DbContext pooling nao e connection pooling
+## Solução
 
-O pool de `DbContext` e gerenciado pelo EF Core e reutiliza objetos de contexto.
-O pool de conexoes e gerenciado pelo provider ADO.NET do banco de dados e
-reutiliza conexoes fisicas/logicas com o banco. Eles resolvem custos diferentes
-e podem existir ao mesmo tempo.
+Trate todo contexto criado pela factory como um recurso de vida curta:
 
-## Cuidado com estado mutavel
+```csharp
+await using var context = await factory.CreateDbContextAsync(cancellationToken);
+```
 
-Um contexto pooled pode ser reutilizado por varias operacoes depois de ser
-descartado. Na pratica, trate a instancia como reutilizavel pelo container e nao
-guarde nela estado que muda por request, por tenant ou por usuario.
+Esse padrão garante que o contexto seja descartado no fim da operação e possa
+voltar ao pool.
 
-Tambem nao use `OnConfiguring` para configurar estado variavel. Em contextos
-pooled, `OnConfiguring` roda quando a instancia e criada pela primeira vez, nao
-a cada uso. Se uma operacao precisa de estado dinamico, injete esse estado fora
-do contexto ou crie uma factory scoped que configure o contexto antes de
-entrega-lo ao codigo chamador.
+## O que fica para os próximos tutoriais
 
-Referencia: https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics?tabs=with-di%2Cexpression-api-with-constant#dbcontext-pooling
+Este tutorial não cobre estado dinâmico nem connection pooling. Esses assuntos
+ficaram separados para reduzir a mistura de conceitos:
+
+- Tutorial04: estado dinâmico em contexto pooled.
+- Tutorial05: diferença entre DbContext pooling e connection pooling.
+
+Referência: https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics?tabs=with-di%2Cexpression-api-with-constant#dbcontext-pooling

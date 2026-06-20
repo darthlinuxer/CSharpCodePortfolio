@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "ZKQlkUSH+Fi9fa/6G6QikF7KsYZp1dmat6QfwyLtSzJwu6iqOAVTTWbZHBryPSMWz0YVZvOppb+GarWYvnUVEA==",
+  "dgSpecHash": "VRWYhwEJdV8=",
   "success": true,
-  "projectFilePath": "D:\\Dev\\CSharpCodePortfolio\\Dependency Inversion using Constructor and Property Dependency Injection Services\\Dependency Inversion using Constructor and Property Dependency Injection Services.csproj",
+  "projectFilePath": "/home/darthlinuxer/CSharpCodePortfolio/Dependency Inversion using Constructor and Property Dependency Injection Services/Dependency Inversion using Constructor and Property Dependency Injection Services.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\chave\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\5.0.1\\microsoft.extensions.dependencyinjection.5.0.1.nupkg.sha512",
-    "C:\\Users\\chave\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\5.0.0\\microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512"
+    "/home/darthlinuxer/.nuget/packages/microsoft.extensions.dependencyinjection/5.0.1/microsoft.extensions.dependencyinjection.5.0.1.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/5.0.0/microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.ref/3.1.0/microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.aspnetcore.app.ref/3.1.10/microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "/home/darthlinuxer/.nuget/packages/microsoft.netcore.app.host.linux-x64/3.1.32/microsoft.netcore.app.host.linux-x64.3.1.32.nupkg.sha512"
   ],
   "logs": []
 }

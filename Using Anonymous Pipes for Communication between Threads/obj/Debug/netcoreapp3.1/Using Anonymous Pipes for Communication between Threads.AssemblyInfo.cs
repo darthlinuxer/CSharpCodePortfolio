@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Using Anonymous Pipes for Communication between Threads")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f548c23f489324b6e76ccf4f6319ccf76f5a0564")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f27fbefcf7cd7e6f57d05a4b441166d50d242c23")]
 [assembly: System.Reflection.AssemblyProductAttribute("Using Anonymous Pipes for Communication between Threads")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Using Anonymous Pipes for Communication between Threads")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
