@@ -15,14 +15,22 @@ A saída do console usa a mesma estrutura visual dos demais tutoriais:
 - `Pergunta central`: qual dúvida o tutorial responde.
 - `Hipótese`: qual comportamento esperamos observar.
 - `Preparação`: passos necessários antes do CRUD.
-- `Experimento N`: ação executada, observações e conclusão.
+- `Experimento N`: ação executada.
+- `Código observado`: trecho curto de C# que demonstra a ação do experimento.
+- `Evidências`: valores medidos em runtime, como IDs, URLs e contagens.
+- `Conclusão`: como interpretar o resultado.
 - `Limpeza`: remoção dos dados criados pela demonstração.
+
+Os snippets mostrados no console são curados para focar no conceito do
+experimento; eles não tentam reproduzir o arquivo inteiro. As evidências
+mostram o que foi verificado depois de cada operação, em vez de depender apenas
+da ausência de erro.
 
 ## Experimentos
 
-1. Criar e consultar um blog.
-2. Atualizar o blog e adicionar um post.
-3. Remover o blog.
+1. Criar e consultar um blog, confirmando o `BlogId` gerado e a URL recuperada.
+2. Atualizar o blog e adicionar um post, confirmando o `PostId`, o `BlogId` do post e a contagem persistida.
+3. Remover o blog, confirmando por consulta que não restaram registros com o ID removido.
 
 ## Regra prática
 

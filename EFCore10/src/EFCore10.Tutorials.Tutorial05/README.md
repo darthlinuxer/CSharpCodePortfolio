@@ -8,9 +8,14 @@ Confundir os dois leva a expectativas erradas sobre o que o EF Core está
 reutilizando.
 
 A saída do console usa painéis e separadores para mostrar `Contexto`,
-`Pergunta central`, `Hipótese`, `Preparação`, `Experimento N`, `Observação`,
-`Conclusão` e `Limpeza`. Isso separa visualmente o objeto `DbContext` da
-conexão ADO.NET.
+`Pergunta central`, `Hipótese`, `Preparação`, `Experimento N`,
+`Código observado`, `Evidências`, `Conclusão` e `Limpeza`. Isso separa
+visualmente o objeto `DbContext` da conexão ADO.NET.
+
+Os snippets mostrados no console são curados para destacar o código que
+manipula o `DbContext` e a conexão ADO.NET sem reproduzir arquivos inteiros. As
+evidências aparecem como tabelas: uma compara hashes de `DbContext`, e outra
+mostra a linha do tempo do estado da conexão.
 
 ## DbContext pooling
 
@@ -40,11 +45,14 @@ Um contexto pooled não significa uma conexão permanentemente aberta. O objeto
 `DbContext` pode ser reaproveitado enquanto a conexão ADO.NET permanece fechada
 entre operações.
 
-A saída esperada inclui:
+A saída esperada inclui uma tabela com estes fatos:
 
 ```text
-Observação DbContext em uso: hash <valor>. Estado da conexão ADO.NET antes da query EF: Closed.
-Observação A query leu 1 blog(s). Depois da query EF, o estado da conexão ADO.NET é Closed.
+Estado antes da query EF               Closed
+Blogs lidos pela query                 1
+Estado depois da query EF              Closed
+Estado depois de OpenConnectionAsync   Open
+Estado depois de CloseConnectionAsync  Closed
 Conclusão DbContext pooling reutiliza objetos de contexto; connection pooling é responsabilidade do provedor ADO.NET.
 ```
 

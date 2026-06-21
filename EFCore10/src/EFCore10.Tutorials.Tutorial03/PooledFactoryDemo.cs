@@ -15,6 +15,15 @@ internal sealed class PooledFactoryDemo(IDbContextFactory<BloggingContext> dbCon
         TutorialConsole.WriteHypothesis(
             "Com pool size 1, um contexto descartado pode voltar ao pool.",
             "Um contexto não descartado fica emprestado e força a factory a entregar outra instância.");
+        TutorialConsole.WriteCodeSnippet(
+            "Registrar uma factory pooled com pool size controlado pelo tutorial.",
+            "Tutorial03.cs",
+            """
+            services.AddSqlitePooledDbContextFactory<BloggingContext>(
+                connectionString,
+                DemoPoolSize);
+            services.AddScoped<PooledFactoryDemo>();
+            """);
 
         await ResetDatabaseAsync(cancellationToken).ConfigureAwait(false);
         await SeedBlogAsync(cancellationToken).ConfigureAwait(false);
@@ -60,17 +69,37 @@ internal sealed class PooledFactoryDemo(IDbContextFactory<BloggingContext> dbCon
             1,
             "Contexto descartado volta ao pool?",
             "Criar, consultar e descartar dois contextos em sequência usando uma factory pooled com pool size 1.");
+        TutorialConsole.WriteCodeSnippet(
+            "Criar o DbContext com await using para devolvê-lo ao pool no descarte.",
+            "PooledFactoryDemo.cs",
+            """
+            await using var context =
+                await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        var firstHash = await CreateReadAndDisposeContextAsync("Primeiro contexto descartado", cancellationToken)
+            var postCount = await context.Posts.CountAsync(cancellationToken);
+            var hash = RuntimeHelpers.GetHashCode(context);
+            """);
+
+        var firstContext = await CreateReadAndDisposeContextAsync(cancellationToken)
             .ConfigureAwait(false);
-        var secondHash = await CreateReadAndDisposeContextAsync("Segundo contexto descartado", cancellationToken)
+        var secondContext = await CreateReadAndDisposeContextAsync(cancellationToken)
             .ConfigureAwait(false);
+        var sameInstance = firstContext.Hash == secondContext.Hash;
+
+        TutorialConsole.WriteEvidence(
+            "Contextos descartados",
+            ("Pool size", Tutorial03.DemoPoolSize.ToString()),
+            ("Hash primeiro contexto", firstContext.Hash.ToString()),
+            ("Posts lidos no primeiro", firstContext.PostCount.ToString()),
+            ("Hash segundo contexto", secondContext.Hash.ToString()),
+            ("Posts lidos no segundo", secondContext.PostCount.ToString()),
+            ("Mesmo objeto CLR?", FormatBoolean(sameInstance)));
 
         TutorialConsole.WriteConclusion(
-            firstHash == secondHash
+            sameInstance
                 ? "O hash se repetiu; isso mostra que a primeira instância foi descartada, voltou ao pool e foi reutilizada."
                 : "O hash mudou; isso ainda é válido, mas neste teste o pool entregou outra instância mesmo com os contextos descartados.",
-            firstHash == secondHash ? TutorialConclusionKind.Success : TutorialConclusionKind.Warning);
+            sameInstance ? TutorialConclusionKind.Success : TutorialConclusionKind.Warning);
     }
 
     private async Task DemonstrateUndisposedContextFailureAsync(CancellationToken cancellationToken)
@@ -79,28 +108,47 @@ internal sealed class PooledFactoryDemo(IDbContextFactory<BloggingContext> dbCon
             2,
             "Contexto não descartado volta ao pool?",
             "Manter um contexto sem descarte e pedir outro contexto à factory enquanto o primeiro ainda está emprestado.");
+        TutorialConsole.WriteCodeSnippet(
+            "Manter um contexto emprestado impede a reutilização imediata daquela instância.",
+            "PooledFactoryDemo.cs",
+            """
+            leakedContext =
+                await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var leakedHash = RuntimeHelpers.GetHashCode(leakedContext);
+
+            await using var replacementContext =
+                await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            var replacementHash = RuntimeHelpers.GetHashCode(replacementContext);
+            """);
 
         BloggingContext? leakedContext = null;
 
         try
         {
             leakedContext = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-            _ = await leakedContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
+            var leakedBlogCount = await leakedContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
             var leakedHash = RuntimeHelpers.GetHashCode(leakedContext);
-            TutorialConsole.WriteObservation(
-                $"Contexto ainda não descartado: hash {leakedHash}. Ele continua fora do pool.");
 
             await using var replacementContext = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
-            _ = await replacementContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
+            var replacementBlogCount = await replacementContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
             var replacementHash = RuntimeHelpers.GetHashCode(replacementContext);
-            TutorialConsole.WriteObservation(
-                $"Contexto entregue enquanto o primeiro ainda está emprestado: hash {replacementHash}.");
+            var sameInstance = replacementHash == leakedHash;
+
+            TutorialConsole.WriteEvidence(
+                "Contexto não descartado",
+                ("Pool size", Tutorial03.DemoPoolSize.ToString()),
+                ("Hash contexto emprestado", leakedHash.ToString()),
+                ("Blogs lidos no contexto emprestado", leakedBlogCount.ToString()),
+                ("Hash contexto substituto", replacementHash.ToString()),
+                ("Blogs lidos no substituto", replacementBlogCount.ToString()),
+                ("Mesmo objeto CLR?", FormatBoolean(sameInstance)),
+                ("Interpretação", sameInstance ? "falha: instância emprestada foi reutilizada" : "evidência: a instância emprestada ficou fora do pool"));
 
             TutorialConsole.WriteConclusion(
-                replacementHash == leakedHash
+                sameInstance
                     ? "Resultado inesperado: o mesmo contexto ainda emprestado foi reutilizado."
                     : "O contexto não descartado não voltou ao pool; por isso a factory precisou entregar outra instância.",
-                replacementHash == leakedHash ? TutorialConclusionKind.Failure : TutorialConclusionKind.Warning);
+                sameInstance ? TutorialConclusionKind.Failure : TutorialConclusionKind.Warning);
         }
         finally
         {
@@ -119,15 +167,16 @@ internal sealed class PooledFactoryDemo(IDbContextFactory<BloggingContext> dbCon
         TutorialConsole.WriteCleanup("O banco SQLite de demonstração foi removido.");
     }
 
-    private async Task<int> CreateReadAndDisposeContextAsync(
-        string label,
-        CancellationToken cancellationToken)
+    private async Task<(int Hash, int PostCount)> CreateReadAndDisposeContextAsync(CancellationToken cancellationToken)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         var postCount = await context.Posts.CountAsync(cancellationToken).ConfigureAwait(false);
         var hash = RuntimeHelpers.GetHashCode(context);
-        TutorialConsole.WriteObservation(
-            $"{label}: hash {hash}, posts lidos {postCount}. O hash identifica a instância CLR do DbContext neste processo.");
-        return hash;
+        return (hash, postCount);
+    }
+
+    private static string FormatBoolean(bool value)
+    {
+        return value ? "sim" : "não";
     }
 }

@@ -30,6 +30,44 @@ public sealed class SecondTutorial : ITutorial
             "A connection string pode vir do appsettings.json.",
             "O container de DI pode criar o BloggingContext e injetá-lo no serviço CRUD.",
             "A Fluent API torna o modelo explícito sem depender apenas de convenções.");
+        TutorialConsole.WriteCodeSnippet(
+            "Registrar o DbContext no container usando a connection string carregada.",
+            "SecondTutorial.cs",
+            """
+            var services = new ServiceCollection();
+            services.AddSqliteDbContext<BloggingContext>(connectionString);
+            services.AddScoped<CRUD>();
+            """);
+        TutorialConsole.WriteCodeSnippet(
+            "Aplicar todas as configurações Fluent API do assembly.",
+            "Context/BlogContext.cs",
+            """
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.ApplyConfigurationsFromAssembly(
+                    typeof(BloggingContext).Assembly);
+            }
+            """);
+        TutorialConsole.WriteCodeSnippet(
+            "Configurar tabela, chave e propriedades fora da entidade.",
+            "Configurations/BlogConfiguration.cs",
+            """
+            public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
+            {
+                public void Configure(EntityTypeBuilder<Blog> builder)
+                {
+                    builder.ToTable("Blogs");
+                    builder.HasKey(blog => blog.BlogId);
+                    builder.Property(blog => blog.Url).IsRequired().HasMaxLength(500);
+                }
+            }
+            """);
+        TutorialConsole.WriteEvidence(
+            "Configuração aplicada ao tutorial",
+            ("Diretório do appsettings", Path.GetRelativePath(AppContext.BaseDirectory, tutorialConfiguration.DirectoryPath)),
+            ("Connection string", SqliteConnectionStrings.GetDisplayDataSource(connectionString, AppContext.BaseDirectory)),
+            ("Registro do DbContext", "AddSqliteDbContext<BloggingContext>"),
+            ("Modelo aplicado por", "ApplyConfigurationsFromAssembly"));
 
         var services = new ServiceCollection();
         services.AddSqliteDbContext<BloggingContext>(connectionString);

@@ -19,6 +19,13 @@ public sealed class FirstTutorial : ITutorial
         TutorialConsole.WriteHypothesis(
             "Com modelos CLR, DbContext e migration aplicada, o EF Core consegue mapear tabelas e persistir objetos.",
             "O Change Tracker detecta alterações no blog e nos posts durante a unidade de trabalho.");
+        TutorialConsole.WriteCodeSnippet(
+            "O DbContext inicial configura o provider SQLite dentro de OnConfiguring.",
+            "Context/BlogContext.cs",
+            """
+            protected override void OnConfiguring(DbContextOptionsBuilder options)
+                => options.UseSqlite($"Data Source={DbPath}");
+            """);
 
         await CRUD.ExecuteAsync(cancellationToken).ConfigureAwait(false);
     }

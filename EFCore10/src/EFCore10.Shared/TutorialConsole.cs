@@ -30,24 +30,32 @@ public static class TutorialConsole
     {
         ArgumentNullException.ThrowIfNull(items);
 
-        var table = new Table()
-            .NoBorder()
-            .HideHeaders()
-            .AddColumn("Campo")
-            .AddColumn("Valor");
-
-        foreach (var (label, value) in items)
-        {
-            table.AddRow(
-                new Markup($"[grey]{Escape(label)}[/]"),
-                new Markup(Escape(value)));
-        }
+        var table = CreateKeyValueTable(items, "grey");
 
         AnsiConsole.Write(
             new Panel(table)
                 .Header("[bold]Contexto[/]")
                 .Border(BoxBorder.Rounded)
                 .BorderColor(Color.Grey)
+                .Expand());
+        AnsiConsole.WriteLine();
+    }
+
+    /// <summary>
+    /// Writes measured evidence collected by the current experiment.
+    /// </summary>
+    public static void WriteEvidence(string title, params (string Label, string Value)[] items)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentNullException.ThrowIfNull(items);
+
+        var table = CreateKeyValueTable(items, "aqua");
+
+        AnsiConsole.Write(
+            new Panel(table)
+                .Header($"[bold]Evidências[/] [grey]|[/] {Escape(title)}")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Aqua)
                 .Expand());
         AnsiConsole.WriteLine();
     }
@@ -95,6 +103,27 @@ public static class TutorialConsole
                 .RuleStyle("grey")
                 .LeftJustified());
         WriteLabeledText("Ação", action, "blue");
+    }
+
+    /// <summary>
+    /// Writes a curated code snippet related to the current experiment.
+    /// </summary>
+    public static void WriteCodeSnippet(string title, string fileName, string code)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(code);
+
+        WriteLabeledText("Código", title, "purple");
+
+        var panel = new Panel(new Markup($"[grey]{Escape(NormalizeCode(code))}[/]"))
+            .Header($"[bold]Código observado[/] [grey]|[/] {Escape(fileName)}")
+            .Border(BoxBorder.Rounded)
+            .BorderColor(Color.Purple)
+            .Expand();
+
+        AnsiConsole.Write(panel);
+        AnsiConsole.WriteLine();
     }
 
     /// <summary>
@@ -177,6 +206,29 @@ public static class TutorialConsole
         AnsiConsole.Write(table);
     }
 
+    private static Table CreateKeyValueTable(
+        IReadOnlyCollection<(string Label, string Value)> items,
+        string labelColor)
+    {
+        var table = new Table()
+            .NoBorder()
+            .HideHeaders()
+            .AddColumn("Campo")
+            .AddColumn("Valor");
+
+        foreach (var (label, value) in items)
+        {
+            if (string.IsNullOrWhiteSpace(label))
+                continue;
+
+            table.AddRow(
+                new Markup($"[bold {Escape(labelColor)}]{Escape(label)}[/]"),
+                new Markup(Escape(value)));
+        }
+
+        return table;
+    }
+
     private static void WriteLabeledText(string label, string text, string labelColor)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(label);
@@ -203,6 +255,11 @@ public static class TutorialConsole
             lines
                 .Where(static line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => includeBullets ? $"- {line}" : line));
+    }
+
+    private static string NormalizeCode(string code)
+    {
+        return code.Trim('\r', '\n');
     }
 
     private static string Escape(string value)

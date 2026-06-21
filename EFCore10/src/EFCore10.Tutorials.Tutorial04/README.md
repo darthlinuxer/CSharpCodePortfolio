@@ -18,9 +18,14 @@ instância é inicializada. Se o código tenta carregar estado variável ali, co
 tenant atual, esse estado pode ficar antigo quando a instância voltar do pool.
 
 A saída do console usa painéis e separadores para mostrar `Contexto`,
-`Pergunta central`, `Hipótese`, `Preparação`, `Experimento N`, `Observação`,
-`Conclusão` e `Limpeza`. O primeiro experimento demonstra a falha, e o segundo
-mostra a correção.
+`Pergunta central`, `Hipótese`, `Preparação`, `Experimento N`,
+`Código observado`, `Evidências`, `Conclusão` e `Limpeza`. O primeiro
+experimento demonstra a falha, e o segundo mostra a correção.
+
+Os snippets mostrados no console são curados para destacar o trecho de código
+que explica a falha ou a solução de cada experimento. As evidências mostram
+tenant ambiente, tenant guardado no contexto, URLs retornadas e se o mesmo
+objeto CLR foi reaproveitado pelo pool.
 
 ## Onde falha
 
@@ -36,7 +41,9 @@ O fluxo executado é:
 5. A factory entrega a mesma instância reaproveitada.
 
 Como `OnConfiguring` não roda novamente para atualizar o estado, o contexto
-continua configurado com `tenant-a`. A saída mostra:
+continua configurado com `tenant-a`. A saída mostra a contradição em forma de
+tabela: o ambiente passa a ser `tenant-b`, mas o contexto ainda guarda
+`tenant-a` e retorna URLs do `tenant-a`. Em seguida, aparece a conclusão:
 
 ```text
 Conclusão Falha demonstrada: OnConfiguring manteve tenant-a enquanto o tenant ambiente mudou para tenant-b.
@@ -61,7 +68,9 @@ await using var lease = await tenantAwareFactory.CreateDbContextAsync(
 var blogs = await lease.Context.Blogs.ToListAsync(cancellationToken);
 ```
 
-O tutorial confirma a solução com a mensagem:
+O tutorial confirma a solução mostrando, em evidências, o tenant solicitado, o
+tenant aplicado no contexto e as URLs retornadas para `tenant-a` e `tenant-b`.
+Depois disso, aparece a mensagem:
 
 ```text
 Conclusão Solução demonstrada: a factory tenant-aware retornou dados de tenant-b quando o lease foi criado para tenant-b.

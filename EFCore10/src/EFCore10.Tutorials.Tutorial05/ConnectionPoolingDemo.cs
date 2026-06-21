@@ -49,15 +49,35 @@ internal sealed class ConnectionPoolingDemo(IDbContextFactory<PoolingContext> db
             1,
             "DbContext pooling reutiliza o objeto de contexto?",
             "Criar, consultar e descartar duas instâncias de DbContext usando uma factory pooled com pool size 1.");
+        TutorialConsole.WriteCodeSnippet(
+            "Criar e descartar o DbContext via factory pooled.",
+            "ConnectionPoolingDemo.cs",
+            """
+            await using var context =
+                await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        var firstHash = await CreateAndReadContextAsync("Primeiro DbContext", cancellationToken).ConfigureAwait(false);
-        var secondHash = await CreateAndReadContextAsync("Segundo DbContext", cancellationToken).ConfigureAwait(false);
+            var blogCount = await context.Blogs.CountAsync(cancellationToken);
+            var hash = RuntimeHelpers.GetHashCode(context);
+            """);
+
+        var firstContext = await CreateAndReadContextAsync(cancellationToken).ConfigureAwait(false);
+        var secondContext = await CreateAndReadContextAsync(cancellationToken).ConfigureAwait(false);
+        var sameInstance = firstContext.Hash == secondContext.Hash;
+
+        TutorialConsole.WriteEvidence(
+            "DbContext pooling",
+            ("Pool size", ConnectionPoolingTutorial.DemoPoolSize.ToString()),
+            ("Hash primeiro DbContext", firstContext.Hash.ToString()),
+            ("Blogs lidos no primeiro", firstContext.BlogCount.ToString()),
+            ("Hash segundo DbContext", secondContext.Hash.ToString()),
+            ("Blogs lidos no segundo", secondContext.BlogCount.ToString()),
+            ("Mesmo objeto CLR?", FormatBoolean(sameInstance)));
 
         TutorialConsole.WriteConclusion(
-            firstHash == secondHash
+            sameInstance
                 ? "O hash se repetiu; isso mostra reutilização do objeto DbContext pelo pool do EF Core."
                 : "O hash mudou; o pool pode entregar outra instância, mas esse teste ainda trata apenas do objeto DbContext.",
-            firstHash == secondHash ? TutorialConclusionKind.Success : TutorialConclusionKind.Warning);
+            sameInstance ? TutorialConclusionKind.Success : TutorialConclusionKind.Warning);
     }
 
     private async Task DemonstrateConnectionBoundaryAsync(CancellationToken cancellationToken)
@@ -66,31 +86,59 @@ internal sealed class ConnectionPoolingDemo(IDbContextFactory<PoolingContext> db
             2,
             "DbContext pooling mantém a conexão ADO.NET aberta?",
             "Observar o estado da conexão ADO.NET antes e depois de uma query EF e de uma abertura explícita.");
+        TutorialConsole.WriteCodeSnippet(
+            "Obter a conexão ADO.NET por baixo do DbContext.",
+            "ConnectionPoolingDemo.cs",
+            """
+            await using var context =
+                await dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+            var connection = context.Database.GetDbConnection();
+            var beforeQuery = connection.State;
+
+            var blogCount = await context.Blogs.CountAsync(cancellationToken);
+            var afterQuery = connection.State;
+            """);
+        TutorialConsole.WriteCodeSnippet(
+            "Abrir e fechar a conexão explicitamente quando esse controle for necessário.",
+            "ConnectionPoolingDemo.cs",
+            """
+            await context.Database.OpenConnectionAsync(cancellationToken);
+            var openState = connection.State;
+
+            await context.Database.CloseConnectionAsync();
+            var closedState = connection.State;
+            """);
 
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         var connection = context.Database.GetDbConnection();
-
-        TutorialConsole.WriteObservation(
-            $"DbContext em uso: hash {RuntimeHelpers.GetHashCode(context)}. Estado da conexão ADO.NET antes da query EF: {connection.State}.");
+        var contextHash = RuntimeHelpers.GetHashCode(context);
+        var stateBeforeQuery = connection.State;
 
         var blogCount = await context.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
-
-        TutorialConsole.WriteObservation(
-            $"A query leu {blogCount} blog(s). Depois da query EF, o estado da conexão ADO.NET é {connection.State}.");
+        var stateAfterEfQuery = connection.State;
 
         await context.Database.OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
-        TutorialConsole.WriteObservation(
-            $"Depois de OpenConnectionAsync explícito, o estado da conexão ADO.NET é {connection.State}.");
+        var stateAfterExplicitOpen = connection.State;
 
         await context.Database.CloseConnectionAsync().ConfigureAwait(false);
-        TutorialConsole.WriteObservation(
-            $"Depois de CloseConnectionAsync explícito, o estado da conexão ADO.NET é {connection.State}.");
+        var stateAfterExplicitClose = connection.State;
+
+        TutorialConsole.WriteEvidence(
+            "Linha do tempo da conexão ADO.NET",
+            ("Hash do DbContext", contextHash.ToString()),
+            ("Estado antes da query EF", stateBeforeQuery.ToString()),
+            ("Blogs lidos pela query", blogCount.ToString()),
+            ("Estado depois da query EF", stateAfterEfQuery.ToString()),
+            ("Estado depois de OpenConnectionAsync", stateAfterExplicitOpen.ToString()),
+            ("Estado depois de CloseConnectionAsync", stateAfterExplicitClose.ToString()),
+            ("Connection pooling controlado por", "provedor ADO.NET"));
 
         TutorialConsole.WriteConclusion(
-            connection.State == ConnectionState.Closed
+            stateAfterExplicitClose == ConnectionState.Closed
                 ? "DbContext pooling reutiliza objetos de contexto; connection pooling é responsabilidade do provedor ADO.NET."
                 : "Resultado inesperado: a conexão ADO.NET permaneceu aberta.",
-            connection.State == ConnectionState.Closed ? TutorialConclusionKind.Success : TutorialConclusionKind.Failure);
+            stateAfterExplicitClose == ConnectionState.Closed ? TutorialConclusionKind.Success : TutorialConclusionKind.Failure);
     }
 
     private async Task CleanupDatabaseAsync(CancellationToken cancellationToken)
@@ -100,15 +148,16 @@ internal sealed class ConnectionPoolingDemo(IDbContextFactory<PoolingContext> db
         TutorialConsole.WriteCleanup("O banco SQLite de demonstração foi removido.");
     }
 
-    private async Task<int> CreateAndReadContextAsync(
-        string label,
-        CancellationToken cancellationToken)
+    private async Task<(int Hash, int BlogCount)> CreateAndReadContextAsync(CancellationToken cancellationToken)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
         var blogCount = await context.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
         var hash = RuntimeHelpers.GetHashCode(context);
-        TutorialConsole.WriteObservation(
-            $"{label}: hash {hash}, blogs lidos {blogCount}. O hash identifica a instância CLR do DbContext neste processo.");
-        return hash;
+        return (hash, blogCount);
+    }
+
+    private static string FormatBoolean(bool value)
+    {
+        return value ? "sim" : "não";
     }
 }

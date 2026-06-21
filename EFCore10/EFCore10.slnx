@@ -8,8 +8,10 @@
     <Project Path="src/EFCore10.Tutorials.Tutorial03/EFCore10.Tutorials.Tutorial03.csproj" />
     <Project Path="src/EFCore10.Tutorials.Tutorial04/EFCore10.Tutorials.Tutorial04.csproj" />
     <Project Path="src/EFCore10.Tutorials.Tutorial05/EFCore10.Tutorials.Tutorial05.csproj" />
+    <Project Path="src/EFCore10.Tutorials.Tutorial06/EFCore10.Tutorials.Tutorial06.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/EFCore10.Tutorials.Tutorial06.Tests/EFCore10.Tutorials.Tutorial06.Tests.csproj" />
     <Project Path="tests/EFCore10.Shared.Tests/EFCore10.Shared.Tests.csproj" />
   </Folder>
 </Solution>

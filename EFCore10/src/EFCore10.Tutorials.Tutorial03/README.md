@@ -21,8 +21,16 @@ A saída do console usa uma estrutura guiada com painéis e separadores:
 - `Pergunta central`: qual dúvida o tutorial responde.
 - `Hipótese`: qual comportamento esperamos observar.
 - `Preparação`: dados criados antes dos experimentos.
-- `Experimento N`: ação executada, observações e conclusão.
+- `Experimento N`: ação executada.
+- `Código observado`: trecho curto de C# que demonstra a factory e o descarte.
+- `Evidências`: tabela com hash da instância, contagens lidas e comparação entre objetos.
+- `Conclusão`: como interpretar o resultado.
 - `Limpeza`: remoção dos artefatos criados pelo tutorial.
+
+Os snippets mostrados no console são curados para destacar o ponto do
+experimento sem reproduzir arquivos inteiros. A tabela de evidências é a parte
+que prova o comportamento observado: ela mostra se os hashes se repetiram e se a
+factory precisou entregar outra instância.
 
 ## Onde falha
 
@@ -32,7 +40,8 @@ que chama `CreateDbContextAsync` também é responsável por chamar
 
 Quando um contexto não é descartado, ele continua fora do pool. Nesse caso, a
 próxima chamada da factory precisa criar ou entregar outra instância. O tutorial
-mostra essa falha com uma conclusão explícita:
+mostra essa falha com uma tabela comparando o hash do contexto ainda emprestado
+com o hash do contexto substituto, seguida por uma conclusão explícita:
 
 ```text
 Conclusão O contexto não descartado não voltou ao pool; por isso a factory precisou entregar outra instância.

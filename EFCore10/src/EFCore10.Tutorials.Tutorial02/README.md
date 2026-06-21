@@ -19,15 +19,23 @@ A saída do console usa a mesma estrutura visual dos demais tutoriais:
 - `Pergunta central`: qual dúvida o tutorial responde.
 - `Hipótese`: qual comportamento esperamos observar.
 - `Preparação`: configuração carregada e schema garantido.
-- `Experimento N`: ação executada, observações e conclusão.
+- `Experimento N`: ação executada.
+- `Código observado`: trecho curto de C# que demonstra a decisão técnica.
+- `Evidências`: valores medidos em runtime, como provider, banco, IDs e contagens.
+- `Conclusão`: como interpretar o resultado.
 - `Limpeza`: remoção dos dados criados pela demonstração.
+
+Os snippets mostrados no console são curados para destacar DI, `appsettings` e
+Fluent API sem despejar arquivos inteiros no terminal. As evidências conectam
+esses snippets ao comportamento observado: qual `DbContext` foi injetado, qual
+provider foi usado e quais registros foram persistidos ou removidos.
 
 ## Experimentos
 
-1. Inserir um blog usando o contexto injetado.
-2. Consultar o blog e carregar a coleção de posts.
-3. Atualizar o blog e adicionar um post.
-4. Remover o blog.
+1. Inserir um blog usando o contexto injetado e confirmar o `BlogId` gerado.
+2. Consultar o blog com `Include` e confirmar a coleção carregada.
+3. Atualizar o blog e adicionar um post, confirmando o relacionamento 1:N no banco.
+4. Remover o blog e confirmar por consulta que os registros não permanecem.
 
 ## Regra prática
 

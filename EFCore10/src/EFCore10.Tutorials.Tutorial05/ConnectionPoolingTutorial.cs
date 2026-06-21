@@ -9,7 +9,7 @@ namespace EFCore10.Tutorials.Tutorial05;
 public sealed class ConnectionPoolingTutorial : ITutorial
 {
     private const string ConnectionStringName = "TutorialDatabase";
-    private const int DemoPoolSize = 1;
+    internal const int DemoPoolSize = 1;
 
     public async Task RunAsync(CancellationToken cancellationToken)
     {

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using EFCore10.Shared;
 using EFCore10.Tutorials.Tutorial04.Context;
 using EFCore10.Tutorials.Tutorial04.Models;
@@ -77,31 +78,63 @@ internal sealed class PooledDynamicStateDemo(
             1,
             "OnConfiguring mantém estado dinâmico obsoleto?",
             "Usar um contexto ruim que lê o tenant ambiente em OnConfiguring; depois mudar o ambiente de tenant-a para tenant-b.");
+        TutorialConsole.WriteCodeSnippet(
+            "Exemplo ruim: OnConfiguring captura o tenant só quando a instância é inicializada.",
+            "Context/BadOnConfiguringTenantContext.cs",
+            """
+            protected override void OnConfiguring(
+                DbContextOptionsBuilder optionsBuilder)
+            {
+                CurrentTenantId =
+                    AmbientTenantState.CurrentTenantId ?? string.Empty;
+            }
+            """);
 
         try
         {
             AmbientTenantState.CurrentTenantId = TenantIds.TenantA;
+            int tenantAHash;
+            string tenantAContextTenant;
+            List<string> tenantAUrls;
             await using (var tenantAContext = await badTenantContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false))
             {
                 _ = tenantAContext.Database.ProviderName;
-                var tenantABlogCount = await tenantAContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
-                TutorialConsole.WriteObservation(
-                    $"Primeiro uso: tenant ambiente tenant-a, tenant guardado no contexto {tenantAContext.CurrentTenantId}, blogs visíveis {tenantABlogCount}.");
+                tenantAHash = RuntimeHelpers.GetHashCode(tenantAContext);
+                tenantAContextTenant = tenantAContext.CurrentTenantId;
+                tenantAUrls = await ReadBlogUrlsAsync(tenantAContext, cancellationToken).ConfigureAwait(false);
             }
 
             AmbientTenantState.CurrentTenantId = TenantIds.TenantB;
+            int tenantBHash;
+            string tenantBContextTenant;
+            List<string> tenantBUrls;
             await using (var tenantBContext = await badTenantContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false))
             {
                 _ = tenantBContext.Database.ProviderName;
-                var tenantBBlogCount = await tenantBContext.Blogs.CountAsync(cancellationToken).ConfigureAwait(false);
-                TutorialConsole.WriteObservation(
-                    $"Segundo uso: tenant ambiente tenant-b, tenant guardado no contexto {tenantBContext.CurrentTenantId}, blogs visíveis {tenantBBlogCount}.");
+                tenantBHash = RuntimeHelpers.GetHashCode(tenantBContext);
+                tenantBContextTenant = tenantBContext.CurrentTenantId;
+                tenantBUrls = await ReadBlogUrlsAsync(tenantBContext, cancellationToken).ConfigureAwait(false);
+                var tenantWasUpdated = tenantBContext.CurrentTenantId == TenantIds.TenantB;
+
+                TutorialConsole.WriteEvidence(
+                    "OnConfiguring com estado dinâmico",
+                    ("Pool size", PooledDynamicStateTutorial.DemoPoolSize.ToString()),
+                    ("Hash primeiro uso", tenantAHash.ToString()),
+                    ("Tenant ambiente no primeiro uso", TenantIds.TenantA),
+                    ("Tenant guardado no primeiro contexto", tenantAContextTenant),
+                    ("URLs visíveis no primeiro uso", FormatUrls(tenantAUrls)),
+                    ("Hash segundo uso", tenantBHash.ToString()),
+                    ("Tenant ambiente no segundo uso", TenantIds.TenantB),
+                    ("Tenant guardado no segundo contexto", tenantBContextTenant),
+                    ("URLs visíveis no segundo uso", FormatUrls(tenantBUrls)),
+                    ("Mesmo objeto CLR?", FormatBoolean(tenantAHash == tenantBHash)),
+                    ("Tenant atualizado no segundo uso?", FormatBoolean(tenantWasUpdated)));
 
                 TutorialConsole.WriteConclusion(
-                    tenantBContext.CurrentTenantId == TenantIds.TenantB
+                    tenantWasUpdated
                         ? "Resultado inesperado: OnConfiguring atualizou o tenant no contexto reaproveitado."
                         : "Falha demonstrada: OnConfiguring manteve tenant-a enquanto o tenant ambiente mudou para tenant-b.",
-                    tenantBContext.CurrentTenantId == TenantIds.TenantB
+                    tenantWasUpdated
                         ? TutorialConclusionKind.Warning
                         : TutorialConclusionKind.Failure);
             }
@@ -118,34 +151,97 @@ internal sealed class PooledDynamicStateDemo(
             2,
             "Factory tenant-aware aplica o tenant por lease?",
             "Usar TenantAwareBloggingContextFactory para aplicar o tenant no início de cada lease e limpar o estado no descarte.");
+        TutorialConsole.WriteCodeSnippet(
+            "O contexto correto expõe métodos explícitos para aplicar e limpar o tenant.",
+            "Context/BloggingContext.cs",
+            """
+            public void SetTenant(string tenantId)
+            {
+                CurrentTenantId = tenantId;
+            }
+
+            public void ClearTenant()
+            {
+                CurrentTenantId = string.Empty;
+            }
+            """);
+        TutorialConsole.WriteCodeSnippet(
+            "O filtro global depende do tenant aplicado na instância atual.",
+            "Context/BloggingContext.cs",
+            """
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<Blog>()
+                    .HasQueryFilter(blog => blog.TenantId == CurrentTenantId);
+            }
+            """);
+        TutorialConsole.WriteCodeSnippet(
+            "A factory aplica o tenant em cada lease e limpa antes de devolver ao pool.",
+            "TenantAwareBloggingContextFactory.cs",
+            """
+            var context =
+                await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            context.SetTenant(tenantId);
+            return new TenantBloggingContextLease(context);
+
+            public async ValueTask DisposeAsync()
+            {
+                context.ClearTenant();
+                await context.DisposeAsync();
+            }
+            """);
 
         List<string> tenantABlogs;
+        string tenantAContextTenant;
+        int tenantAHash;
         await using (var tenantALease = await tenantAwareFactory
             .CreateDbContextAsync(TenantIds.TenantA, cancellationToken)
             .ConfigureAwait(false))
         {
+            tenantAHash = RuntimeHelpers.GetHashCode(tenantALease.Context);
+            tenantAContextTenant = tenantALease.Context.CurrentTenantId;
             tenantABlogs = await ReadBlogUrlsAsync(tenantALease.Context, cancellationToken).ConfigureAwait(false);
         }
 
-        TutorialConsole.WriteObservation(
-            $"Factory tenant-aware para tenant-a retornou: {FormatUrls(tenantABlogs)}.");
-
         List<string> tenantBBlogs;
+        string tenantBContextTenant;
+        int tenantBHash;
         await using (var tenantBLease = await tenantAwareFactory
             .CreateDbContextAsync(TenantIds.TenantB, cancellationToken)
             .ConfigureAwait(false))
         {
+            tenantBHash = RuntimeHelpers.GetHashCode(tenantBLease.Context);
+            tenantBContextTenant = tenantBLease.Context.CurrentTenantId;
             tenantBBlogs = await ReadBlogUrlsAsync(tenantBLease.Context, cancellationToken).ConfigureAwait(false);
         }
 
-        TutorialConsole.WriteObservation(
-            $"Factory tenant-aware para tenant-b retornou: {FormatUrls(tenantBBlogs)}.");
+        string tenantAfterLease;
+        await using (var rawContext = await dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            tenantAfterLease = rawContext.CurrentTenantId;
+        }
+
+        var tenantBWasIsolated = tenantBBlogs.Count == 1
+            && tenantBBlogs[0].Contains("tenant-b", StringComparison.Ordinal);
+
+        TutorialConsole.WriteEvidence(
+            "Factory tenant-aware",
+            ("Pool size", PooledDynamicStateTutorial.DemoPoolSize.ToString()),
+            ("Tenant solicitado A", TenantIds.TenantA),
+            ("Tenant aplicado no contexto A", tenantAContextTenant),
+            ("URLs retornadas para A", FormatUrls(tenantABlogs)),
+            ("Tenant solicitado B", TenantIds.TenantB),
+            ("Tenant aplicado no contexto B", tenantBContextTenant),
+            ("URLs retornadas para B", FormatUrls(tenantBBlogs)),
+            ("Mesmo objeto CLR?", FormatBoolean(tenantAHash == tenantBHash)),
+            ("Tenant após descarte do lease", string.IsNullOrEmpty(tenantAfterLease) ? "(vazio)" : tenantAfterLease),
+            ("Tenant B isolado?", FormatBoolean(tenantBWasIsolated)));
 
         TutorialConsole.WriteConclusion(
-            tenantBBlogs.Count == 1 && tenantBBlogs[0].Contains("tenant-b", StringComparison.Ordinal)
+            tenantBWasIsolated
                 ? "Solução demonstrada: a factory tenant-aware retornou dados de tenant-b quando o lease foi criado para tenant-b."
                 : "Resultado inesperado: a factory tenant-aware não isolou os dados de tenant-b.",
-            tenantBBlogs.Count == 1 && tenantBBlogs[0].Contains("tenant-b", StringComparison.Ordinal)
+            tenantBWasIsolated
                 ? TutorialConclusionKind.Success
                 : TutorialConclusionKind.Failure);
     }
@@ -169,11 +265,28 @@ internal sealed class PooledDynamicStateDemo(
             .ConfigureAwait(false);
     }
 
+    private static async Task<List<string>> ReadBlogUrlsAsync(
+        BadOnConfiguringTenantContext context,
+        CancellationToken cancellationToken)
+    {
+        return await context.Blogs
+            .AsNoTracking()
+            .OrderBy(blog => blog.Url)
+            .Select(blog => blog.Url)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     private static string FormatUrls(IReadOnlyCollection<string> urls)
     {
         return urls.Count == 0
             ? "(nenhum)"
             : string.Join(", ", urls);
+    }
+
+    private static string FormatBoolean(bool value)
+    {
+        return value ? "sim" : "não";
     }
 
 }
