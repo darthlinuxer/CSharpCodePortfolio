@@ -104,14 +104,24 @@ public sealed class ValueObjectTests
     {
         Assert.AreEqual(7, UserId.NewId().Value.Version);
         Assert.AreEqual(7, BlogId.NewId().Value.Version);
-        Assert.AreEqual(7, BlogOwnerId.NewId().Value.Version);
-        Assert.AreEqual(7, AuthorId.NewId().Value.Version);
+        Assert.AreEqual(7, BlogMembershipId.NewId().Value.Version);
         Assert.AreEqual(7, PostId.NewId().Value.Version);
 
         Assert.ThrowsExactly<DomainException>(() => UserId.From(Guid.Empty));
-        Assert.ThrowsExactly<DomainException>(() => AuthorId.From(Guid.Empty));
+        Assert.ThrowsExactly<DomainException>(() => BlogMembershipId.From(Guid.Empty));
         Assert.ThrowsExactly<DomainException>(() => BlogId.From(Guid.Empty));
-        Assert.ThrowsExactly<DomainException>(() => BlogOwnerId.From(Guid.Empty));
         Assert.ThrowsExactly<DomainException>(() => PostId.From(Guid.Empty));
+    }
+
+    [TestMethod]
+    public void TimestampRequiresUtcAndSupportsRangeComparison()
+    {
+        var start = Timestamp.FromDatabase(new DateTime(2026, 06, 01, 12, 00, 00, DateTimeKind.Utc));
+        var end = start.Add(TimeSpan.FromDays(1));
+
+        Assert.AreEqual(DateTimeKind.Utc, start.Value.Kind);
+        Assert.IsTrue(end > start);
+        Assert.IsTrue(start <= end);
+        Assert.ThrowsExactly<ArgumentException>(() => Timestamp.FromDatabase(DateTime.SpecifyKind(start.Value, DateTimeKind.Local)));
     }
 }

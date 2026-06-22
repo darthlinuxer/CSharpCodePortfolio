@@ -1,12 +1,12 @@
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public sealed record PostArchivedDomainEvent(
+public sealed record PostDraftCreatedDomainEvent(
     PostId PostId,
     BlogId BlogId,
-    UserId ArchivedByUserId,
+    UserId PostedByUserId,
     Timestamp OccurredOnUtc) : IDomainEvent
 {
-    public string EventName => "post.archived";
+    public string EventName => "post.draft-created";
 
     public int EventVersion => 1;
 

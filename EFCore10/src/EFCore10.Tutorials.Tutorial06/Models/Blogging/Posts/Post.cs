@@ -8,13 +8,14 @@ public sealed class Post : AggregateRoot<PostId>
     {
     }
 
-    private Post(BlogId blogId, UserId postedByUserId, PostTitle title, PostContent content)
+    private Post(BlogId blogId, UserId postedByUserId, PostTitle title, PostContent content, Timestamp createdOnUtc)
     {
         Id = PostId.NewId();
         BlogId = blogId;
         PostedByUserId = postedByUserId;
         Title = title;
         Content = content;
+        CreatedOnUtc = createdOnUtc;
     }
 
     public PostTitle Title { get; private set; } = null!;
@@ -29,6 +30,12 @@ public sealed class Post : AggregateRoot<PostId>
 
     public User PostedBy { get; private set; } = null!;
 
+    public Timestamp CreatedOnUtc { get; private set; }
+
+    public Timestamp? PublishedOnUtc { get; private set; }
+
+    public Timestamp? ArchivedOnUtc { get; private set; }
+
     public string StateName => _state.Name;
 
     private string StateKey
@@ -42,21 +49,26 @@ public sealed class Post : AggregateRoot<PostId>
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(content);
 
-        var post = new Post(blogId, postedByUserId, title, content);
-        post.Raise(new PostCreatedDomainEvent(post.Id, blogId, postedByUserId, DateTime.UtcNow));
+        var occurredOnUtc = Timestamp.UtcNow;
+        var post = new Post(blogId, postedByUserId, title, content, occurredOnUtc);
+        post.Raise(new PostDraftCreatedDomainEvent(post.Id, blogId, postedByUserId, occurredOnUtc));
 
         return post;
     }
 
-    public void Publish()
+    public void Publish(UserId publishedByUserId)
     {
+        var occurredOnUtc = Timestamp.UtcNow;
         _state = _state.Publish();
-        Raise(new PostPublishedDomainEvent(Id, DateTime.UtcNow));
+        PublishedOnUtc = occurredOnUtc;
+        Raise(new PostPublishedDomainEvent(Id, BlogId, publishedByUserId, occurredOnUtc));
     }
 
-    public void Archive()
+    public void Archive(UserId archivedByUserId)
     {
+        var occurredOnUtc = Timestamp.UtcNow;
         _state = _state.Archive();
-        Raise(new PostArchivedDomainEvent(Id, DateTime.UtcNow));
+        ArchivedOnUtc = occurredOnUtc;
+        Raise(new PostArchivedDomainEvent(Id, BlogId, archivedByUserId, occurredOnUtc));
     }
 }

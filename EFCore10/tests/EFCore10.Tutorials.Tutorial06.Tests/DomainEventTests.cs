@@ -12,37 +12,49 @@ public sealed class DomainEventTests
 
         var domainEvent = AssertHasSingleEvent<UserRegisteredDomainEvent>(user);
         Assert.AreEqual(user.Id, domainEvent.UserId);
+        Assert.AreEqual("user.registered", domainEvent.EventName);
+        Assert.AreEqual(1, domainEvent.EventVersion);
     }
 
     [TestMethod]
-    public void BlogCreateRaisesBlogCreatedDomainEvent()
+    public void BlogCreateRaisesBlogCreatedDomainEventAndCreatesSingleActiveOwnerMembership()
     {
         var owner = TestDomain.CreateOwner();
         var blog = TestDomain.CreateBlog(owner);
 
         var domainEvent = AssertHasSingleEvent<BlogCreatedDomainEvent>(blog);
+        var currentOwner = blog.CurrentOwner;
+
         Assert.AreEqual(blog.Id, domainEvent.BlogId);
-        Assert.AreEqual(blog.CurrentOwner.Id, domainEvent.BlogOwnerId);
+        Assert.AreEqual(currentOwner.Id, domainEvent.OwnerMembershipId);
         Assert.AreEqual(owner.Id, domainEvent.OwnerUserId);
+        Assert.AreEqual("blog.created", domainEvent.EventName);
+        Assert.AreEqual("Owner", currentOwner.RoleName);
+        Assert.AreEqual("Active", currentOwner.StateName);
+        Assert.HasCount(1, blog.Memberships.Where(membership => membership.RoleName == "Owner" && membership.IsActive).ToArray());
     }
 
     [TestMethod]
-    public void BlogInvitesAndAcceptsAuthor()
+    public void BlogInvitesAndAcceptsAuthorMembership()
     {
-        var blog = TestDomain.CreateBlog(TestDomain.CreateOwner());
+        var owner = TestDomain.CreateOwner();
+        var blog = TestDomain.CreateBlog(owner);
         var user = TestDomain.CreateAuthorUser();
 
-        var author = blog.InviteAuthor(user);
-        blog.AcceptAuthor(author.Id);
+        var membership = blog.InviteAuthor(user, owner);
+        blog.AcceptAuthorInvitation(membership.Id, user);
 
         var invitedEvent = blog.DomainEvents.OfType<AuthorInvitedToBlogDomainEvent>().Single();
         var acceptedEvent = blog.DomainEvents.OfType<AuthorAcceptedBlogInvitationDomainEvent>().Single();
 
-        Assert.AreEqual(author.Id, invitedEvent.AuthorId);
+        Assert.AreEqual(membership.Id, invitedEvent.AuthorMembershipId);
         Assert.AreEqual(user.Id, invitedEvent.InvitedUserId);
-        Assert.AreEqual(author.Id, acceptedEvent.AuthorId);
-        Assert.AreEqual(user.Id, acceptedEvent.AuthorUserId);
-        Assert.AreEqual("Accepted", author.StateName);
+        Assert.AreEqual(owner.Id, invitedEvent.InvitedByUserId);
+        Assert.AreEqual(membership.Id, acceptedEvent.AuthorMembershipId);
+        Assert.AreEqual(user.Id, acceptedEvent.AcceptedByUserId);
+        Assert.AreEqual("Author", membership.RoleName);
+        Assert.AreEqual("Active", membership.StateName);
+        Assert.IsTrue(membership.CanPost);
     }
 
     [TestMethod]
@@ -53,14 +65,17 @@ public sealed class DomainEventTests
         var blog = TestDomain.CreateBlog(owner);
 
         var previousOwner = blog.CurrentOwner;
-        blog.TransferOwnership(successor);
+        blog.TransferOwnership(successor, owner);
 
         var transferredEvent = blog.DomainEvents.OfType<BlogOwnershipTransferredDomainEvent>().Single();
 
         Assert.IsFalse(previousOwner.IsActive);
+        Assert.AreEqual("Ended", previousOwner.StateName);
+        Assert.IsNotNull(previousOwner.EndedOnUtc);
         Assert.AreEqual(successor.Id, blog.CurrentOwner.UserId);
-        Assert.AreEqual(previousOwner.Id, transferredEvent.PreviousBlogOwnerId);
-        Assert.AreEqual(blog.CurrentOwner.Id, transferredEvent.NewBlogOwnerId);
+        Assert.AreEqual(previousOwner.Id, transferredEvent.PreviousOwnerMembershipId);
+        Assert.AreEqual(blog.CurrentOwner.Id, transferredEvent.NewOwnerMembershipId);
+        Assert.AreEqual(owner.Id, transferredEvent.TransferredByUserId);
     }
 
     [TestMethod]
@@ -74,14 +89,19 @@ public sealed class DomainEventTests
             PostTitle.Create("Owner post"),
             PostContent.Create("Owner can post without author invite."));
 
-        var createdEvent = AssertHasSingleEvent<PostCreatedDomainEvent>(post);
+        var createdEvent = AssertHasSingleEvent<PostDraftCreatedDomainEvent>(post);
 
+        Assert.IsFalse(blog.Authors.Any(membership => membership.UserId == owner.Id));
         Assert.AreEqual(owner.Id, post.PostedByUserId);
         Assert.AreEqual(owner.Id, createdEvent.PostedByUserId);
+        Assert.AreEqual(blog.Id, createdEvent.BlogId);
+        Assert.IsTrue(post.CreatedOnUtc <= Timestamp.UtcNow);
+        Assert.IsNull(post.PublishedOnUtc);
+        Assert.IsNull(post.ArchivedOnUtc);
     }
 
     [TestMethod]
-    public void UserWithoutBlogRoleCannotCreatePost()
+    public void UserWithoutBlogMembershipCannotCreatePost()
     {
         var blog = TestDomain.CreateBlog(TestDomain.CreateOwner());
         var user = TestDomain.CreateAuthorUser();
@@ -100,26 +120,42 @@ public sealed class DomainEventTests
         var owner = TestDomain.CreateOwner();
         var user = TestDomain.CreateAuthorUser();
         var blog = TestDomain.CreateBlog(owner);
-        var author = blog.InviteAuthor(user);
-        blog.AcceptAuthor(author.Id);
-        blog.RevokeAuthor(author.Id, owner);
+        var membership = blog.InviteAuthor(user, owner);
+        blog.AcceptAuthorInvitation(membership.Id, user);
+        blog.RevokeAuthor(membership.Id, owner);
 
         var exception = Assert.ThrowsExactly<DomainException>(() => blog.CreatePost(
             user,
             PostTitle.Create("Revoked"),
             PostContent.Create("Revoked authors cannot post.")));
 
+        Assert.AreEqual("Revoked", membership.StateName);
+        Assert.IsFalse(membership.CanPost);
         Assert.AreEqual("User cannot post to this blog.", exception.Message);
+    }
+
+    [TestMethod]
+    public void BlogDeleteRaisesBlogDeletedDomainEvent()
+    {
+        var owner = TestDomain.CreateOwner();
+        var blog = TestDomain.CreateBlog(owner);
+
+        blog.Delete(owner);
+
+        var deletedEvent = blog.DomainEvents.OfType<BlogDeletedDomainEvent>().Single();
+        Assert.AreEqual(blog.Id, deletedEvent.BlogId);
+        Assert.AreEqual(owner.Id, deletedEvent.DeletedByUserId);
+        Assert.AreEqual("Deleted", blog.StateName);
     }
 
     [TestMethod]
     public void ClearDomainEventsEmptiesInMemoryEvents()
     {
-        var author = TestDomain.CreateOwner();
+        var user = TestDomain.CreateOwner();
 
-        author.ClearDomainEvents();
+        user.ClearDomainEvents();
 
-        Assert.IsFalse(author.DomainEvents.Any());
+        Assert.IsFalse(user.DomainEvents.Any());
     }
 
     private static TEvent AssertHasSingleEvent<TEvent>(AggregateRoot aggregate)

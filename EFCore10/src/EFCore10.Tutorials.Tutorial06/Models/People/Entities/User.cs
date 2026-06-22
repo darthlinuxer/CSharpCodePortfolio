@@ -57,7 +57,7 @@ public sealed class User : Person<UserId>
         ArgumentNullException.ThrowIfNull(passwordHash);
 
         var user = new User(name, document, address, contact, userName, passwordHash);
-        user.Raise(new UserRegisteredDomainEvent(user.Id, DateTime.UtcNow));
+        user.Raise(new UserRegisteredDomainEvent(user.Id, Timestamp.UtcNow));
 
         return user;
     }

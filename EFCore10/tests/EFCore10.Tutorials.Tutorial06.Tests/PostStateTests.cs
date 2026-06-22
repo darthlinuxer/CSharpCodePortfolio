@@ -6,43 +6,56 @@ namespace EFCore10.Tutorials.Tutorial06.Tests;
 public sealed class PostStateTests
 {
     [TestMethod]
-    public void PublishMovesDraftPostToPublishedAndRaisesEvent()
+    public void PublishMovesDraftPostToPublishedRecordsTimestampAndRaisesEvent()
     {
-        var post = TestDomain.CreatePost();
+        var postedByUserId = UserId.NewId();
+        var post = TestDomain.CreatePost(postedByUserId);
         post.ClearDomainEvents();
 
-        post.Publish();
+        post.Publish(postedByUserId);
 
         Assert.AreEqual("Published", post.StateName);
+        Assert.IsNotNull(post.PublishedOnUtc);
+        Assert.IsNull(post.ArchivedOnUtc);
+        Assert.IsTrue(post.PublishedOnUtc >= post.CreatedOnUtc);
         var domainEvent = (PostPublishedDomainEvent)post.DomainEvents.Single();
-        Assert.IsInstanceOfType(domainEvent, typeof(PostPublishedDomainEvent));
+        Assert.AreEqual("post.published", domainEvent.EventName);
         Assert.AreEqual(post.Id, domainEvent.PostId);
+        Assert.AreEqual(post.BlogId, domainEvent.BlogId);
+        Assert.AreEqual(postedByUserId, domainEvent.PublishedByUserId);
     }
 
     [TestMethod]
     public void PublishFailsWhenPostIsArchived()
     {
-        var post = TestDomain.CreatePost();
-        post.Publish();
-        post.Archive();
+        var userId = UserId.NewId();
+        var post = TestDomain.CreatePost(userId);
+        post.Publish(userId);
+        post.Archive(userId);
 
-        var exception = Assert.ThrowsExactly<DomainException>(post.Publish);
+        var exception = Assert.ThrowsExactly<DomainException>(() => post.Publish(userId));
 
         Assert.AreEqual("Archived posts cannot be published.", exception.Message);
     }
 
     [TestMethod]
-    public void ArchiveMovesPublishedPostToArchivedAndRaisesEvent()
+    public void ArchiveMovesPublishedPostToArchivedRecordsTimestampAndRaisesEvent()
     {
-        var post = TestDomain.CreatePost();
-        post.Publish();
+        var userId = UserId.NewId();
+        var post = TestDomain.CreatePost(userId);
+        post.Publish(userId);
         post.ClearDomainEvents();
 
-        post.Archive();
+        post.Archive(userId);
 
         Assert.AreEqual("Archived", post.StateName);
+        Assert.IsNotNull(post.PublishedOnUtc);
+        Assert.IsNotNull(post.ArchivedOnUtc);
+        Assert.IsTrue(post.ArchivedOnUtc >= post.PublishedOnUtc);
         var domainEvent = (PostArchivedDomainEvent)post.DomainEvents.Single();
-        Assert.IsInstanceOfType(domainEvent, typeof(PostArchivedDomainEvent));
+        Assert.AreEqual("post.archived", domainEvent.EventName);
         Assert.AreEqual(post.Id, domainEvent.PostId);
+        Assert.AreEqual(post.BlogId, domainEvent.BlogId);
+        Assert.AreEqual(userId, domainEvent.ArchivedByUserId);
     }
 }

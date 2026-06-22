@@ -37,12 +37,28 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasConversion(id => id.Value, value => UserId.From(value))
             .IsRequired();
 
+        builder.Property(post => post.CreatedOnUtc)
+            .HasConversion(timestamp => timestamp.Value, value => Timestamp.FromDatabase(value))
+            .IsRequired();
+
+        builder.Property(post => post.PublishedOnUtc)
+            .HasConversion(
+                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
+                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+
+        builder.Property(post => post.ArchivedOnUtc)
+            .HasConversion(
+                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
+                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+
         builder.Property<string>("StateKey")
             .HasColumnName("PostState")
             .HasMaxLength(32)
             .IsRequired();
 
         builder.HasIndex(post => post.BlogId);
+
+        builder.HasIndex(post => new { post.BlogId, post.PublishedOnUtc });
 
         builder.HasIndex(post => post.PostedByUserId);
 

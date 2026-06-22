@@ -39,10 +39,10 @@ public sealed class Tutorial06 : ITutorial
         var authorUser = Tutorial06SampleData.CreateDemoAuthor();
         var successorOwner = Tutorial06SampleData.CreateDemoSuccessorOwner();
         var blog = Tutorial06SampleData.CreateDemoBlog(owner);
-        var author = Tutorial06SampleData.InviteAcceptedAuthor(blog, authorUser);
+        var author = Tutorial06SampleData.InviteAcceptedAuthor(blog, owner, authorUser);
         var post = Tutorial06SampleData.AddArchivedPost(blog, authorUser);
-        blog.Rename(BlogName.Create("EF Core Ownership Notes"));
-        blog.TransferOwnership(successorOwner);
+        blog.Rename(BlogName.Create("EF Core Ownership Notes"), owner);
+        blog.TransferOwnership(successorOwner, owner);
 
         var aggregates = new AggregateRoot[] { owner, authorUser, successorOwner, blog, post };
         var capturedEvents = FormatDomainEvents(aggregates);
@@ -50,19 +50,16 @@ public sealed class Tutorial06 : ITutorial
         context.AddRange(owner, authorUser, successorOwner, blog);
         await context.SaveChangesAsync(cancellationToken);
 
-        foreach (var aggregate in aggregates)
-            aggregate.ClearDomainEvents();
-
         context.ChangeTracker.Clear();
 
-        var outboxMessageCount = await context.Set<OutboxMessage>()
-            .CountAsync(cancellationToken);
+        var outboxMessages = await context.Set<OutboxMessage>()
+            .AsNoTracking()
+            .OrderBy(message => message.OccurredOnUtc)
+            .ToListAsync(cancellationToken);
 
         var persistedBlog = await context.Blogs
-            .Include(savedBlog => savedBlog.Owners)
-                .ThenInclude(savedOwner => savedOwner.User)
-            .Include(savedBlog => savedBlog.Authors)
-                .ThenInclude(savedAuthor => savedAuthor.User)
+            .Include(savedBlog => savedBlog.Memberships)
+                .ThenInclude(savedMembership => savedMembership.User)
             .Include(savedBlog => savedBlog.Posts)
                 .ThenInclude(savedPost => savedPost.PostedBy)
             .AsSplitQuery()
@@ -70,15 +67,29 @@ public sealed class Tutorial06 : ITutorial
 
         var persistedPost = persistedBlog.Posts.Single();
         var persistedAuthor = persistedBlog.Authors.Single(savedAuthor => savedAuthor.Id == author.Id);
+        var publishedOnUtc = persistedPost.PublishedOnUtc.GetValueOrDefault();
+        var publishedFrom = publishedOnUtc.Add(TimeSpan.FromDays(-1));
+        var publishedTo = publishedOnUtc.Add(TimeSpan.FromDays(1));
+        var postsInPublishedRange = await context.Posts
+            .AsNoTracking()
+            .Where(savedPost => savedPost.BlogId == persistedBlog.Id)
+            .Where(savedPost => savedPost.PublishedOnUtc >= publishedFrom && savedPost.PublishedOnUtc <= publishedTo)
+            .CountAsync(cancellationToken);
+
+        var sampleOutboxMessage = outboxMessages.First(message => message.EventName == "blog.created");
 
         TutorialConsole.WriteEvidence(
             "Persistência",
             ("Owner atual", persistedBlog.CurrentOwner.User.UserName.Value),
-            ("Author convidado", $"{persistedAuthor.User.Name.Value} / {persistedAuthor.StateName}"),
+            ("Author membership", $"{persistedAuthor.User.Name.Value} / {persistedAuthor.RoleName} / {persistedAuthor.StateName}"),
             ("Blog", $"{persistedBlog.Name.Value} ({persistedBlog.Url.Value})"),
             ("Post", $"{persistedPost.Title.Value} por {persistedPost.PostedBy.UserName.Value} -> {persistedPost.StateName}"),
+            ("Publicado em", persistedPost.PublishedOnUtc?.ToString() ?? "(sem publicação)"),
+            ("Posts no range", postsInPublishedRange.ToString()),
             ("Domain events capturados", capturedEvents),
-            ("Outbox messages", outboxMessageCount.ToString()),
+            ("Outbox messages", outboxMessages.Count.ToString()),
+            ("Outbox eventos", FormatOutboxEvents(outboxMessages)),
+            ("Outbox payload", $"{sampleOutboxMessage.EventName} -> {sampleOutboxMessage.Payload}"),
             ("Domain events após limpeza", aggregates.Sum(aggregate => aggregate.DomainEvents.Count).ToString()));
     }
 
@@ -87,6 +98,15 @@ public sealed class Tutorial06 : ITutorial
         var eventNames = aggregates
             .SelectMany(aggregate => aggregate.DomainEvents)
             .Select(domainEvent => domainEvent.GetType().Name)
+            .ToArray();
+
+        return eventNames.Length == 0 ? "(nenhum)" : string.Join(", ", eventNames);
+    }
+
+    private static string FormatOutboxEvents(IEnumerable<OutboxMessage> messages)
+    {
+        var eventNames = messages
+            .Select(message => $"{message.EventName}:{message.Status}")
             .ToArray();
 
         return eventNames.Length == 0 ? "(nenhum)" : string.Join(", ", eventNames);

@@ -58,10 +58,10 @@ internal static class TestDomain
             BlogUrl.Create("https://example.com/blog"),
             owner);
 
-    public static Post CreatePost() =>
+    public static Post CreatePost(UserId? postedByUserId = null) =>
         Post.Create(
             BlogId.NewId(),
-            UserId.NewId(),
+            postedByUserId ?? UserId.NewId(),
             PostTitle.Create("Draft lifecycle"),
             PostContent.Create("Lifecycle content."));
 }

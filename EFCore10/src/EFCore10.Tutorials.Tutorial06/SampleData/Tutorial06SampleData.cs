@@ -58,10 +58,10 @@ internal static class Tutorial06SampleData
             BlogUrl.Create("https://example.com/blog"),
             owner);
 
-    public static Author InviteAcceptedAuthor(Blog blog, User authorUser)
+    public static BlogMembership InviteAcceptedAuthor(Blog blog, User owner, User authorUser)
     {
-        var author = blog.InviteAuthor(authorUser);
-        blog.AcceptAuthor(author.Id);
+        var author = blog.InviteAuthor(authorUser, owner);
+        blog.AcceptAuthorInvitation(author.Id, authorUser);
 
         return author;
     }
@@ -73,8 +73,8 @@ internal static class Tutorial06SampleData
             PostTitle.Create("DDD with EF Core 10"),
             PostContent.Create("Value objects, ownership roles, behavioral state, and in-memory domain events."));
 
-        post.Publish();
-        post.Archive();
+        post.Publish(authorUser.Id);
+        post.Archive(authorUser.Id);
 
         return post;
     }

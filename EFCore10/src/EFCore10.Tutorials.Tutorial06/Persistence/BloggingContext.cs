@@ -17,30 +17,48 @@ public sealed class BloggingContext(DbContextOptions<BloggingContext> options) :
 
     public override int SaveChanges()
     {
-        AddOutboxMessages();
-        return base.SaveChanges();
+        var aggregates = AddOutboxMessages();
+        var result = base.SaveChanges();
+        ClearDomainEvents(aggregates);
+
+        return result;
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        AddOutboxMessages();
-        return base.SaveChangesAsync(cancellationToken);
+        var aggregates = AddOutboxMessages();
+        var result = await base.SaveChangesAsync(cancellationToken);
+        ClearDomainEvents(aggregates);
+
+        return result;
     }
 
-    private void AddOutboxMessages()
+    private AggregateRoot[] AddOutboxMessages()
     {
         ChangeTracker.DetectChanges();
 
-        var domainEvents = ChangeTracker
+        var aggregates = ChangeTracker
             .Entries()
             .Select(entry => entry.Entity)
             .OfType<AggregateRoot>()
+            .Where(aggregate => aggregate.DomainEvents.Count > 0)
+            .ToArray();
+
+        var domainEvents = aggregates
             .SelectMany(aggregate => aggregate.DomainEvents)
             .ToArray();
 
         if (domainEvents.Length == 0)
-            return;
+            return [];
 
         Set<OutboxMessage>().AddRange(domainEvents.Select(OutboxMessage.FromDomainEvent));
+
+        return aggregates;
+    }
+
+    private static void ClearDomainEvents(IEnumerable<AggregateRoot> aggregates)
+    {
+        foreach (var aggregate in aggregates)
+            aggregate.ClearDomainEvents();
     }
 }

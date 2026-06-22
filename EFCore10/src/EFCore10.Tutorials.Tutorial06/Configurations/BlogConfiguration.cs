@@ -17,6 +17,7 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
             .ValueGeneratedNever();
 
         builder.Ignore(blog => blog.DomainEvents);
+        builder.Ignore(blog => blog.Authors);
 
         builder.Property(blog => blog.Name)
             .HasConversion(name => name.Value, value => BlogName.Create(value))
@@ -47,10 +48,7 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
         builder.Navigation(blog => blog.Posts)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.Navigation(blog => blog.Owners)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Navigation(blog => blog.Authors)
+        builder.Navigation(blog => blog.Memberships)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

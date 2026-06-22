@@ -1,13 +1,11 @@
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public sealed record AuthorAcceptedBlogInvitationDomainEvent(
+public sealed record BlogDeletedDomainEvent(
     BlogId BlogId,
-    BlogMembershipId AuthorMembershipId,
-    UserId AuthorUserId,
-    UserId AcceptedByUserId,
+    UserId DeletedByUserId,
     Timestamp OccurredOnUtc) : IDomainEvent
 {
-    public string EventName => "blog.author-invitation-accepted";
+    public string EventName => "blog.deleted";
 
     public int EventVersion => 1;
 
