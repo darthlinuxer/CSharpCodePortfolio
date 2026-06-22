@@ -16,15 +16,15 @@
 - [x] Mergear em `main`.
 - [x] Remover a worktree da fase zero.
 
-## Gate Por Pasta
+## Pasta Concluida: `AsyncAwaitTask`
 
-- [ ] Criar worktree limpa.
-- [ ] Criar `WORKTREE_GOAL.md` temporario.
-- [ ] Identificar conceito principal da pasta.
-- [ ] Migrar para tutorial/app `net10.0`.
-- [ ] Remover arquivos antigos sem funcao.
-- [ ] Atualizar `ROADMAP.md` e este `TODO.md`.
-- [ ] Rodar validacoes da pasta.
-- [ ] Commitar e mergear.
-- [ ] Remover worktree.
+- [x] Criar worktree limpa para `AsyncAwaitTask`.
+- [x] Criar `WORKTREE_GOAL.md` temporario.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Remover arquivos antigos sem funcao.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validacoes da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuario.

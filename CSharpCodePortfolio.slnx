@@ -3,5 +3,6 @@
     <Project Path="src/CSharpCodePortfolio.App/CSharpCodePortfolio.App.csproj" />
     <Project Path="src/CSharpCodePortfolio.Shared/CSharpCodePortfolio.Shared.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Abstractions/CSharpCodePortfolio.Tutorials.Abstractions.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial01/CSharpCodePortfolio.Tutorials.Tutorial01.csproj" />
   </Folder>
 </Solution>

@@ -27,7 +27,7 @@ Transformar o repositorio em um workspace .NET 10 guiado por um menu raiz de tut
 
 ## Ordem De Migracao Por Pasta
 
-- [ ] `AsyncAwaitTask`
+- [x] `AsyncAwaitTask`
 - [ ] `Client Server Socket Communication`
 - [ ] `Creating string Pipes using reverse Pipe Builder recursion`
 - [ ] `Server Client Communication with named Pipes`
