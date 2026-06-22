@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Transformar o repositorio em um workspace .NET 10 guiado por um menu raiz de tutoriais. O menu raiz chama o menu existente do `EFCore10` sem refatorar esse projeto, e cada pasta antiga sera migrada depois como uma entrega separada com feedback do usuario.
+Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tutoriais. O menu raiz chama o menu existente do `EFCore10` sem refatorar esse projeto, e cada pasta de topo será migrada como uma entrega separada com feedback do usuário.
 
 ## Estado Atual
 
@@ -15,7 +15,7 @@ Transformar o repositorio em um workspace .NET 10 guiado por um menu raiz de tut
 - [x] Criar `src/CSharpCodePortfolio.Tutorials.Abstractions`.
 - [x] Criar launcher externo para `EFCore10`.
 - [x] Criar template local `portfolio-tutorial`.
-- [ ] Migrar pastas antigas, uma pasta de topo por vez.
+- [ ] Migrar pastas de topo restantes, uma pasta por vez.
 
 ## Arquitetura Alvo
 
@@ -23,12 +23,12 @@ Transformar o repositorio em um workspace .NET 10 guiado por um menu raiz de tut
 - `CSharpCodePortfolio.Shared`: UI de console compartilhada para tutoriais do portfolio.
 - `CSharpCodePortfolio.Tutorials.Abstractions`: contrato minimo de descoberta por atributo e execucao.
 - `EFCore10`: permanece como workspace independente; o host raiz executa o menu dele via `dotnet run --project EFCore10/src/EFCore10.App -- menu`.
-- `templates/portfolio-tutorial`: template local para novas migracoes de pastas antigas.
+- `templates/portfolio-tutorial`: template local para novas migrações de pastas.
 
 ## Ordem De Migracao Por Pasta
 
 - [x] `AsyncAwaitTask`
-- [ ] `Client Server Socket Communication`
+- [x] `Client Server Socket Communication`
 - [ ] `Creating string Pipes using reverse Pipe Builder recursion`
 - [ ] `Server Client Communication with named Pipes`
 - [ ] `Using Anonymous Pipes for Communication between Threads`
@@ -59,7 +59,7 @@ Transformar o repositorio em um workspace .NET 10 guiado por um menu raiz de tut
 ## Regra De Execucao Para Cada Pasta
 
 1. Criar uma worktree por pasta e um `WORKTREE_GOAL.md` temporario com o objetivo.
-2. Preservar o conceito principal da pasta, mesmo que a implementacao antiga seja deletada.
+2. Preservar o conceito principal da pasta em uma solução simples.
 3. Preferir tutorial console `net10.0`; manter app web/API somente quando HTTP/auth for o proprio conceito.
 4. Validar build, testes existentes e execucao do tutorial migrado pelo menu raiz.
 5. Commitar, mergear em `main`, remover a worktree e confirmar `git worktree list`.
