@@ -13,7 +13,7 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
         builder.HasKey(blog => blog.Id);
 
         builder.Property(blog => blog.Id)
-            .HasConversion(id => id.Value, value => BlogId.From(value))
+            .HasBlogIdConversion()
             .ValueGeneratedNever();
 
         builder.Ignore(blog => blog.DomainEvents);

@@ -20,7 +20,7 @@ para uma tabela de outbox processável.
 - `Blog` protege regras de dono atual, transferência, convite de autores e autorização de postagem.
 - `Post` muda estado por comportamento: `Draft -> Published -> Archived`, registrando `CreatedOnUtc`, `PublishedOnUtc` e `ArchivedOnUtc` para queries por range.
 - Estados persistem chaves estáveis (`UserState`, `BlogState`, `MembershipRole`, `MembershipState`, `PostState`) e são reconstruídos por registries, sem `int` e sem `switch`.
-- `DomainEvents` são capturados em `OutboxMessages` com `EventName`, `EventVersion`, aggregate, status, retry metadata e payload JSON estável; o `DbContext` limpa eventos após persistir.
+- `DomainEvents` carregam fatos do domínio; o mapper do outbox traduz esses fatos para `OutboxMessages` com `EventName`, `EventVersion`, aggregate, status, retry metadata e payload JSON estável.
 - O domínio fica separado por subdomínio: `Models/Common`, `Models/People` e `Models/Blogging`, com subfolders para entities, value objects, states e events.
 - `BloggingContext` expõe apenas aggregates concretos (`Users`, `Blogs`, `Posts`); memberships continuam persistidas, mas não são `DbSet` público.
 

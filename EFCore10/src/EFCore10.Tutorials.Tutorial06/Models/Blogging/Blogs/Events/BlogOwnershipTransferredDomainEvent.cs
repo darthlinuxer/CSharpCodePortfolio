@@ -7,13 +7,4 @@ public sealed record BlogOwnershipTransferredDomainEvent(
     UserId PreviousOwnerUserId,
     UserId NewOwnerUserId,
     UserId TransferredByUserId,
-    Timestamp OccurredOnUtc) : IDomainEvent
-{
-    public string EventName => "blog.ownership-transferred";
-
-    public int EventVersion => 1;
-
-    public string AggregateType => "Blog";
-
-    public string AggregateId => BlogId.ToString();
-}
+    Timestamp OccurredOnUtc) : IDomainEvent;

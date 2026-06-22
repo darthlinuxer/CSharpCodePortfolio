@@ -6,14 +6,24 @@ namespace EFCore10.Tutorials.Tutorial06.Tests;
 public sealed class DomainEventTests
 {
     [TestMethod]
+    public void DomainEventContractContainsOnlyOccurrenceTimestamp()
+    {
+        var propertyNames = typeof(IDomainEvent)
+            .GetProperties()
+            .Select(property => property.Name)
+            .ToArray();
+
+        CollectionAssert.AreEqual(new[] { nameof(IDomainEvent.OccurredOnUtc) }, propertyNames);
+    }
+
+    [TestMethod]
     public void UserRegisterRaisesUserRegisteredDomainEvent()
     {
         var user = TestDomain.CreateOwner();
 
         var domainEvent = AssertHasSingleEvent<UserRegisteredDomainEvent>(user);
         Assert.AreEqual(user.Id, domainEvent.UserId);
-        Assert.AreEqual("user.registered", domainEvent.EventName);
-        Assert.AreEqual(1, domainEvent.EventVersion);
+        Assert.AreNotEqual(default, domainEvent.OccurredOnUtc);
     }
 
     [TestMethod]
@@ -28,7 +38,7 @@ public sealed class DomainEventTests
         Assert.AreEqual(blog.Id, domainEvent.BlogId);
         Assert.AreEqual(currentOwner.Id, domainEvent.OwnerMembershipId);
         Assert.AreEqual(owner.Id, domainEvent.OwnerUserId);
-        Assert.AreEqual("blog.created", domainEvent.EventName);
+        Assert.AreNotEqual(default, domainEvent.OccurredOnUtc);
         Assert.AreEqual("Owner", currentOwner.RoleName);
         Assert.AreEqual("Active", currentOwner.StateName);
         Assert.HasCount(1, blog.Memberships.Where(membership => membership.RoleName == "Owner" && membership.IsActive).ToArray());

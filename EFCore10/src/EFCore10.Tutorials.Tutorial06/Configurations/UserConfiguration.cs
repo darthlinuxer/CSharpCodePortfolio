@@ -13,7 +13,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(user => user.Id);
 
         builder.Property(user => user.Id)
-            .HasConversion(id => id.Value, value => UserId.From(value))
+            .HasUserIdConversion()
             .ValueGeneratedNever();
 
         builder.Ignore(user => user.DomainEvents);

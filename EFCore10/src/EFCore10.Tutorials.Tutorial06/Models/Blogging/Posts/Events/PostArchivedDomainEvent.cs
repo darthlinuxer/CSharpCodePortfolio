@@ -4,13 +4,4 @@ public sealed record PostArchivedDomainEvent(
     PostId PostId,
     BlogId BlogId,
     UserId ArchivedByUserId,
-    Timestamp OccurredOnUtc) : IDomainEvent
-{
-    public string EventName => "post.archived";
-
-    public int EventVersion => 1;
-
-    public string AggregateType => "Post";
-
-    public string AggregateId => PostId.ToString();
-}
+    Timestamp OccurredOnUtc) : IDomainEvent;

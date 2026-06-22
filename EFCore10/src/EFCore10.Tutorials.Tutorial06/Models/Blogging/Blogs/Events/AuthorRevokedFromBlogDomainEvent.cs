@@ -5,13 +5,4 @@ public sealed record AuthorRevokedFromBlogDomainEvent(
     BlogMembershipId AuthorMembershipId,
     UserId RevokedUserId,
     UserId RevokedByUserId,
-    Timestamp OccurredOnUtc) : IDomainEvent
-{
-    public string EventName => "blog.author-revoked";
-
-    public int EventVersion => 1;
-
-    public string AggregateType => "Blog";
-
-    public string AggregateId => BlogId.ToString();
-}
+    Timestamp OccurredOnUtc) : IDomainEvent;

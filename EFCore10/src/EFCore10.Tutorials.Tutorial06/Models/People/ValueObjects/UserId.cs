@@ -6,10 +6,9 @@ public readonly record struct UserId
 
     public Guid Value { get; }
 
-    public static UserId NewId() => From(Guid.CreateVersion7());
+    public static UserId NewId() => new(StronglyTypedId.NewValue());
 
-    public static UserId From(Guid value) =>
-        value == Guid.Empty ? throw new DomainException("User ID is required.") : new UserId(value);
+    public static UserId From(Guid value) => new(StronglyTypedId.Require(value, "User ID"));
 
     public override string ToString() => Value.ToString();
 }

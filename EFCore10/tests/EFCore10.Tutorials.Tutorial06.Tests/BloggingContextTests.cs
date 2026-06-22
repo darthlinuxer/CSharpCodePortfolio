@@ -114,6 +114,17 @@ public sealed class BloggingContextTests
         using var payload = JsonDocument.Parse(outboxMessages.Single(message => message.EventName == "blog.created").Payload);
         Assert.IsTrue(payload.RootElement.TryGetProperty("blogId", out _));
         Assert.IsTrue(payload.RootElement.TryGetProperty("ownerMembershipId", out _));
+        Assert.IsFalse(payload.RootElement.TryGetProperty("occurredOnUtc", out _));
+    }
+
+    [TestMethod]
+    public void OutboxMapperRejectsUnmappedDomainEvents()
+    {
+        var domainEvent = new UnmappedDomainEvent(Timestamp.UtcNow);
+
+        var exception = Assert.ThrowsExactly<DomainException>(() => OutboxMessage.FromDomainEvent(domainEvent));
+
+        Assert.AreEqual("Domain event 'UnmappedDomainEvent' does not have an outbox mapping.", exception.Message);
     }
 
     [TestMethod]
@@ -188,4 +199,6 @@ public sealed class BloggingContextTests
 
         return new BloggingContext(options);
     }
+
+    private sealed record UnmappedDomainEvent(Timestamp OccurredOnUtc) : IDomainEvent;
 }

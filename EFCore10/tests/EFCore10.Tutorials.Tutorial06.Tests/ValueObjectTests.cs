@@ -114,6 +114,16 @@ public sealed class ValueObjectTests
     }
 
     [TestMethod]
+    public void StronglyTypedIdsDoNotExposePublicGuidConstructors()
+    {
+        var idTypes = new[] { typeof(UserId), typeof(BlogId), typeof(BlogMembershipId), typeof(PostId) };
+
+        Assert.IsTrue(idTypes.All(type => type
+            .GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+            .All(constructor => constructor.GetParameters() is not [{ ParameterType: var parameterType }] || parameterType != typeof(Guid))));
+    }
+
+    [TestMethod]
     public void TimestampRequiresUtcAndSupportsRangeComparison()
     {
         var start = Timestamp.FromDatabase(new DateTime(2026, 06, 01, 12, 00, 00, DateTimeKind.Utc));

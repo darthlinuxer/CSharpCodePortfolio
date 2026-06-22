@@ -35,7 +35,7 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
             .IsRequired();
 
         builder.Property(message => message.OccurredOnUtc)
-            .HasConversion(timestamp => timestamp.Value, value => Timestamp.FromDatabase(value))
+            .HasTimestampConversion()
             .IsRequired();
 
         builder.Property(message => message.Status)
@@ -46,14 +46,10 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
             .IsRequired();
 
         builder.Property(message => message.NextAttemptOnUtc)
-            .HasConversion(
-                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
-                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+            .HasNullableTimestampConversion();
 
         builder.Property(message => message.ProcessedOnUtc)
-            .HasConversion(
-                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
-                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+            .HasNullableTimestampConversion();
 
         builder.Property(message => message.Error);
 

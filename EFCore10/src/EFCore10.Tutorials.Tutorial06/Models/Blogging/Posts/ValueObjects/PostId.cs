@@ -6,10 +6,9 @@ public readonly record struct PostId
 
     public Guid Value { get; }
 
-    public static PostId NewId() => From(Guid.CreateVersion7());
+    public static PostId NewId() => new(StronglyTypedId.NewValue());
 
-    public static PostId From(Guid value) =>
-        value == Guid.Empty ? throw new DomainException("Post ID is required.") : new PostId(value);
+    public static PostId From(Guid value) => new(StronglyTypedId.Require(value, "Post ID"));
 
     public override string ToString() => Value.ToString();
 }

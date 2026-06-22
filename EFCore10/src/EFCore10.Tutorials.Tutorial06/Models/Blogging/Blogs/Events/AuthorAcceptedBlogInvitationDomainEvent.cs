@@ -5,13 +5,4 @@ public sealed record AuthorAcceptedBlogInvitationDomainEvent(
     BlogMembershipId AuthorMembershipId,
     UserId AuthorUserId,
     UserId AcceptedByUserId,
-    Timestamp OccurredOnUtc) : IDomainEvent
-{
-    public string EventName => "blog.author-invitation-accepted";
-
-    public int EventVersion => 1;
-
-    public string AggregateType => "Blog";
-
-    public string AggregateId => BlogId.ToString();
-}
+    Timestamp OccurredOnUtc) : IDomainEvent;

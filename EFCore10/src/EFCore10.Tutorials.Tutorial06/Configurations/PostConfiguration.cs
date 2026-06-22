@@ -13,7 +13,7 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasKey(post => post.Id);
 
         builder.Property(post => post.Id)
-            .HasConversion(id => id.Value, value => PostId.From(value))
+            .HasPostIdConversion()
             .ValueGeneratedNever();
 
         builder.Ignore(post => post.DomainEvents);
@@ -30,26 +30,22 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasMaxLength(4_000);
 
         builder.Property(post => post.BlogId)
-            .HasConversion(id => id.Value, value => BlogId.From(value))
+            .HasBlogIdConversion()
             .IsRequired();
 
         builder.Property(post => post.PostedByUserId)
-            .HasConversion(id => id.Value, value => UserId.From(value))
+            .HasUserIdConversion()
             .IsRequired();
 
         builder.Property(post => post.CreatedOnUtc)
-            .HasConversion(timestamp => timestamp.Value, value => Timestamp.FromDatabase(value))
+            .HasTimestampConversion()
             .IsRequired();
 
         builder.Property(post => post.PublishedOnUtc)
-            .HasConversion(
-                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
-                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+            .HasNullableTimestampConversion();
 
         builder.Property(post => post.ArchivedOnUtc)
-            .HasConversion(
-                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
-                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+            .HasNullableTimestampConversion();
 
         builder.Property<string>("StateKey")
             .HasColumnName("PostState")

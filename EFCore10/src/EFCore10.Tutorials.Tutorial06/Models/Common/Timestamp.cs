@@ -13,12 +13,16 @@ public readonly record struct Timestamp
 
     public static Timestamp FromUtc(DateTime value) => new(value);
 
-    public static Timestamp FromDatabase(DateTime value) => value.Kind switch
+    public static Timestamp FromDatabase(DateTime value)
     {
-        DateTimeKind.Utc => new Timestamp(value),
-        DateTimeKind.Unspecified => new Timestamp(DateTime.SpecifyKind(value, DateTimeKind.Utc)),
-        _ => throw new ArgumentException("Timestamp from database must be UTC or unspecified.", nameof(value))
-    };
+        if (value.Kind == DateTimeKind.Utc)
+            return new Timestamp(value);
+
+        if (value.Kind == DateTimeKind.Unspecified)
+            return new Timestamp(DateTime.SpecifyKind(value, DateTimeKind.Utc));
+
+        throw new ArgumentException("Timestamp from database must be UTC or unspecified.", nameof(value));
+    }
 
     public Timestamp Add(TimeSpan timeSpan) =>
         new(Value.Add(timeSpan));

@@ -6,10 +6,9 @@ public readonly record struct BlogMembershipId
 
     public Guid Value { get; }
 
-    public static BlogMembershipId NewId() => From(Guid.CreateVersion7());
+    public static BlogMembershipId NewId() => new(StronglyTypedId.NewValue());
 
-    public static BlogMembershipId From(Guid value) =>
-        value == Guid.Empty ? throw new DomainException("Blog membership ID is required.") : new BlogMembershipId(value);
+    public static BlogMembershipId From(Guid value) => new(StronglyTypedId.Require(value, "Blog membership ID"));
 
     public override string ToString() => Value.ToString();
 }

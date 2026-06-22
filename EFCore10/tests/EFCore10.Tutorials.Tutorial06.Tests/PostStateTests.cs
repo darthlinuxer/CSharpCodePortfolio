@@ -19,7 +19,7 @@ public sealed class PostStateTests
         Assert.IsNull(post.ArchivedOnUtc);
         Assert.IsTrue(post.PublishedOnUtc >= post.CreatedOnUtc);
         var domainEvent = (PostPublishedDomainEvent)post.DomainEvents.Single();
-        Assert.AreEqual("post.published", domainEvent.EventName);
+        Assert.AreEqual(post.PublishedOnUtc, domainEvent.OccurredOnUtc);
         Assert.AreEqual(post.Id, domainEvent.PostId);
         Assert.AreEqual(post.BlogId, domainEvent.BlogId);
         Assert.AreEqual(postedByUserId, domainEvent.PublishedByUserId);
@@ -53,7 +53,7 @@ public sealed class PostStateTests
         Assert.IsNotNull(post.ArchivedOnUtc);
         Assert.IsTrue(post.ArchivedOnUtc >= post.PublishedOnUtc);
         var domainEvent = (PostArchivedDomainEvent)post.DomainEvents.Single();
-        Assert.AreEqual("post.archived", domainEvent.EventName);
+        Assert.AreEqual(post.ArchivedOnUtc, domainEvent.OccurredOnUtc);
         Assert.AreEqual(post.Id, domainEvent.PostId);
         Assert.AreEqual(post.BlogId, domainEvent.BlogId);
         Assert.AreEqual(userId, domainEvent.ArchivedByUserId);

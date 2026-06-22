@@ -13,40 +13,32 @@ public sealed class BlogMembershipConfiguration : IEntityTypeConfiguration<BlogM
         builder.HasKey(membership => membership.Id);
 
         builder.Property(membership => membership.Id)
-            .HasConversion(id => id.Value, value => BlogMembershipId.From(value))
+            .HasBlogMembershipIdConversion()
             .ValueGeneratedNever();
 
         builder.Property(membership => membership.BlogId)
-            .HasConversion(id => id.Value, value => BlogId.From(value))
+            .HasBlogIdConversion()
             .IsRequired();
 
         builder.Property(membership => membership.UserId)
-            .HasConversion(id => id.Value, value => UserId.From(value))
+            .HasUserIdConversion()
             .IsRequired();
 
         builder.Property(membership => membership.CreatedByUserId)
-            .HasConversion(
-                id => id.HasValue ? id.Value.Value : (Guid?)null,
-                value => value.HasValue ? UserId.From(value.Value) : null);
+            .HasNullableUserIdConversion();
 
         builder.Property(membership => membership.EndedByUserId)
-            .HasConversion(
-                id => id.HasValue ? id.Value.Value : (Guid?)null,
-                value => value.HasValue ? UserId.From(value.Value) : null);
+            .HasNullableUserIdConversion();
 
         builder.Property(membership => membership.CreatedOnUtc)
-            .HasConversion(timestamp => timestamp.Value, value => Timestamp.FromDatabase(value))
+            .HasTimestampConversion()
             .IsRequired();
 
         builder.Property(membership => membership.ActivatedOnUtc)
-            .HasConversion(
-                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
-                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+            .HasNullableTimestampConversion();
 
         builder.Property(membership => membership.EndedOnUtc)
-            .HasConversion(
-                timestamp => timestamp.HasValue ? timestamp.Value.Value : (DateTime?)null,
-                value => value.HasValue ? Timestamp.FromDatabase(value.Value) : null);
+            .HasNullableTimestampConversion();
 
         builder.Ignore(membership => membership.RoleName);
         builder.Ignore(membership => membership.StateName);
