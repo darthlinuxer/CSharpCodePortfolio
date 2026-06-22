@@ -45,7 +45,7 @@ public sealed class Tutorial06 : ITutorial
         blog.TransferOwnership(successorOwner, owner);
 
         var aggregates = new AggregateRoot[] { owner, authorUser, successorOwner, blog, post };
-        var capturedEvents = FormatDomainEvents(aggregates);
+        var capturedEvents = Tutorial06EvidenceFormatter.FormatDomainEvents(aggregates);
 
         context.AddRange(owner, authorUser, successorOwner, blog);
         await context.SaveChangesAsync(cancellationToken);
@@ -84,31 +84,14 @@ public sealed class Tutorial06 : ITutorial
             ("Author membership", $"{persistedAuthor.User.Name.Value} / {persistedAuthor.RoleName} / {persistedAuthor.StateName}"),
             ("Blog", $"{persistedBlog.Name.Value} ({persistedBlog.Url.Value})"),
             ("Post", $"{persistedPost.Title.Value} por {persistedPost.PostedBy.UserName.Value} -> {persistedPost.StateName}"),
+            ("Estados do workflow", Tutorial06EvidenceFormatter.FormatWorkflowStates(persistedBlog, persistedAuthor, persistedPost)),
             ("Publicado em", persistedPost.PublishedOnUtc?.ToString() ?? "(sem publicação)"),
             ("Posts no range", postsInPublishedRange.ToString()),
             ("Domain events capturados", capturedEvents),
             ("Outbox messages", outboxMessages.Count.ToString()),
-            ("Outbox eventos", FormatOutboxEvents(outboxMessages)),
+            ("Outbox eventos", Tutorial06EvidenceFormatter.FormatOutboxEventNames(outboxMessages)),
+            ("Status da outbox", Tutorial06EvidenceFormatter.FormatOutboxDispatchStatus(outboxMessages)),
             ("Outbox payload", $"{sampleOutboxMessage.EventName} -> {sampleOutboxMessage.Payload}"),
             ("Domain events após limpeza", aggregates.Sum(aggregate => aggregate.DomainEvents.Count).ToString()));
-    }
-
-    private static string FormatDomainEvents(IEnumerable<AggregateRoot> aggregates)
-    {
-        var eventNames = aggregates
-            .SelectMany(aggregate => aggregate.DomainEvents)
-            .Select(domainEvent => domainEvent.GetType().Name)
-            .ToArray();
-
-        return eventNames.Length == 0 ? "(nenhum)" : string.Join(", ", eventNames);
-    }
-
-    private static string FormatOutboxEvents(IEnumerable<OutboxMessage> messages)
-    {
-        var eventNames = messages
-            .Select(message => $"{message.EventName}:{message.Status}")
-            .ToArray();
-
-        return eventNames.Length == 0 ? "(nenhum)" : string.Join(", ", eventNames);
     }
 }

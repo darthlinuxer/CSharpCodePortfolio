@@ -21,6 +21,7 @@ para uma tabela de outbox processável.
 - `Post` muda estado por comportamento: `Draft -> Published -> Archived`, registrando `CreatedOnUtc`, `PublishedOnUtc` e `ArchivedOnUtc` para queries por range.
 - Estados persistem chaves estáveis (`UserState`, `BlogState`, `MembershipRole`, `MembershipState`, `PostState`) e são reconstruídos por registries, sem `int` e sem `switch`.
 - `DomainEvents` carregam fatos do domínio; o mapper do outbox traduz esses fatos para `OutboxMessages` com `EventName`, `EventVersion`, aggregate, status, retry metadata e payload JSON estável.
+- Sem worker nesta etapa, mensagens da outbox permanecem `Pending`; os estados do workflow mudam nos aggregates antes da persistência.
 - O domínio fica separado por subdomínio: `Models/Common`, `Models/People` e `Models/Blogging`, com subfolders para entities, value objects, states e events.
 - `BloggingContext` expõe apenas aggregates concretos (`Users`, `Blogs`, `Posts`); memberships continuam persistidas, mas não são `DbSet` público.
 
