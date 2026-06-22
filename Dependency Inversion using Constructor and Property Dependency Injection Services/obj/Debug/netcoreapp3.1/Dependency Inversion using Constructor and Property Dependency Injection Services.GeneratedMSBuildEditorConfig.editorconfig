@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = Dependency_Inversion_using_Constructor_and_Property_Dependency_Injection_Services
-build_property.ProjectDir = /home/darthlinuxer/CSharpCodePortfolio/Dependency Inversion using Constructor and Property Dependency Injection Services/
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 

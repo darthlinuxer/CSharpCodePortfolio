@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = Replace_If_Then_Else_with_Reflection_and_Attributes
-build_property.ProjectDir = /home/darthlinuxer/CSharpCodePortfolio/Replace If-Then-Else with Reflection and Attributes/
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 

@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = Lambda_Validators
-build_property.ProjectDir = /home/darthlinuxer/CSharpCodePortfolio/Lambda Validators/
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 

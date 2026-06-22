@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CSharpCodePortfolio.App/CSharpCodePortfolio.App.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Shared/CSharpCodePortfolio.Shared.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Tutorials.Abstractions/CSharpCodePortfolio.Tutorials.Abstractions.csproj" />
+  </Folder>
+</Solution>

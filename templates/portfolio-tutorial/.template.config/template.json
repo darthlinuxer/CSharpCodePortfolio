@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "CSharpCodePortfolio",
+  "classifications": [
+    "CSharp",
+    "Tutorial",
+    "Library"
+  ],
+  "identity": "CSharpCodePortfolio.Templates.Tutorial",
+  "name": "CSharpCodePortfolio Tutorial",
+  "shortName": "portfolio-tutorial",
+  "sourceName": "CSharpCodePortfolio.Tutorials.TutorialTemplate",
+  "defaultName": "CSharpCodePortfolio.Tutorials.Tutorial00",
+  "preferNameDirectory": true,
+  "description": "Creates a CSharpCodePortfolio tutorial class library.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "tutorialId": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial id",
+      "description": "Identifier shown in the portfolio menu.",
+      "defaultValue": "00",
+      "replaces": "TutorialId"
+    },
+    "slug": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial slug",
+      "description": "Slug used by the CLI run command.",
+      "defaultValue": "new-tutorial",
+      "replaces": "TutorialSlug"
+    },
+    "title": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial title",
+      "description": "Human-readable title shown in the portfolio menu.",
+      "defaultValue": "New Portfolio Tutorial",
+      "replaces": "TutorialTitle"
+    },
+    "className": {
+      "type": "parameter",
+      "datatype": "string",
+      "displayName": "Tutorial class name",
+      "description": "Name of the generated tutorial class.",
+      "defaultValue": "TutorialClass",
+      "replaces": "TutorialClass",
+      "fileRename": "TutorialClass"
+    }
+  }
+}

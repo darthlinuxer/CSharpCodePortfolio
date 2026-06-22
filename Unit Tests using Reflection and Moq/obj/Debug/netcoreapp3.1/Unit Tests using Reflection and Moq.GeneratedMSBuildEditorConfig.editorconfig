@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = Unit_Tests_using_Reflection_and_Moq
-build_property.ProjectDir = /home/darthlinuxer/CSharpCodePortfolio/Unit Tests using Reflection and Moq/
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 
