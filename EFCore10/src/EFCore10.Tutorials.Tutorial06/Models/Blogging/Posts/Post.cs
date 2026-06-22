@@ -8,10 +8,11 @@ public sealed class Post : AggregateRoot<PostId>
     {
     }
 
-    private Post(BlogId blogId, PostTitle title, PostContent content)
+    private Post(BlogId blogId, UserId postedByUserId, PostTitle title, PostContent content)
     {
         Id = PostId.NewId();
         BlogId = blogId;
+        PostedByUserId = postedByUserId;
         Title = title;
         Content = content;
     }
@@ -24,6 +25,10 @@ public sealed class Post : AggregateRoot<PostId>
 
     public Blog Blog { get; private set; } = null!;
 
+    public UserId PostedByUserId { get; private set; }
+
+    public User PostedBy { get; private set; } = null!;
+
     public string StateName => _state.Name;
 
     private string StateKey
@@ -32,13 +37,13 @@ public sealed class Post : AggregateRoot<PostId>
         set => _state = PostStateRegistry.FromKey(value);
     }
 
-    public static Post Create(BlogId blogId, PostTitle title, PostContent content)
+    public static Post Create(BlogId blogId, UserId postedByUserId, PostTitle title, PostContent content)
     {
         ArgumentNullException.ThrowIfNull(title);
         ArgumentNullException.ThrowIfNull(content);
 
-        var post = new Post(blogId, title, content);
-        post.Raise(new PostCreatedDomainEvent(post.Id, blogId, DateTime.UtcNow));
+        var post = new Post(blogId, postedByUserId, title, content);
+        post.Raise(new PostCreatedDomainEvent(post.Id, blogId, postedByUserId, DateTime.UtcNow));
 
         return post;
     }

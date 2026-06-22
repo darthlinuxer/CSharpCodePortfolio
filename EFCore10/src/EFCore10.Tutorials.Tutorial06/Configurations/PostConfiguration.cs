@@ -33,11 +33,23 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasConversion(id => id.Value, value => BlogId.From(value))
             .IsRequired();
 
+        builder.Property(post => post.PostedByUserId)
+            .HasConversion(id => id.Value, value => UserId.From(value))
+            .IsRequired();
+
         builder.Property<string>("StateKey")
             .HasColumnName("PostState")
             .HasMaxLength(32)
             .IsRequired();
 
         builder.HasIndex(post => post.BlogId);
+
+        builder.HasIndex(post => post.PostedByUserId);
+
+        builder.HasOne(post => post.PostedBy)
+            .WithMany()
+            .HasForeignKey(post => post.PostedByUserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
     }
 }

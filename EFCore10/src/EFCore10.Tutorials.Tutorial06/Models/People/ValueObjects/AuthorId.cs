@@ -6,7 +6,7 @@ public readonly record struct AuthorId
 
     public Guid Value { get; }
 
-    public static AuthorId From(PersonId id) => From(id.Value);
+    public static AuthorId NewId() => From(Guid.CreateVersion7());
 
     public static AuthorId From(Guid value) =>
         value == Guid.Empty ? throw new DomainException("Author ID is required.") : new AuthorId(value);

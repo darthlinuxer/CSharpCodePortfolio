@@ -28,17 +28,15 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
             .IsRequired()
             .HasMaxLength(500);
 
-        builder.Property(blog => blog.AuthorId)
-            .HasConversion(id => id.Value, value => PersonId.From(value))
+        builder.Ignore(blog => blog.CurrentOwner);
+        builder.Ignore(blog => blog.StateName);
+
+        builder.Property<string>("StateKey")
+            .HasColumnName("BlogState")
+            .HasMaxLength(32)
             .IsRequired();
 
         builder.HasIndex(blog => blog.Url);
-
-        builder.HasOne(blog => blog.Author)
-            .WithMany()
-            .HasForeignKey(blog => blog.AuthorId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired();
 
         builder.HasMany(blog => blog.Posts)
             .WithOne(post => post.Blog)
@@ -47,6 +45,12 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
             .IsRequired();
 
         builder.Navigation(blog => blog.Posts)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Navigation(blog => blog.Owners)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Navigation(blog => blog.Authors)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

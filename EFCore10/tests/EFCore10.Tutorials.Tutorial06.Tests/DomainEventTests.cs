@@ -6,46 +6,116 @@ namespace EFCore10.Tutorials.Tutorial06.Tests;
 public sealed class DomainEventTests
 {
     [TestMethod]
-    public void AuthorCreateRaisesAuthorCreatedDomainEvent()
+    public void UserRegisterRaisesUserRegisteredDomainEvent()
     {
-        var author = TestDomain.CreateAuthor();
+        var user = TestDomain.CreateOwner();
 
-        var domainEvent = AssertHasSingleEvent<AuthorCreatedDomainEvent>(author);
-        Assert.AreEqual(author.AuthorId, domainEvent.AuthorId);
+        var domainEvent = AssertHasSingleEvent<UserRegisteredDomainEvent>(user);
+        Assert.AreEqual(user.Id, domainEvent.UserId);
     }
 
     [TestMethod]
     public void BlogCreateRaisesBlogCreatedDomainEvent()
     {
-        var author = TestDomain.CreateAuthor();
-        var blog = TestDomain.CreateBlog(author);
+        var owner = TestDomain.CreateOwner();
+        var blog = TestDomain.CreateBlog(owner);
 
         var domainEvent = AssertHasSingleEvent<BlogCreatedDomainEvent>(blog);
         Assert.AreEqual(blog.Id, domainEvent.BlogId);
-        Assert.AreEqual(author.Id, domainEvent.AuthorId);
+        Assert.AreEqual(blog.CurrentOwner.Id, domainEvent.BlogOwnerId);
+        Assert.AreEqual(owner.Id, domainEvent.OwnerUserId);
     }
 
     [TestMethod]
-    public void BlogAddPostRaisesBlogAndPostDomainEvents()
+    public void BlogInvitesAndAcceptsAuthor()
     {
-        var blog = TestDomain.CreateBlog(TestDomain.CreateAuthor());
+        var blog = TestDomain.CreateBlog(TestDomain.CreateOwner());
+        var user = TestDomain.CreateAuthorUser();
 
-        var post = blog.AddPost(
-            PostTitle.Create("Domain events in EF"),
-            PostContent.Create("Domain events stay in memory."));
+        var author = blog.InviteAuthor(user);
+        blog.AcceptAuthor(author.Id);
 
-        var addedEvent = AssertHasSingleEvent<PostAddedToBlogDomainEvent>(blog);
+        var invitedEvent = blog.DomainEvents.OfType<AuthorInvitedToBlogDomainEvent>().Single();
+        var acceptedEvent = blog.DomainEvents.OfType<AuthorAcceptedBlogInvitationDomainEvent>().Single();
+
+        Assert.AreEqual(author.Id, invitedEvent.AuthorId);
+        Assert.AreEqual(user.Id, invitedEvent.InvitedUserId);
+        Assert.AreEqual(author.Id, acceptedEvent.AuthorId);
+        Assert.AreEqual(user.Id, acceptedEvent.AuthorUserId);
+        Assert.AreEqual("Accepted", author.StateName);
+    }
+
+    [TestMethod]
+    public void BlogTransferOwnershipEndsPreviousOwnerAndCreatesNewActiveOwner()
+    {
+        var owner = TestDomain.CreateOwner();
+        var successor = TestDomain.CreateSuccessorOwner();
+        var blog = TestDomain.CreateBlog(owner);
+
+        var previousOwner = blog.CurrentOwner;
+        blog.TransferOwnership(successor);
+
+        var transferredEvent = blog.DomainEvents.OfType<BlogOwnershipTransferredDomainEvent>().Single();
+
+        Assert.IsFalse(previousOwner.IsActive);
+        Assert.AreEqual(successor.Id, blog.CurrentOwner.UserId);
+        Assert.AreEqual(previousOwner.Id, transferredEvent.PreviousBlogOwnerId);
+        Assert.AreEqual(blog.CurrentOwner.Id, transferredEvent.NewBlogOwnerId);
+    }
+
+    [TestMethod]
+    public void OwnerCanCreatePostWithoutAuthorRole()
+    {
+        var owner = TestDomain.CreateOwner();
+        var blog = TestDomain.CreateBlog(owner);
+
+        var post = blog.CreatePost(
+            owner,
+            PostTitle.Create("Owner post"),
+            PostContent.Create("Owner can post without author invite."));
+
         var createdEvent = AssertHasSingleEvent<PostCreatedDomainEvent>(post);
 
-        Assert.AreEqual(blog.Id, addedEvent.BlogId);
-        Assert.AreEqual(post.Id, addedEvent.PostId);
-        Assert.AreEqual(post.Id, createdEvent.PostId);
+        Assert.AreEqual(owner.Id, post.PostedByUserId);
+        Assert.AreEqual(owner.Id, createdEvent.PostedByUserId);
+    }
+
+    [TestMethod]
+    public void UserWithoutBlogRoleCannotCreatePost()
+    {
+        var blog = TestDomain.CreateBlog(TestDomain.CreateOwner());
+        var user = TestDomain.CreateAuthorUser();
+
+        var exception = Assert.ThrowsExactly<DomainException>(() => blog.CreatePost(
+            user,
+            PostTitle.Create("Unauthorized"),
+            PostContent.Create("This user has no role.")));
+
+        Assert.AreEqual("User cannot post to this blog.", exception.Message);
+    }
+
+    [TestMethod]
+    public void RevokedAuthorCannotCreatePost()
+    {
+        var owner = TestDomain.CreateOwner();
+        var user = TestDomain.CreateAuthorUser();
+        var blog = TestDomain.CreateBlog(owner);
+        var author = blog.InviteAuthor(user);
+        blog.AcceptAuthor(author.Id);
+        blog.RevokeAuthor(author.Id, owner);
+
+        var exception = Assert.ThrowsExactly<DomainException>(() => blog.CreatePost(
+            user,
+            PostTitle.Create("Revoked"),
+            PostContent.Create("Revoked authors cannot post.")));
+
+        Assert.AreEqual("User cannot post to this blog.", exception.Message);
     }
 
     [TestMethod]
     public void ClearDomainEventsEmptiesInMemoryEvents()
     {
-        var author = TestDomain.CreateAuthor();
+        var author = TestDomain.CreateOwner();
 
         author.ClearDomainEvents();
 

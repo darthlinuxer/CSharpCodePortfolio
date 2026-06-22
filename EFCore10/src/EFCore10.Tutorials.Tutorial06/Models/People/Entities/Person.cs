@@ -1,14 +1,15 @@
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public abstract class Person : AggregateRoot<PersonId>
+public abstract class Person<TId> : AggregateRoot<TId>
+    where TId : struct
 {
     protected Person()
     {
     }
 
-    protected Person(PersonName name, Cpf document, Address address, Contact contact)
+    protected Person(TId id, PersonName name, Cpf document, Address address, Contact contact)
     {
-        Id = PersonId.NewId();
+        Id = id;
         Name = name;
         Document = document;
         Address = address;

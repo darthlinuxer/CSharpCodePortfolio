@@ -1,6 +1,7 @@
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public sealed record PostAddedToBlogDomainEvent(
+public sealed record AuthorAcceptedBlogInvitationDomainEvent(
     BlogId BlogId,
-    PostId PostId,
+    AuthorId AuthorId,
+    UserId AuthorUserId,
     DateTime OccurredOnUtc) : IDomainEvent;

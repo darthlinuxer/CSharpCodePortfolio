@@ -102,13 +102,16 @@ public sealed class ValueObjectTests
     [TestMethod]
     public void StronglyTypedIdFactoriesUseUuidVersion7AndRejectEmptyGuid()
     {
-        Assert.AreEqual(7, PersonId.NewId().Value.Version);
+        Assert.AreEqual(7, UserId.NewId().Value.Version);
         Assert.AreEqual(7, BlogId.NewId().Value.Version);
+        Assert.AreEqual(7, BlogOwnerId.NewId().Value.Version);
+        Assert.AreEqual(7, AuthorId.NewId().Value.Version);
         Assert.AreEqual(7, PostId.NewId().Value.Version);
 
-        Assert.ThrowsExactly<DomainException>(() => PersonId.From(Guid.Empty));
+        Assert.ThrowsExactly<DomainException>(() => UserId.From(Guid.Empty));
         Assert.ThrowsExactly<DomainException>(() => AuthorId.From(Guid.Empty));
         Assert.ThrowsExactly<DomainException>(() => BlogId.From(Guid.Empty));
+        Assert.ThrowsExactly<DomainException>(() => BlogOwnerId.From(Guid.Empty));
         Assert.ThrowsExactly<DomainException>(() => PostId.From(Guid.Empty));
     }
 }

@@ -6,7 +6,7 @@ namespace EFCore10.Tutorials.Tutorial06.Persistence;
 
 public sealed class BloggingContext(DbContextOptions<BloggingContext> options) : DbContext(options)
 {
-    public DbSet<Author> Authors => Set<Author>();
+    public DbSet<User> Users => Set<User>();
 
     public DbSet<Blog> Blogs => Set<Blog>();
 

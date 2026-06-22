@@ -1,21 +1,21 @@
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public abstract class User : Person
+public sealed class User : Person<UserId>
 {
     private UserState _state = new ActiveUserState();
 
-    protected User()
+    private User()
     {
     }
 
-    protected User(
+    private User(
         PersonName name,
         Cpf document,
         Address address,
         Contact contact,
         UserName userName,
         PasswordHash passwordHash)
-        : base(name, document, address, contact)
+        : base(UserId.NewId(), name, document, address, contact)
     {
         UserName = userName;
         PasswordHash = passwordHash;
@@ -40,6 +40,27 @@ public abstract class User : Person
     public void Deactivate() => _state = _state.Deactivate();
 
     public void Lock() => _state = _state.Lock();
+
+    public static User Register(
+        PersonName name,
+        Cpf document,
+        Address address,
+        Contact contact,
+        UserName userName,
+        PasswordHash passwordHash)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(address);
+        ArgumentNullException.ThrowIfNull(contact);
+        ArgumentNullException.ThrowIfNull(userName);
+        ArgumentNullException.ThrowIfNull(passwordHash);
+
+        var user = new User(name, document, address, contact, userName, passwordHash);
+        user.Raise(new UserRegisteredDomainEvent(user.Id, DateTime.UtcNow));
+
+        return user;
+    }
 
     public void ChangeUserName(UserName userName)
     {
