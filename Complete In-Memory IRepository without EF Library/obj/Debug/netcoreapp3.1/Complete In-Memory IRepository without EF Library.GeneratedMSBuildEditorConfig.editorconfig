@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = Complete_In_Memory_IRepository_without_EF_Library
+build_property.ProjectDir = /home/darthlinuxer/CSharpCodePortfolio/Complete In-Memory IRepository without EF Library/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 
