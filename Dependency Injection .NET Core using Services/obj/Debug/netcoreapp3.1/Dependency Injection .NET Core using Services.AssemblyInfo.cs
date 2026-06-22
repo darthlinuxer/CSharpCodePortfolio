@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dependency Injection .NET Core using Services")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f27fbefcf7cd7e6f57d05a4b441166d50d242c23")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+785a3cc993505fbe30f37923b2e46572448d863d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dependency Injection .NET Core using Services")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dependency Injection .NET Core using Services")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
