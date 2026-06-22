@@ -32,7 +32,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `Creating string Pipes using reverse Pipe Builder recursion`
 - [x] `Server Client Communication with named Pipes`
 - [x] `Using Anonymous Pipes for Communication between Threads`
-- [ ] `Lambda Validators`
+- [x] `Lambda Validators`
 - [ ] `Replace If-Then-Else with Reflection and Attributes`
 - [ ] `Replace If-Then-Else for complex objects (using Reflection)`
 - [ ] `Replacing If-Then-Else using Pipe Builder structure (simple input types)`
