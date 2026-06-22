@@ -14,25 +14,25 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
     {
         TutorialConsole.WriteHeader("01", "Async/Await e Tasks");
         TutorialConsole.WriteContext(
-            ("Origem", "AsyncAwaitTask"),
+            ("Tema", "Async/await com Task"),
             ("Conceito", "Comparar fluxo bloqueante com fluxo async/await"),
             ("Runtime", ".NET 10"),
             ("Slug", "async-await-task"));
         TutorialConsole.WriteQuestion("Quando `await` melhora um fluxo em vez de apenas trocar a sintaxe?");
         TutorialConsole.WriteHypothesis(
-            "Se uma operacao de I/O esta pendente, o programa pode iniciar essa Task e executar trabalho independente antes de aguardar o resultado.",
-            "O tempo total do fluxo async tende a se aproximar da operacao mais longa, nao da soma de todas as esperas.");
+            "Se uma operação de entrada e saída está pendente, o programa pode iniciar essa Task e executar trabalho independente antes de aguardar o resultado.",
+            "O tempo total do fluxo assíncrono tende a se aproximar da operação mais longa, não da soma de todas as esperas.");
         TutorialConsole.WritePreparation(
-            "O exemplo antigo fazia cha com `Task.Delay`: primeiro bloqueando a espera da chaleira, depois usando `await`.",
-            "Aqui os tempos sao curtos para a execucao do tutorial, mas a relacao e a mesma de chamadas HTTP, disco, banco ou mensageria.");
+            "O cenário prepara chá com `Task.Delay`: primeiro bloqueando a espera da chaleira, depois usando `await`.",
+            "Os tempos são curtos para a execução do tutorial, mas a relação é a mesma de chamadas HTTP, disco, banco de dados ou mensageria.");
 
         TutorialConsole.WriteExperiment(
             1,
-            "Fluxo sincrono bloqueante",
-            "A chaleira termina antes de qualquer preparo das xicaras comecar.");
+            "Fluxo síncrono bloqueante",
+            "A chaleira termina antes de qualquer preparo das xícaras começar.");
         TutorialConsole.WriteCodeSnippet(
-            "O trabalho independente fica preso atras da espera.",
-            "SyncProcesses.cs",
+            "O trabalho independente fica preso atrás da espera.",
+            "FluxoSincrono.cs",
             """
             var water = BoilWater();
             PrepareCups();
@@ -41,21 +41,21 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
 
         var syncRun = BrewTeaSynchronously();
         TutorialConsole.WriteEvidence(
-            "Sincrono",
+            "Síncrono",
             ("Passos", string.Join(" -> ", syncRun.Steps)),
             ("Tempo medido", Format(syncRun.Elapsed)),
             ("Resultado", syncRun.Result));
         TutorialConsole.WriteConclusion(
-            "A thread fica ocupada esperando a chaleira; o preparo das xicaras so acontece depois.",
+            "A thread fica ocupada esperando a chaleira; o preparo das xícaras só acontece depois.",
             TutorialConclusionKind.Warning);
 
         TutorialConsole.WriteExperiment(
             2,
             "Fluxo async/await",
-            "A Task da chaleira comeca, as xicaras sao preparadas, e so entao o codigo aguarda a agua.");
+            "A Task da chaleira começa, as xícaras são preparadas, e só então o código aguarda a água.");
         TutorialConsole.WriteCodeSnippet(
             "O trabalho independente acontece antes do await final.",
-            "AsyncProcesses.cs",
+            "FluxoAssincrono.cs",
             """
             var boilingWater = BoilWaterAsync(cancellationToken);
             await PrepareCupsAsync(cancellationToken);
@@ -71,22 +71,22 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
             ("Resultado", asyncRun.Result),
             ("Ganho observado", Format(syncRun.Elapsed - asyncRun.Elapsed)));
         TutorialConsole.WriteObservation(
-            "`await` nao cria velocidade magica: ele deixa o codigo continuar quando existe outro trabalho util enquanto a Task ainda nao terminou.");
+            "`await` não cria velocidade mágica: ele deixa o código continuar quando existe outro trabalho útil enquanto a Task ainda não terminou.");
         TutorialConsole.WriteConclusion(
-            "Use async/await em operacoes naturalmente assincronas e propague o CancellationToken; nao use para CPU pesada sem uma razao explicita.",
+            "Use async/await em operações naturalmente assíncronas e propague o CancellationToken; não use para CPU pesada sem uma razão explícita.",
             TutorialConclusionKind.Success);
     }
 
     private static TeaRun BrewTeaSynchronously()
     {
         var stopwatch = Stopwatch.StartNew();
-        var steps = new List<string> { "liga chaleira e bloqueia" };
+        var steps = new List<string> { "liga a chaleira e bloqueia" };
 
         Thread.Sleep(KettleTime);
-        steps.Add("agua pronta");
+        steps.Add("água pronta");
 
         Thread.Sleep(CupPreparationTime);
-        steps.Add("xicaras prontas");
+        steps.Add("xícaras prontas");
 
         stopwatch.Stop();
         return new TeaRun("Pour Hot Water in cups", stopwatch.Elapsed, steps);
@@ -95,16 +95,16 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
     private static async Task<TeaRun> BrewTeaAsync(CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
-        var steps = new List<string> { "liga chaleira" };
+        var steps = new List<string> { "liga a chaleira" };
 
         var boilingWater = BoilWaterAsync(cancellationToken);
-        steps.Add("prepara xicaras enquanto a chaleira trabalha");
+        steps.Add("prepara xícaras enquanto a chaleira trabalha");
 
         await Task.Delay(CupPreparationTime, cancellationToken).ConfigureAwait(false);
-        steps.Add("xicaras prontas");
+        steps.Add("xícaras prontas");
 
         var water = await boilingWater.ConfigureAwait(false);
-        steps.Add("agua pronta");
+        steps.Add("água pronta");
 
         stopwatch.Stop();
         return new TeaRun($"Pour {water} in cups", stopwatch.Elapsed, steps);
