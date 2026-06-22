@@ -9,22 +9,22 @@
 - [x] Substituir a solução raiz por `CSharpCodePortfolio.slnx`.
 - [x] Criar `CSharpCodePortfolio.App`, `Shared` e `Tutorials.Abstractions`.
 - [x] Implementar `menu`, `list` e `run`.
-- [x] Adicionar entrada executavel para `EFCore10`.
+- [x] Adicionar entrada executável para `EFCore10`.
 - [x] Criar template local e script `scripts/new-tutorial.sh`.
 - [x] Validar build, listagem, launcher do EFCore10 e template.
 - [x] Commitar a fase zero.
 - [x] Mergear em `main`.
 - [x] Remover a worktree da fase zero.
 
-## Pasta Concluida: `AsyncAwaitTask`
+## Pasta Concluída: `AsyncAwaitTask`
 
 - [x] Criar worktree limpa para `AsyncAwaitTask`.
-- [x] Criar `WORKTREE_GOAL.md` temporario.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
 - [x] Identificar conceito principal da pasta.
 - [x] Migrar para tutorial/app `net10.0`.
 - [x] Remover arquivos sem função.
 - [x] Atualizar `ROADMAP.md` e este `TODO.md`.
-- [x] Rodar validacoes da pasta.
+- [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
 - [x] Aguardar feedback do usuário.
@@ -45,6 +45,19 @@
 ## Pasta Concluída: `Creating string Pipes using reverse Pipe Builder recursion`
 
 - [x] Criar worktree limpa para `Creating string Pipes using reverse Pipe Builder recursion`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `Server Client Communication with named Pipes`
+
+- [x] Criar worktree limpa para `Server Client Communication with named Pipes`.
 - [x] Criar `WORKTREE_GOAL.md` temporário.
 - [x] Identificar conceito principal da pasta.
 - [x] Migrar para tutorial/app `net10.0`.

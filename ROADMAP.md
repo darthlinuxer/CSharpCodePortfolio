@@ -21,16 +21,16 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 
 - `CSharpCodePortfolio.App`: CLI raiz com comandos `menu`, `list` e `run <id-or-slug>`.
 - `CSharpCodePortfolio.Shared`: UI de console compartilhada para tutoriais do portfolio.
-- `CSharpCodePortfolio.Tutorials.Abstractions`: contrato minimo de descoberta por atributo e execucao.
+- `CSharpCodePortfolio.Tutorials.Abstractions`: contrato mínimo de descoberta por atributo e execução.
 - `EFCore10`: permanece como workspace independente; o host raiz executa o menu dele via `dotnet run --project EFCore10/src/EFCore10.App -- menu`.
 - `templates/portfolio-tutorial`: template local para novas migrações de pastas.
 
-## Ordem De Migracao Por Pasta
+## Ordem De Migração Por Pasta
 
 - [x] `AsyncAwaitTask`
 - [x] `Client Server Socket Communication`
 - [x] `Creating string Pipes using reverse Pipe Builder recursion`
-- [ ] `Server Client Communication with named Pipes`
+- [x] `Server Client Communication with named Pipes`
 - [ ] `Using Anonymous Pipes for Communication between Threads`
 - [ ] `Lambda Validators`
 - [ ] `Replace If-Then-Else with Reflection and Attributes`
@@ -58,9 +58,9 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 
 ## Regra De Execucao Para Cada Pasta
 
-1. Criar uma worktree por pasta e um `WORKTREE_GOAL.md` temporario com o objetivo.
+1. Criar uma worktree por pasta e um `WORKTREE_GOAL.md` temporário com o objetivo.
 2. Preservar o conceito principal da pasta em uma solução simples.
-3. Preferir tutorial console `net10.0`; manter app web/API somente quando HTTP/auth for o proprio conceito.
-4. Validar build, testes existentes e execucao do tutorial migrado pelo menu raiz.
+3. Preferir tutorial console `net10.0`; manter app web/API somente quando HTTP/auth for o próprio conceito.
+4. Validar build, testes existentes e execução do tutorial migrado pelo menu raiz.
 5. Commitar, mergear em `main`, remover a worktree e confirmar `git worktree list`.
-6. Parar para feedback do usuario antes da proxima pasta.
+6. Parar para feedback do usuário antes da próxima pasta.
