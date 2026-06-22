@@ -33,7 +33,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `Server Client Communication with named Pipes`
 - [x] `Using Anonymous Pipes for Communication between Threads`
 - [x] `Lambda Validators`
-- [ ] `Replace If-Then-Else with Reflection and Attributes`
+- [x] `Replace If-Then-Else with Reflection and Attributes`
 - [ ] `Replace If-Then-Else for complex objects (using Reflection)`
 - [ ] `Replacing If-Then-Else using Pipe Builder structure (simple input types)`
 - [ ] `Replacing If-Then-Else for complex objects using Pipe Structure`
