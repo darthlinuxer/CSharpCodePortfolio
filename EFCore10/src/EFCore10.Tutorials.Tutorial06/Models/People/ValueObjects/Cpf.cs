@@ -1,28 +1,21 @@
-using System.Text.RegularExpressions;
+using EFCore10.Tutorials.Tutorial06.Extensions;
 
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public sealed partial record Cpf
+public sealed record Cpf
 {
-    public Cpf(string value) => Value = value;
+    private Cpf(string value) => Value = value;
 
-    public string Value
-    {
-        get;
-        init
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new DomainException("CPF is required.");
+    public string Value { get; }
 
-            var digits = NonDigits().Replace(value, "");
-            field = digits.Length == 11 ? digits : throw new DomainException("CPF must have 11 digits.");
-        }
-    }
-
-    public static Cpf Create(string value) => new(value);
+    public static Cpf Create(string value) => new(Validate(value));
 
     public override string ToString() => Value;
 
-    [GeneratedRegex(@"\D")]
-    private static partial Regex NonDigits();
+    private static string Validate(string? value)
+    {
+        var digits = value.OnlyDigits("CPF");
+
+        return digits.Length == 11 ? digits : throw new DomainException("CPF must have 11 digits.");
+    }
 }

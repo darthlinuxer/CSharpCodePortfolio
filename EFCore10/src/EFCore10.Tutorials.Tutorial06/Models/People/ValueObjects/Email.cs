@@ -1,27 +1,21 @@
 using System.Net.Mail;
+using EFCore10.Tutorials.Tutorial06.Extensions;
 
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
 public sealed record Email
 {
-    public Email(string value) => Value = value;
+    private Email(string value) => Value = value;
 
-    public string Value
-    {
-        get;
-        init => field = Normalize(value);
-    }
+    public string Value { get; }
 
-    public static Email Create(string value) => new(value);
+    public static Email Create(string value) => new(Normalize(value));
 
     public override string ToString() => Value;
 
     private static string Normalize(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new DomainException("Email is required.");
-
-        var normalized = value.Trim().ToLowerInvariant();
+        var normalized = value.ToLowerInvariantRequired("Email");
 
         try
         {

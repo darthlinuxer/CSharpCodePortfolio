@@ -18,7 +18,7 @@ internal static class Tutorial06SampleData
                 Email.Create("ada@example.com"),
                 PhoneNumber.Create("+55 (11) 99999-9999")),
             UserName.Create("ada.lovelace"),
-            PasswordHash.FromHash("hashed-password"));
+            PasswordHash.HashPassword("Correct Horse Battery Staple 42!"));
 
     public static Blog CreateDemoBlog(Author author) =>
         Blog.Create(

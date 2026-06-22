@@ -1,4 +1,5 @@
 using EFCore10.Tutorials.Tutorial06.Models;
+using System.Reflection;
 
 namespace EFCore10.Tutorials.Tutorial06.Tests;
 
@@ -15,7 +16,8 @@ public sealed class ValueObjectTests
         Assert.ThrowsExactly<DomainException>(() => ZipCode.Create("123"));
         Assert.ThrowsExactly<DomainException>(() => StateCode.Create("Sao Paulo"));
         Assert.ThrowsExactly<DomainException>(() => UserName.Create("ab"));
-        Assert.ThrowsExactly<DomainException>(() => PasswordHash.FromHash(new string('a', 501)));
+        Assert.ThrowsExactly<DomainException>(() => PasswordHash.HashPassword(""));
+        Assert.ThrowsExactly<DomainException>(() => PasswordHash.FromEncodedHash("not-a-hash"));
     }
 
     [TestMethod]
@@ -46,5 +48,67 @@ public sealed class ValueObjectTests
         Assert.AreEqual("https://example.com/blog", BlogUrl.Create("  https://example.com/blog  ").Value);
         Assert.AreEqual("DDD with EF Core", PostTitle.Create("  DDD with EF Core  ").Value);
         Assert.AreEqual("Rich model content.", PostContent.Create("  Rich model content.  ").Value);
+    }
+
+    [TestMethod]
+    public void SingleValueObjectsDoNotExposePublicConstructors()
+    {
+        var valueObjectTypes = new[]
+        {
+            typeof(PersonName),
+            typeof(Cpf),
+            typeof(Email),
+            typeof(PhoneNumber),
+            typeof(ZipCode),
+            typeof(StateCode),
+            typeof(UserName),
+            typeof(PasswordHash),
+            typeof(BlogName),
+            typeof(BlogUrl),
+            typeof(PostTitle),
+            typeof(PostContent)
+        };
+
+        Assert.IsTrue(valueObjectTypes.All(type => type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).Length == 0));
+        Assert.IsFalse(typeof(PersonName).GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Any(method => method.Name == "Normalize"));
+    }
+
+    [TestMethod]
+    public void PasswordHashUsesArgon2IdSaltAndConstantVerificationApi()
+    {
+        const string password = "Correct Horse Battery Staple 42!";
+
+        var first = PasswordHash.HashPassword(password);
+        var second = PasswordHash.HashPassword(password);
+
+        StringAssert.StartsWith(first.Value, "$argon2id$v=19$m=19456,t=2,p=1$");
+        Assert.AreNotEqual(password, first.Value);
+        Assert.AreNotEqual(first.Value, second.Value);
+        Assert.IsTrue(first.VerifyPassword(password));
+        Assert.IsFalse(first.VerifyPassword("wrong password"));
+        Assert.IsTrue(PasswordHash.FromEncodedHash(first.Value).VerifyPassword(password));
+    }
+
+    [TestMethod]
+    public void PasswordHashRejectsUnsupportedArgon2Parameters()
+    {
+        var encodedHash = PasswordHash.HashPassword("Correct Horse Battery Staple 42!").Value;
+
+        Assert.ThrowsExactly<DomainException>(() => PasswordHash.FromEncodedHash(encodedHash.Replace("m=19456", "m=1", StringComparison.Ordinal)));
+        Assert.ThrowsExactly<DomainException>(() => PasswordHash.FromEncodedHash(encodedHash.Replace("t=2", "t=1", StringComparison.Ordinal)));
+        Assert.ThrowsExactly<DomainException>(() => PasswordHash.FromEncodedHash(encodedHash.Replace("p=1", "p=2", StringComparison.Ordinal)));
+    }
+
+    [TestMethod]
+    public void StronglyTypedIdFactoriesUseUuidVersion7AndRejectEmptyGuid()
+    {
+        Assert.AreEqual(7, PersonId.NewId().Value.Version);
+        Assert.AreEqual(7, BlogId.NewId().Value.Version);
+        Assert.AreEqual(7, PostId.NewId().Value.Version);
+
+        Assert.ThrowsExactly<DomainException>(() => PersonId.From(Guid.Empty));
+        Assert.ThrowsExactly<DomainException>(() => AuthorId.From(Guid.Empty));
+        Assert.ThrowsExactly<DomainException>(() => BlogId.From(Guid.Empty));
+        Assert.ThrowsExactly<DomainException>(() => PostId.From(Guid.Empty));
     }
 }

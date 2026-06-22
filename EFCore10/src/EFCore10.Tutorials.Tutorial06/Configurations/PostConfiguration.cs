@@ -13,7 +13,7 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasKey(post => post.Id);
 
         builder.Property(post => post.Id)
-            .HasConversion(id => id.Value, value => new PostId(value))
+            .HasConversion(id => id.Value, value => PostId.From(value))
             .ValueGeneratedNever();
 
         builder.Ignore(post => post.DomainEvents);
@@ -30,7 +30,7 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasMaxLength(4_000);
 
         builder.Property(post => post.BlogId)
-            .HasConversion(id => id.Value, value => new BlogId(value))
+            .HasConversion(id => id.Value, value => BlogId.From(value))
             .IsRequired();
 
         builder.Property<string>("StateKey")

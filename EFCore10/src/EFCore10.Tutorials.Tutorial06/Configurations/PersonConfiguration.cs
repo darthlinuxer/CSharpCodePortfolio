@@ -15,7 +15,7 @@ public sealed class PersonConfiguration : IEntityTypeConfiguration<Person>
         builder.HasKey(person => person.Id);
 
         builder.Property(person => person.Id)
-            .HasConversion(id => id.Value, value => new PersonId(value))
+            .HasConversion(id => id.Value, value => PersonId.From(value))
             .ValueGeneratedNever();
 
         builder.HasDiscriminator<string>("PersonType")

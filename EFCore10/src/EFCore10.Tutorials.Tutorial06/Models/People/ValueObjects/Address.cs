@@ -1,3 +1,5 @@
+using EFCore10.Tutorials.Tutorial06.Extensions;
+
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
 public sealed record Address
@@ -8,9 +10,9 @@ public sealed record Address
 
     private Address(string street, string number, string city, StateCode state, ZipCode zipCode)
     {
-        Street = PersonName.Normalize(street, nameof(Street), 3, 200);
-        Number = PersonName.Normalize(number, nameof(Number), 1, 30);
-        City = PersonName.Normalize(city, nameof(City), 2, 100);
+        Street = street.NormalizeLength(nameof(Street), 3, 200);
+        Number = number.NormalizeLength(nameof(Number), 1, 30);
+        City = city.NormalizeLength(nameof(City), 2, 100);
         State = state;
         ZipCode = zipCode;
     }

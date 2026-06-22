@@ -32,7 +32,7 @@ public sealed class OutboxMessage
         var eventType = domainEvent.GetType();
 
         return new OutboxMessage(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             eventType.FullName ?? eventType.Name,
             JsonSerializer.Serialize(domainEvent, eventType),
             domainEvent.OccurredOnUtc);

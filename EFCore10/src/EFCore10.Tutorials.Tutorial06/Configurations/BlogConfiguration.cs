@@ -13,7 +13,7 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
         builder.HasKey(blog => blog.Id);
 
         builder.Property(blog => blog.Id)
-            .HasConversion(id => id.Value, value => new BlogId(value))
+            .HasConversion(id => id.Value, value => BlogId.From(value))
             .ValueGeneratedNever();
 
         builder.Ignore(blog => blog.DomainEvents);
@@ -29,7 +29,7 @@ public sealed class BlogConfiguration : IEntityTypeConfiguration<Blog>
             .HasMaxLength(500);
 
         builder.Property(blog => blog.AuthorId)
-            .HasConversion(id => id.Value, value => new PersonId(value))
+            .HasConversion(id => id.Value, value => PersonId.From(value))
             .IsRequired();
 
         builder.HasIndex(blog => blog.Url);

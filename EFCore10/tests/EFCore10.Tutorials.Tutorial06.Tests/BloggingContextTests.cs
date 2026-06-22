@@ -41,6 +41,9 @@ public sealed class BloggingContextTests
 
         Assert.AreEqual("Ada Lovelace", persistedBlog.Author.Name.Value);
         Assert.AreEqual("ada.lovelace", persistedBlog.Author.UserName.Value);
+        StringAssert.StartsWith(persistedBlog.Author.PasswordHash.Value, "$argon2id$v=19$m=19456,t=2,p=1$");
+        Assert.IsTrue(persistedBlog.Author.PasswordHash.VerifyPassword("Correct Horse Battery Staple 42!"));
+        Assert.IsFalse(persistedBlog.Author.PasswordHash.Value.Contains("Correct Horse Battery Staple 42!", StringComparison.Ordinal));
         Assert.AreEqual("Rua A", persistedBlog.Author.Address.Street);
         Assert.AreEqual("SP", persistedBlog.Author.Address.State.Value);
         Assert.AreEqual("ada@example.com", persistedBlog.Author.Contact.Email.Value);
@@ -62,6 +65,7 @@ public sealed class BloggingContextTests
             },
             outboxMessages.Select(message => message.Type).ToArray());
         Assert.IsTrue(outboxMessages.All(message => message.Payload.Length > 0));
+        Assert.IsTrue(outboxMessages.All(message => message.Id.Version == 7));
     }
 
     [TestMethod]
@@ -89,16 +93,26 @@ public sealed class BloggingContextTests
 
         var authorEntityType = context.Model.FindEntityType(typeof(Author));
         var personEntityType = context.Model.FindEntityType(typeof(Person));
+        var blogEntityType = context.Model.FindEntityType(typeof(Blog));
         var postEntityType = context.Model.FindEntityType(typeof(Post));
 
         Assert.IsNotNull(authorEntityType);
         Assert.IsNotNull(personEntityType);
+        Assert.IsNotNull(blogEntityType);
         Assert.IsNotNull(postEntityType);
         Assert.AreEqual("People", authorEntityType.GetTableName());
         Assert.AreEqual("People", personEntityType.GetTableName());
         Assert.IsNotNull(personEntityType.FindDiscriminatorProperty());
         Assert.AreEqual("UserState", authorEntityType.FindProperty("StateKey")?.GetColumnName());
         Assert.AreEqual("PostState", postEntityType.FindProperty("StateKey")?.GetColumnName());
+        Assert.IsFalse(authorEntityType.FindProperty(nameof(User.UserName))?.IsNullable ?? true);
+        Assert.IsFalse(authorEntityType.FindProperty(nameof(User.PasswordHash))?.IsNullable ?? true);
+        Assert.IsFalse(personEntityType.FindProperty(nameof(Person.Name))?.IsNullable ?? true);
+        Assert.IsFalse(personEntityType.FindProperty(nameof(Person.Document))?.IsNullable ?? true);
+        Assert.IsFalse(blogEntityType.FindProperty(nameof(Blog.Name))?.IsNullable ?? true);
+        Assert.IsFalse(blogEntityType.FindProperty(nameof(Blog.Url))?.IsNullable ?? true);
+        Assert.IsFalse(postEntityType.FindProperty(nameof(Post.Title))?.IsNullable ?? true);
+        Assert.IsFalse(postEntityType.FindProperty(nameof(Post.Content))?.IsNullable ?? true);
         Assert.IsNull(authorEntityType.FindProperty("StateId"));
         Assert.IsNull(postEntityType.FindProperty("StateId"));
         Assert.IsNull(authorEntityType.FindProperty("AuthorId"));

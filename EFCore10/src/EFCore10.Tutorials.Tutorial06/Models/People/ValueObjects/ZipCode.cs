@@ -1,28 +1,21 @@
-using System.Text.RegularExpressions;
+using EFCore10.Tutorials.Tutorial06.Extensions;
 
 namespace EFCore10.Tutorials.Tutorial06.Models;
 
-public sealed partial record ZipCode
+public sealed record ZipCode
 {
-    public ZipCode(string value) => Value = value;
+    private ZipCode(string value) => Value = value;
 
-    public string Value
-    {
-        get;
-        init
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new DomainException("ZIP code is required.");
+    public string Value { get; }
 
-            var digits = NonDigits().Replace(value, "");
-            field = digits.Length == 8 ? digits : throw new DomainException("ZIP code must have 8 digits.");
-        }
-    }
-
-    public static ZipCode Create(string value) => new(value);
+    public static ZipCode Create(string value) => new(Validate(value));
 
     public override string ToString() => Value;
 
-    [GeneratedRegex(@"\D")]
-    private static partial Regex NonDigits();
+    private static string Validate(string? value)
+    {
+        var digits = value.OnlyDigits("ZIP code");
+
+        return digits.Length == 8 ? digits : throw new DomainException("ZIP code must have 8 digits.");
+    }
 }

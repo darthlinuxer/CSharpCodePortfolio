@@ -17,7 +17,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.Property(user => user.PasswordHash)
-            .HasConversion(passwordHash => passwordHash.Value, value => PasswordHash.FromHash(value))
+            .HasConversion(passwordHash => passwordHash.Value, value => PasswordHash.FromEncodedHash(value))
             .HasMaxLength(500)
             .IsRequired();
 
