@@ -29,7 +29,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 
 - [x] `AsyncAwaitTask`
 - [x] `Client Server Socket Communication`
-- [ ] `Creating string Pipes using reverse Pipe Builder recursion`
+- [x] `Creating string Pipes using reverse Pipe Builder recursion`
 - [ ] `Server Client Communication with named Pipes`
 - [ ] `Using Anonymous Pipes for Communication between Threads`
 - [ ] `Lambda Validators`
