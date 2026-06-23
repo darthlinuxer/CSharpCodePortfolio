@@ -22,9 +22,11 @@
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial17/CSharpCodePortfolio.Tutorials.Tutorial17.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial18/CSharpCodePortfolio.Tutorials.Tutorial18.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial19/CSharpCodePortfolio.Tutorials.Tutorial19.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial20/CSharpCodePortfolio.Tutorials.Tutorial20.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CSharpCodePortfolio.Shared.Tests/CSharpCodePortfolio.Shared.Tests.csproj" />
     <Project Path="tests/CSharpCodePortfolio.Tutorials.Tutorial19.Tests/CSharpCodePortfolio.Tutorials.Tutorial19.Tests.csproj" />
+    <Project Path="tests/CSharpCodePortfolio.Tutorials.Tutorial20.Tests/CSharpCodePortfolio.Tutorials.Tutorial20.Tests.csproj" />
   </Folder>
 </Solution>

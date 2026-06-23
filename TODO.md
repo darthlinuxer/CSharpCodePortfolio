@@ -262,6 +262,20 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `MockHttpClient`
+
+- [x] Criar worktree limpa para `MockHttpClient`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Adicionar teste `net10.0` para validar o `HttpMessageHandler` simulado.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código
@@ -311,9 +325,9 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 07`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial08
+## Ciclo Concluído: Helper No Tutorial08
 
 - [x] Refatorar `ComplexObjectReflectionTutorial` para ler ranges reais de `ExecuteDirectChecks` e `ExecuteReflectedChecks`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 08`.
-- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
