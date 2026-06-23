@@ -276,6 +276,20 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `MassTransitConsole`
+
+- [x] Criar worktree limpa para `MassTransitConsole`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Adicionar teste `net10.0` para validar publicação e consumo com MassTransit em memória.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código
@@ -332,9 +346,9 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 08`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial09
+## Ciclo Concluído: Helper No Tutorial09
 
 - [x] Refatorar `SimplePipeBuilderTutorial` para ler ranges reais de `ExecuteDirectChecks` e `ExecutePipeBuilder`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 09`.
-- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

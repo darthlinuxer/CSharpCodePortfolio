@@ -34,6 +34,7 @@
     <ProjectReference Include="..\CSharpCodePortfolio.Tutorials.Tutorial18\CSharpCodePortfolio.Tutorials.Tutorial18.csproj" />
     <ProjectReference Include="..\CSharpCodePortfolio.Tutorials.Tutorial19\CSharpCodePortfolio.Tutorials.Tutorial19.csproj" />
     <ProjectReference Include="..\CSharpCodePortfolio.Tutorials.Tutorial20\CSharpCodePortfolio.Tutorials.Tutorial20.csproj" />
+    <ProjectReference Include="..\CSharpCodePortfolio.Tutorials.Tutorial21\CSharpCodePortfolio.Tutorials.Tutorial21.csproj" />
   </ItemGroup>
 
 </Project>

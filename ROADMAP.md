@@ -33,6 +33,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] Aplicar a helper no Tutorial08 após validação do Tutorial07.
 - [x] Receber feedback do usuário para prosseguir após o Tutorial08.
 - [x] Aplicar a helper no Tutorial09 após validação do Tutorial08.
+- [x] Receber feedback do usuário para prosseguir após o Tutorial09.
 - [ ] Aguardar feedback do usuário antes de aplicar a helper nos tutoriais restantes.
 - [ ] Migrar pastas de topo restantes, uma pasta por vez.
 
@@ -83,7 +84,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `Unit Tests using Reflection and Moq`
 - [x] `ExposeInternalsToTest`
 - [x] `MockHttpClient`
-- [ ] `MassTransitConsole`
+- [x] `MassTransitConsole`
 - [ ] `ASP.NET`
 - [ ] `RazorTest`
 - [ ] `RavenConnection`
