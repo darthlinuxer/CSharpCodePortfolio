@@ -32,19 +32,10 @@ public sealed class ComplexObjectReflectionTutorial : ITutorial
             "Decisão direta",
             "Compara propriedades do objeto em blocos condicionais separados.");
         TutorialConsole.WriteCodeSnippet(
-            "Cada novo caso aumenta a lista de decisões no mesmo ponto do código.",
-            "DirectPersonChecks.cs",
-            """
-            if (person.Name == "Camilo")
-            {
-                handledMessages.Add("Pessoa chamada Camilo");
-            }
-
-            if (person.Name == "Aline")
-            {
-                handledMessages.Add("Pessoa chamada Aline");
-            }
-            """);
+            "Código real: cada novo caso aumenta a lista de decisões no mesmo ponto do código.",
+            typeof(ComplexObjectReflectionTutorial),
+            nameof(ExecuteDirectChecks),
+            new CodeExcerpt(5, 13, "Blocos condicionais por nome"));
 
         var directMessages = ExecuteDirectChecks(person);
         TutorialConsole.WriteEvidence(
@@ -57,16 +48,10 @@ public sealed class ComplexObjectReflectionTutorial : ITutorial
             "Condições refletidas",
             "Descobre classes de condição, instancia cada uma com o objeto e executa apenas as verdadeiras.");
         TutorialConsole.WriteCodeSnippet(
-            "A busca usa as classes aninhadas que derivam de `PersonCondition`.",
-            "ReflectedPersonChecks.cs",
-            """
-            var conditions = typeof(ComplexObjectReflectionTutorial)
-                .GetNestedTypes(BindingFlags.NonPublic)
-                .Where(IsConcretePersonCondition)
-                .Select(type => (PersonCondition)Activator.CreateInstance(type, person)!);
-
-            var passedConditions = conditions.Where(static condition => condition.IsMatch);
-            """);
+            "Código real: a busca usa as classes aninhadas que derivam de `PersonCondition`.",
+            typeof(ComplexObjectReflectionTutorial),
+            nameof(ExecuteReflectedChecks),
+            new CodeExcerpt(3, 11, "Descoberta e filtro das condições"));
 
         var reflectedReport = ExecuteReflectedChecks(person);
         TutorialConsole.WriteEvidence(

@@ -303,9 +303,17 @@
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 06`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
 ## Ciclo Concluído: Helper No Tutorial07
 
 - [x] Refatorar `ReflectionAttributesTutorial` para ler ranges reais de `ExecuteWithSwitch` e `ExecuteWithReflection`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 07`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial08
+
+- [x] Refatorar `ComplexObjectReflectionTutorial` para ler ranges reais de `ExecuteDirectChecks` e `ExecuteReflectedChecks`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 08`.
+- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
