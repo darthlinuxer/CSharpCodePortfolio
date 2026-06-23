@@ -32,12 +32,9 @@ public sealed class SimplePipeBuilderTutorial : ITutorial
             "Compara a mesma string em blocos condicionais independentes.");
         TutorialConsole.WriteCodeSnippet(
             "Cada novo valor adiciona mais uma decisão ao mesmo ponto do código.",
-            "DirectStringChecks.cs",
-            """
-            if (input == "isInit") handledMessages.Add("Entrada isInit");
-            if (input == "isTest") handledMessages.Add("Entrada isTest");
-            if (input == "isStop") handledMessages.Add("Entrada isStop");
-            """);
+            typeof(SimplePipeBuilderTutorial),
+            nameof(ExecuteDirectChecks),
+            new CodeExcerpt(5, 18, "Condições diretas"));
 
         var directMessages = ExecuteDirectChecks(input);
         TutorialConsole.WriteEvidence(
@@ -51,14 +48,9 @@ public sealed class SimplePipeBuilderTutorial : ITutorial
             "Registra tipos de condição, constrói a cadeia e executa apenas os testes aprovados.");
         TutorialConsole.WriteCodeSnippet(
             "O builder concentra a lista de condições disponíveis para a entrada.",
-            "IfBuilder.cs",
-            """
-            var matchedConditions = new IfBuilder(input)
-                .AddCheckCondition(typeof(InputIsInitCondition))
-                .AddCheckCondition(typeof(InputIsTestCondition))
-                .AddCheckCondition(typeof(InputIsStopCondition))
-                .Build();
-            """);
+            typeof(SimplePipeBuilderTutorial),
+            nameof(ExecutePipeBuilder),
+            new CodeExcerpt(3, 8, "Registro e execução da cadeia"));
 
         var pipeReport = ExecutePipeBuilder(input);
         TutorialConsole.WriteEvidence(

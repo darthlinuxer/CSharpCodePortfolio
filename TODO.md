@@ -331,3 +331,10 @@
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 08`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial09
+
+- [x] Refatorar `SimplePipeBuilderTutorial` para ler ranges reais de `ExecuteDirectChecks` e `ExecutePipeBuilder`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 09`.
+- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
