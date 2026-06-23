@@ -32,9 +32,10 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
             "Fluxo síncrono bloqueante",
             "A chaleira termina antes de qualquer preparo das xícaras começar.");
         TutorialConsole.WriteCodeSnippet(
-            "Código real: o trabalho independente fica preso atrás da espera.",
+            "Código real: o fluxo bloqueia cada etapa antes de avançar.",
             typeof(AsyncAwaitTaskTutorial),
-            nameof(BrewTeaSynchronously));
+            nameof(BrewTeaSynchronously),
+            new CodeExcerpt(6, 10, "As esperas acontecem em sequência"));
 
         var syncRun = BrewTeaSynchronously();
         TutorialConsole.WriteEvidence(
@@ -51,9 +52,11 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
             "Fluxo async/await",
             "A Task da chaleira começa, as xícaras são preparadas, e só então o código aguarda a água.");
         TutorialConsole.WriteCodeSnippet(
-            "Código real: o trabalho independente acontece antes do await final.",
+            "Código real: o fluxo inicia a espera e faz trabalho independente.",
             typeof(AsyncAwaitTaskTutorial),
-            nameof(BrewTeaAsync));
+            nameof(BrewTeaAsync),
+            new CodeExcerpt(6, 10, "A chaleira trabalha enquanto as xícaras são preparadas"),
+            new CodeExcerpt(12, 13, "O resultado é aguardado só quando necessário"));
 
         var asyncRun = await BrewTeaAsync(cancellationToken).ConfigureAwait(false);
         TutorialConsole.WriteEvidence(

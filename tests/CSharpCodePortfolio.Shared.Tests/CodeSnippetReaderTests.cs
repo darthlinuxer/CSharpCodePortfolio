@@ -42,6 +42,43 @@ public sealed class CodeSnippetReaderTests
     }
 
     [TestMethod]
+    public void ReadMemberExcerpts_WithValidRange_ReturnsSelectedLinesAndCaption()
+    {
+        var snippets = CodeSnippetReader.ReadMemberExcerpts(
+            typeof(SnippetSubject),
+            nameof(SnippetSubject.Describe),
+            new CodeExcerpt(3, 3, "Retorno"));
+
+        Assert.HasCount(1, snippets);
+        var snippet = snippets[0];
+
+        Assert.AreEqual("Retorno", snippet.Caption);
+        Assert.Contains("CodeSnippetReaderTests.cs | SnippetSubject.Describe | linhas 3-3", snippet.FileName);
+        Assert.Contains("return $\"Subject: {Name}\";", snippet.Code);
+        Assert.DoesNotContain("public string Describe()", snippet.Code);
+    }
+
+    [TestMethod]
+    public void ReadMemberExcerpts_WithRangePastMemberEnd_ThrowsArgumentOutOfRange()
+    {
+        var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => CodeSnippetReader.ReadMemberExcerpts(
+                typeof(SnippetSubject),
+                nameof(SnippetSubject.Describe),
+                new CodeExcerpt(20, 21)));
+
+        Assert.Contains("Describe", exception.Message);
+        Assert.Contains("20-21", exception.Message);
+    }
+
+    [TestMethod]
+    public void CodeExcerpt_WithInvalidRange_ThrowsArgumentOutOfRange()
+    {
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new CodeExcerpt(0, 1));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new CodeExcerpt(2, 1));
+    }
+
+    [TestMethod]
     public void ReadFile_WithMissingFile_ThrowsFileNotFound()
     {
         var exception = Assert.ThrowsExactly<FileNotFoundException>(

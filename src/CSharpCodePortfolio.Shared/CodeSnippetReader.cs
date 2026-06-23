@@ -86,6 +86,50 @@ public static class CodeSnippetReader
         return new CodeSnippet($"{source.FileName} | {type.Name}", code.ToString());
     }
 
+    /// <summary>
+    /// Reads selected line ranges from a single member.
+    /// </summary>
+    public static IReadOnlyList<CodeSnippet> ReadMemberExcerpts(Type type, string memberName, params CodeExcerpt[] excerpts)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentException.ThrowIfNullOrWhiteSpace(memberName);
+        ArgumentNullException.ThrowIfNull(excerpts);
+
+        if (excerpts.Length == 0)
+        {
+            return [ReadMembers(type, memberName)];
+        }
+
+        var source = FindTypeSource(type);
+        var block = ExtractTypeBlock(source.Code, type.Name);
+        var member = ExtractMember(block.Code, type.Name, memberName);
+        var lines = SplitLines(member.Trim('\r', '\n'));
+        var snippets = new List<CodeSnippet>(excerpts.Length);
+
+        foreach (var excerpt in excerpts)
+        {
+            if (excerpt.EndLine > lines.Length)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(excerpts),
+                    excerpt.EndLine,
+                    $"Range {excerpt.StartLine}-{excerpt.EndLine} is outside member '{memberName}', which has {lines.Length} line(s).");
+            }
+
+            var selectedLines = lines
+                .Skip(excerpt.StartLine - 1)
+                .Take(excerpt.EndLine - excerpt.StartLine + 1);
+            var code = Reindent(selectedLines, 0);
+
+            snippets.Add(new CodeSnippet(
+                $"{source.FileName} | {type.Name}.{memberName} | linhas {excerpt.StartLine}-{excerpt.EndLine}",
+                code,
+                excerpt.Caption));
+        }
+
+        return snippets;
+    }
+
     private static CodeSnippet FindTypeSource(Type type)
     {
         var repositoryRoot = FindRepositoryRoot();
@@ -266,8 +310,14 @@ public static class CodeSnippetReader
 
     private static string Reindent(string value, int spaces)
     {
-        var lines = value.Trim('\r', '\n').Split(Environment.NewLine);
-        var commonIndent = lines
+        var lines = SplitLines(value.Trim('\r', '\n'));
+        return Reindent(lines, spaces);
+    }
+
+    private static string Reindent(IEnumerable<string> lines, int spaces)
+    {
+        var linesArray = lines.ToArray();
+        var commonIndent = linesArray
             .Where(static line => !string.IsNullOrWhiteSpace(line))
             .Select(LeadingSpaces)
             .DefaultIfEmpty(0)
@@ -276,9 +326,17 @@ public static class CodeSnippetReader
 
         return string.Join(
             Environment.NewLine,
-            lines.Select(line => string.IsNullOrWhiteSpace(line)
+            linesArray.Select(line => string.IsNullOrWhiteSpace(line)
                 ? string.Empty
                 : $"{prefix}{line[commonIndent..]}"));
+    }
+
+    private static string[] SplitLines(string value)
+    {
+        return value
+            .Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Replace('\r', '\n')
+            .Split('\n');
     }
 
     private static int LeadingSpaces(string value)

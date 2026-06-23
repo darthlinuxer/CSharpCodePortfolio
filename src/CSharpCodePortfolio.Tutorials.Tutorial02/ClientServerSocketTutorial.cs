@@ -37,14 +37,10 @@ public sealed class ClientServerSocketTutorial : ITutorial
             "Servidor TCP local",
             "Cria um socket, vincula a uma porta livre e inicia a escuta.");
         TutorialConsole.WriteCodeSnippet(
-            "O servidor escuta em loopback e aceita uma conexão.",
-            "ServidorTcp.cs",
-            """
-            using var listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            listener.Bind(new IPEndPoint(IPAddress.Loopback, 0));
-            listener.Listen();
-            var serverTask = AcceptAndEchoAsync(listener, cancellationToken);
-            """);
+            "Código real: o servidor escuta em loopback e aceita uma conexão.",
+            typeof(ClientServerSocketTutorial),
+            nameof(RunSocketExchangeAsync),
+            new CodeExcerpt(3, 8, "Servidor abre o endpoint e começa a aceitar o cliente"));
 
         var exchange = await RunSocketExchangeAsync(cancellationToken).ConfigureAwait(false);
 
@@ -59,15 +55,11 @@ public sealed class ClientServerSocketTutorial : ITutorial
             "Cliente TCP local",
             "Conecta ao endpoint do servidor, envia uma mensagem e lê o eco.");
         TutorialConsole.WriteCodeSnippet(
-            "O cliente envia bytes e aguarda a resposta do servidor.",
-            "ClienteTcp.cs",
-            """
-            using var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            await client.ConnectAsync(endpoint, cancellationToken);
-            var requestFrame = Encoding.UTF8.GetBytes($"{message} <EOF>");
-            await client.SendAsync(requestFrame, SocketFlags.None, cancellationToken);
-            var bytesRead = await client.ReceiveAsync(buffer, SocketFlags.None, cancellationToken);
-            """);
+            "Código real: o cliente envia bytes e aguarda a resposta do servidor.",
+            typeof(ClientServerSocketTutorial),
+            nameof(SendAndReceiveAsync),
+            new CodeExcerpt(5, 9, "Cliente conecta e envia o frame"),
+            new CodeExcerpt(11, 13, "Cliente lê a resposta e fecha o socket"));
         TutorialConsole.WriteEvidence(
             "Troca de mensagens",
             ("Cliente enviou", exchange.ClientSentPayload),

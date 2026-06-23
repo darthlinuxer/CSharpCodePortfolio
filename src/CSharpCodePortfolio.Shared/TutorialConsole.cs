@@ -104,6 +104,22 @@ public static class TutorialConsole
     }
 
     /// <summary>
+    /// Writes selected source ranges from one member.
+    /// </summary>
+    public static void WriteCodeSnippet(string title, Type type, string memberName, params CodeExcerpt[] excerpts)
+    {
+        var snippets = CodeSnippetReader.ReadMemberExcerpts(type, memberName, excerpts);
+
+        foreach (var snippet in snippets)
+        {
+            var snippetTitle = string.IsNullOrWhiteSpace(snippet.Caption)
+                ? title
+                : $"{title} | {snippet.Caption}";
+            WriteCodeSnippet(snippetTitle, snippet.FileName, snippet.Code);
+        }
+    }
+
+    /// <summary>
     /// Writes a curated code snippet.
     /// </summary>
     public static void WriteCodeSnippet(string title, string fileName, string code)

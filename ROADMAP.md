@@ -17,7 +17,9 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] Criar template local `portfolio-tutorial`.
 - [x] Criar helper compartilhada para imprimir snippets de código reais no console.
 - [x] Aplicar a helper no Tutorial01 como piloto.
-- [ ] Aguardar feedback do usuário antes de aplicar a helper nos demais tutoriais.
+- [x] Aprimorar a helper com ranges de código e legendas por trecho.
+- [x] Aplicar a helper no Tutorial02 após validação do Tutorial01.
+- [ ] Aguardar feedback do usuário antes de aplicar a helper nos tutoriais restantes.
 - [ ] Migrar pastas de topo restantes, uma pasta por vez.
 
 ## Arquitetura Alvo
@@ -31,9 +33,11 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 ## Helper De Snippets De Código
 
 - [x] Criar overloads em `TutorialConsole` para arquivo, tipo e membros selecionados.
+- [x] Criar overload para ranges selecionados de um membro com `CodeExcerpt`.
 - [x] Criar leitor textual mínimo em `CSharpCodePortfolio.Shared`, sem Roslyn.
-- [x] Cobrir arquivo inteiro, tipo inteiro, construtor, property, método e erros claros com MSTest.
-- [x] Migrar somente o Tutorial01 para o novo helper.
+- [x] Cobrir arquivo inteiro, tipo inteiro, construtor, property, método, ranges e erros claros com MSTest.
+- [x] Migrar o Tutorial01 para snippets reais com ranges selecionados.
+- [x] Migrar o Tutorial02 para snippets reais com ranges selecionados.
 - [ ] Migrar os demais tutoriais somente após feedback do usuário, um tutorial por ciclo.
 
 ## Ordem De Migração Por Pasta
