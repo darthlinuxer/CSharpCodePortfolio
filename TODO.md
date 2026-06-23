@@ -332,6 +332,20 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `AspNet5 with Identity Framework`
+
+- [x] Criar worktree limpa para `AspNet5 with Identity Framework`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Adicionar teste `net10.0` para validar hash de senha, confirmação de e-mail, claims/policies e contrato de access token.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código

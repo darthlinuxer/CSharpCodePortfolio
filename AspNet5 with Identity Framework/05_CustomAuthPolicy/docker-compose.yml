@@ -1,8 +1,0 @@
-services:
-  email:
-    image: jijiechen/papercut:latest
-    ports:
-      - "37408:37408"
-      - "25:25"
-
-    
