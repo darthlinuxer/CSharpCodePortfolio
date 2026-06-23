@@ -24,6 +24,7 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
             "O tempo total do fluxo assíncrono tende a se aproximar da operação mais longa, não da soma de todas as esperas.");
         TutorialConsole.WritePreparation(
             "O cenário prepara chá com `Task.Delay`: primeiro bloqueando a espera da chaleira, depois usando `await`.",
+            "Os blocos de código exibidos abaixo são lidos dos métodos reais desta classe de tutorial.",
             "Os tempos são curtos para a execução do tutorial, mas a relação é a mesma de chamadas HTTP, disco, banco de dados ou mensageria.");
 
         TutorialConsole.WriteExperiment(
@@ -31,13 +32,9 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
             "Fluxo síncrono bloqueante",
             "A chaleira termina antes de qualquer preparo das xícaras começar.");
         TutorialConsole.WriteCodeSnippet(
-            "O trabalho independente fica preso atrás da espera.",
-            "FluxoSincrono.cs",
-            """
-            var water = BoilWater();
-            PrepareCups();
-            return $"Pour {water} in cups";
-            """);
+            "Código real: o trabalho independente fica preso atrás da espera.",
+            typeof(AsyncAwaitTaskTutorial),
+            nameof(BrewTeaSynchronously));
 
         var syncRun = BrewTeaSynchronously();
         TutorialConsole.WriteEvidence(
@@ -54,14 +51,9 @@ public sealed class AsyncAwaitTaskTutorial : ITutorial
             "Fluxo async/await",
             "A Task da chaleira começa, as xícaras são preparadas, e só então o código aguarda a água.");
         TutorialConsole.WriteCodeSnippet(
-            "O trabalho independente acontece antes do await final.",
-            "FluxoAssincrono.cs",
-            """
-            var boilingWater = BoilWaterAsync(cancellationToken);
-            await PrepareCupsAsync(cancellationToken);
-            var water = await boilingWater;
-            return $"Pour {water} in cups";
-            """);
+            "Código real: o trabalho independente acontece antes do await final.",
+            typeof(AsyncAwaitTaskTutorial),
+            nameof(BrewTeaAsync));
 
         var asyncRun = await BrewTeaAsync(cancellationToken).ConfigureAwait(false);
         TutorialConsole.WriteEvidence(

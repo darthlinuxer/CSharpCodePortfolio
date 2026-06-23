@@ -79,6 +79,33 @@ public static class TutorialConsole
     /// <summary>
     /// Writes a curated code snippet.
     /// </summary>
+    public static void WriteCodeSnippet(string title, string relativePath)
+    {
+        var snippet = CodeSnippetReader.ReadFile(relativePath);
+        WriteCodeSnippet(title, snippet.FileName, snippet.Code);
+    }
+
+    /// <summary>
+    /// Writes the source block for a type.
+    /// </summary>
+    public static void WriteCodeSnippet(string title, Type type)
+    {
+        var snippet = CodeSnippetReader.ReadType(type);
+        WriteCodeSnippet(title, snippet.FileName, snippet.Code);
+    }
+
+    /// <summary>
+    /// Writes selected source members from a type.
+    /// </summary>
+    public static void WriteCodeSnippet(string title, Type type, params string[] memberNames)
+    {
+        var snippet = CodeSnippetReader.ReadMembers(type, memberNames);
+        WriteCodeSnippet(title, snippet.FileName, snippet.Code);
+    }
+
+    /// <summary>
+    /// Writes a curated code snippet.
+    /// </summary>
     public static void WriteCodeSnippet(string title, string fileName, string code)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);

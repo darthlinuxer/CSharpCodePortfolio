@@ -210,3 +210,13 @@
 - [x] Commitar e mergear.
 - [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
+
+## Piloto Concluído: Helper De Snippets De Código
+
+- [x] Definir escopo do piloto no `src/` raiz, sem alterar `EFCore10/src`.
+- [x] Criar helper compartilhada para ler snippets de arquivo, tipo e membros selecionados.
+- [x] Manter compatível o overload antigo `WriteCodeSnippet(title, fileName, code)`.
+- [x] Migrar somente `AsyncAwaitTaskTutorial` para ler os métodos reais `BrewTeaSynchronously` e `BrewTeaAsync`.
+- [x] Adicionar projeto MSTest para `CSharpCodePortfolio.Shared`.
+- [x] Validar arquivo inteiro, tipo inteiro, construtor, property, método e erros claros.
+- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

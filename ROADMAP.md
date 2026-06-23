@@ -15,15 +15,26 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] Criar `src/CSharpCodePortfolio.Tutorials.Abstractions`.
 - [x] Criar launcher externo para `EFCore10`.
 - [x] Criar template local `portfolio-tutorial`.
+- [x] Criar helper compartilhada para imprimir snippets de código reais no console.
+- [x] Aplicar a helper no Tutorial01 como piloto.
+- [ ] Aguardar feedback do usuário antes de aplicar a helper nos demais tutoriais.
 - [ ] Migrar pastas de topo restantes, uma pasta por vez.
 
 ## Arquitetura Alvo
 
 - `CSharpCodePortfolio.App`: CLI raiz com comandos `menu`, `list` e `run <id-or-slug>`.
-- `CSharpCodePortfolio.Shared`: UI de console compartilhada para tutoriais do portfolio.
+- `CSharpCodePortfolio.Shared`: UI de console compartilhada e leitor de snippets reais para tutoriais do portfolio.
 - `CSharpCodePortfolio.Tutorials.Abstractions`: contrato mínimo de descoberta por atributo e execução.
 - `EFCore10`: permanece como workspace independente; o host raiz executa o menu dele via `dotnet run --project EFCore10/src/EFCore10.App -- menu`.
 - `templates/portfolio-tutorial`: template local para novas migrações de pastas.
+
+## Helper De Snippets De Código
+
+- [x] Criar overloads em `TutorialConsole` para arquivo, tipo e membros selecionados.
+- [x] Criar leitor textual mínimo em `CSharpCodePortfolio.Shared`, sem Roslyn.
+- [x] Cobrir arquivo inteiro, tipo inteiro, construtor, property, método e erros claros com MSTest.
+- [x] Migrar somente o Tutorial01 para o novo helper.
+- [ ] Migrar os demais tutoriais somente após feedback do usuário, um tutorial por ciclo.
 
 ## Ordem De Migração Por Pasta
 
