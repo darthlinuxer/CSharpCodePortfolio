@@ -241,7 +241,7 @@ public static class CodeSnippetReader
 
         return memberName == typeName
             ? Regex.IsMatch(trimmed, $@"\b{Regex.Escape(typeName)}\s*\(")
-            : Regex.IsMatch(trimmed, $@"\b{Regex.Escape(memberName)}\b\s*(?:\(|\{{|=>|;)");
+            : Regex.IsMatch(trimmed, $@"\b{Regex.Escape(memberName)}\b\s*(?:\(|\{{|=>|=|;)");
     }
 
     private static int FindMatchingBrace(string code, int openBrace)

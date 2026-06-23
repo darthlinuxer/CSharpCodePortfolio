@@ -59,6 +59,19 @@ public sealed class CodeSnippetReaderTests
     }
 
     [TestMethod]
+    public void ReadMemberExcerpts_WithFieldInitializer_ReturnsSelectedLines()
+    {
+        var snippets = CodeSnippetReader.ReadMemberExcerpts(
+            typeof(SnippetSubject),
+            nameof(SnippetSubject.Tags),
+            new CodeExcerpt(1, 5, "Tags"));
+
+        Assert.HasCount(1, snippets);
+        Assert.Contains("public static readonly string[] Tags =", snippets[0].Code);
+        Assert.Contains("\"two\"", snippets[0].Code);
+    }
+
+    [TestMethod]
     public void ReadMemberExcerpts_WithRangePastMemberEnd_ThrowsArgumentOutOfRange()
     {
         var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
@@ -99,6 +112,12 @@ public sealed class CodeSnippetReaderTests
 
 internal sealed class SnippetSubject
 {
+    public static readonly string[] Tags =
+    [
+        "one",
+        "two"
+    ];
+
     public SnippetSubject(string name)
     {
         Name = name;

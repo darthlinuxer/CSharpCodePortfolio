@@ -41,16 +41,10 @@ public sealed class LambdaValidatorsTutorial : ITutorial
             "Regras como lambdas",
             "Define predicados pequenos que podem ser combinados para validar o mesmo objeto.");
         TutorialConsole.WriteCodeSnippet(
-            "Cada lambda recebe uma pessoa e retorna `true` ou `false`.",
-            "PersonRules.cs",
-            """
-            private static readonly (string Name, Predicate<Person> Rule)[] Rules =
-            [
-                ("Nome informado", person => !string.IsNullOrWhiteSpace(person.Name)),
-                ("Idade positiva", person => person.Age > 0),
-                ("E-mail em formato básico", person => EmailRegex.IsMatch(person.Email))
-            ];
-            """);
+            "Código real: cada lambda recebe uma pessoa e retorna `true` ou `false`.",
+            typeof(LambdaValidatorsTutorial),
+            nameof(Rules),
+            new CodeExcerpt(1, 6, "Predicados nomeados"));
 
         var validReport = Validate(new Person("Camila", 32, "camila@example.com"));
         var invalidReport = Validate(new Person("Camilo", -1, "camilo@example.com"));
@@ -66,15 +60,15 @@ public sealed class LambdaValidatorsTutorial : ITutorial
             "Composição das regras",
             "Executa todas as regras e calcula o resultado final com `All`.");
         TutorialConsole.WriteCodeSnippet(
-            "O resultado final depende de todas as regras.",
-            "Validator.cs",
-            """
-            var outcomes = Rules
-                .Select(rule => new RuleOutcome(rule.Name, rule.Rule(person)))
-                .ToArray();
-
-            var isValid = outcomes.All(static outcome => outcome.Passed);
-            """);
+            "Código real: cada regra gera um resultado individual.",
+            typeof(LambdaValidatorsTutorial),
+            nameof(Validate),
+            new CodeExcerpt(3, 7, "Execução das regras"));
+        TutorialConsole.WriteCodeSnippet(
+            "Código real: o resultado final depende de todas as regras.",
+            typeof(ValidationReport),
+            nameof(ValidationReport.IsValid),
+            new CodeExcerpt(1, 1, "Todas as regras precisam passar"));
         TutorialConsole.WriteEvidence(
             "Pessoa reprovada",
             ("Entrada", Describe(invalidReport.Person)),

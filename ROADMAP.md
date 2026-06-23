@@ -25,6 +25,8 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] Aplicar a helper no Tutorial04 após validação do Tutorial03.
 - [x] Receber feedback do usuário para prosseguir após o Tutorial04.
 - [x] Aplicar a helper no Tutorial05 após validação do Tutorial04.
+- [x] Receber feedback do usuário para prosseguir após o Tutorial05.
+- [x] Aplicar a helper no Tutorial06 após validação do Tutorial05.
 - [ ] Aguardar feedback do usuário antes de aplicar a helper nos tutoriais restantes.
 - [ ] Migrar pastas de topo restantes, uma pasta por vez.
 
@@ -47,6 +49,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] Migrar o Tutorial03 para snippets reais com ranges selecionados.
 - [x] Migrar o Tutorial04 para snippets reais com ranges selecionados.
 - [x] Migrar o Tutorial05 para snippets reais com ranges selecionados.
+- [x] Migrar o Tutorial06 para snippets reais com ranges selecionados.
 - [ ] Migrar os demais tutoriais somente após feedback do usuário, um tutorial por ciclo.
 
 ## Ordem De Migração Por Pasta
