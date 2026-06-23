@@ -88,7 +88,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `MockHttpClient`
 - [x] `MassTransitConsole`
 - [x] `ASP.NET`
-- [ ] `RazorTest`
+- [x] `RazorTest`
 - [ ] `RavenConnection`
 - [ ] `AspNet5 with Identity Framework`
 - [ ] `Minimum OpenID Server`

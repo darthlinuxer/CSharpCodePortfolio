@@ -1,0 +1,11 @@
+@page
+@model CSharpCodePortfolio.Tutorials.Tutorial23.Pages.IndexModel
+@{
+    ViewData["Title"] = "Página inicial";
+}
+
+<section data-page="index">
+    <h1>@Model.Heading</h1>
+    <p>@Model.Message</p>
+    <p>Renderizado pelo PageModel em @Model.RenderedAt.</p>
+</section>

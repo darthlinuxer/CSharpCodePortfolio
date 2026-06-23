@@ -304,6 +304,20 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `RazorTest`
+
+- [x] Criar worktree limpa para `RazorTest`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Adicionar teste `net10.0` para validar Razor Pages, PageModel, layout e roteamento.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código
