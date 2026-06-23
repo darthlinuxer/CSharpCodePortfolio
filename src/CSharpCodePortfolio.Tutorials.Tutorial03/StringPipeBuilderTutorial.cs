@@ -33,19 +33,10 @@ public sealed class StringPipeBuilderTutorial : ITutorial
             "Construção recursiva",
             "O builder cria a ação terminal e volta empilhando cada pipe por cima da próxima ação.");
         TutorialConsole.WriteCodeSnippet(
-            "A recursão para no fim da lista e volta compondo as etapas.",
-            "StringPipeBuilder.cs",
-            """
-            Action<string> BuildAt(int index, Action<string> terminal, List<string> trace)
-            {
-                if (index == _steps.Count)
-                    return terminal;
-
-                var step = _steps[index];
-                var next = BuildAt(index + 1, terminal, trace);
-                return value => next(step.Transform(value));
-            }
-            """);
+            "Código real: a recursão para no fim da lista e volta compondo as etapas.",
+            typeof(StringPipeBuilder),
+            "BuildAt",
+            new CodeExcerpt(3, 15, "Caso base, próxima etapa e delegate composto"));
 
         var execution = builder.Run("   Olá, pipes!   ");
         EnsureExpectedResult(execution);

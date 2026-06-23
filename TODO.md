@@ -237,7 +237,7 @@
 - [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
-## Ciclo Atual: Helper De Snippets De Código
+## Ciclo Concluído: Helper De Snippets De Código
 
 - [x] Definir escopo do piloto no `src/` raiz, sem alterar `EFCore10/src`.
 - [x] Criar helper compartilhada para ler snippets de arquivo, tipo e membros selecionados.
@@ -247,4 +247,11 @@
 - [x] Refatorar `ClientServerSocketTutorial` para ler ranges reais de `RunSocketExchangeAsync` e `SendAndReceiveAsync`.
 - [x] Adicionar projeto MSTest para `CSharpCodePortfolio.Shared`.
 - [x] Validar arquivo inteiro, tipo inteiro, construtor, property, método, ranges e erros claros.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial03
+
+- [x] Refatorar `StringPipeBuilderTutorial` para ler range real de `StringPipeBuilder.BuildAt`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 03`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
