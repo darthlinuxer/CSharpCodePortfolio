@@ -35,15 +35,10 @@ public sealed class AnonymousPipesTutorial : ITutorial
             "Servidor anônimo",
             "Cria o lado leitor e obtém o handle que será entregue ao escritor.");
         TutorialConsole.WriteCodeSnippet(
-            "O servidor não publica um nome; ele compartilha o handle do cliente.",
-            "ServidorAnonymousPipe.cs",
-            """
-            await using var pipeReader = new AnonymousPipeServerStream(
-                PipeDirection.In,
-                HandleInheritability.None);
-
-            var clientHandle = pipeReader.GetClientHandleAsString();
-            """);
+            "Código real: o servidor não publica um nome; ele compartilha o handle do cliente.",
+            typeof(AnonymousPipesTutorial),
+            nameof(RunExchangeAsync),
+            new CodeExcerpt(3, 7, "Criação do leitor e handle do cliente"));
 
         var exchange = await RunExchangeAsync(cancellationToken).ConfigureAwait(false);
 
@@ -58,15 +53,15 @@ public sealed class AnonymousPipesTutorial : ITutorial
             "Cliente escritor",
             "Abre o lado de saída com o handle recebido e envia linhas até a mensagem de término.");
         TutorialConsole.WriteCodeSnippet(
-            "O cliente usa o handle para construir seu stream de saída.",
-            "ClienteAnonymousPipe.cs",
-            """
-            await using var pipeWriter = new AnonymousPipeClientStream(
-                PipeDirection.Out,
-                clientHandle);
-
-            await writer.WriteLineAsync(message.AsMemory(), cancellationToken);
-            """);
+            "Código real: o cliente usa o handle para construir seu stream de saída.",
+            typeof(AnonymousPipesTutorial),
+            nameof(RunExchangeAsync),
+            new CodeExcerpt(8, 10, "Abertura do lado escritor com o handle"));
+        TutorialConsole.WriteCodeSnippet(
+            "Código real: o cliente escreve cada linha no pipe.",
+            typeof(AnonymousPipesTutorial),
+            nameof(WriteMessagesAsync),
+            new CodeExcerpt(14, 17, "Envio das mensagens até o marcador final"));
         TutorialConsole.WriteEvidence(
             "Cliente",
             ("Direção", "saída"),
