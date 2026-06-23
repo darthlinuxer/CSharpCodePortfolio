@@ -75,7 +75,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `Dependency Inversion using Constructor and Property Dependency Injection Services`
 - [x] `DotNet ZIP Library`
 - [x] `Unit Tests using Reflection and Moq`
-- [ ] `ExposeInternalsToTest`
+- [x] `ExposeInternalsToTest`
 - [ ] `MockHttpClient`
 - [ ] `MassTransitConsole`
 - [ ] `ASP.NET`

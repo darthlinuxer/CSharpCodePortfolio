@@ -248,6 +248,20 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `ExposeInternalsToTest`
+
+- [x] Criar worktree limpa para `ExposeInternalsToTest`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Adicionar teste `net10.0` para validar `InternalsVisibleTo` entre assemblies.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código
@@ -289,10 +303,9 @@
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 06`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
-
-## Ciclo Atual: Helper No Tutorial07
+## Ciclo Concluído: Helper No Tutorial07
 
 - [x] Refatorar `ReflectionAttributesTutorial` para ler ranges reais de `ExecuteWithSwitch` e `ExecuteWithReflection`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 07`.
-- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
