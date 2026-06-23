@@ -209,6 +209,19 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `Dependency Inversion using Constructor and Property Dependency Injection Services`
+
+- [x] Criar worktree limpa para `Dependency Inversion using Constructor and Property Dependency Injection Services`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Atual: Helper De Snippets De Código
@@ -216,7 +229,7 @@
 - [x] Definir escopo do piloto no `src/` raiz, sem alterar `EFCore10/src`.
 - [x] Criar helper compartilhada para ler snippets de arquivo, tipo e membros selecionados.
 - [x] Adicionar `CodeExcerpt` para imprimir ranges 1-based de um membro com legenda opcional.
-- [x] Manter compatível o overload antigo `WriteCodeSnippet(title, fileName, code)`.
+- [x] Manter compatível o overload existente `WriteCodeSnippet(title, fileName, code)`.
 - [x] Refatorar `AsyncAwaitTaskTutorial` para ler ranges reais de `BrewTeaSynchronously` e `BrewTeaAsync`.
 - [x] Refatorar `ClientServerSocketTutorial` para ler ranges reais de `RunSocketExchangeAsync` e `SendAndReceiveAsync`.
 - [x] Adicionar projeto MSTest para `CSharpCodePortfolio.Shared`.

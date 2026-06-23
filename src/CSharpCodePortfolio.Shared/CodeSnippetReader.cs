@@ -153,7 +153,7 @@ public static class CodeSnippetReader
 
         var sourceFile = Directory
             .EnumerateFiles(repositoryRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(IsSourceFile)
+            .Where(path => IsSourceFile(repositoryRoot, path))
             .FirstOrDefault(path => TypeDeclarationRegex(type.Name).IsMatch(File.ReadAllText(path)));
 
         if (sourceFile is null)
@@ -290,12 +290,14 @@ public static class CodeSnippetReader
         return null;
     }
 
-    private static bool IsSourceFile(string path)
+    private static bool IsSourceFile(string repositoryRoot, string path)
     {
-        var normalized = path.Replace(Path.DirectorySeparatorChar, '/');
-        return !normalized.Contains("/bin/", StringComparison.Ordinal)
-            && !normalized.Contains("/obj/", StringComparison.Ordinal)
-            && !normalized.Contains("/.worktrees/", StringComparison.Ordinal);
+        var normalized = Path.GetRelativePath(repositoryRoot, path).Replace(Path.DirectorySeparatorChar, '/');
+        var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        return !segments.Contains("bin")
+            && !segments.Contains("obj")
+            && !segments.Contains(".worktrees");
     }
 
     private static string ToRelativePath(string repositoryRoot, string path)

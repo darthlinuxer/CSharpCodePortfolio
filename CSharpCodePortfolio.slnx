@@ -18,6 +18,7 @@
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial13/CSharpCodePortfolio.Tutorials.Tutorial13.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial14/CSharpCodePortfolio.Tutorials.Tutorial14.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial15/CSharpCodePortfolio.Tutorials.Tutorial15.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial16/CSharpCodePortfolio.Tutorials.Tutorial16.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CSharpCodePortfolio.Shared.Tests/CSharpCodePortfolio.Shared.Tests.csproj" />
