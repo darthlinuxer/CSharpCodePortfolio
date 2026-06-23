@@ -37,7 +37,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `Replace If-Then-Else for complex objects (using Reflection)`
 - [x] `Replacing If-Then-Else using Pipe Builder structure (simple input types)`
 - [x] `Replacing If-Then-Else for complex objects using Pipe Structure`
-- [ ] `Complete In-Memory IRepository without EF Library`
+- [x] `Complete In-Memory IRepository without EF Library`
 - [ ] `InMemory EFCore without IRepository`
 - [ ] `InMemory EFCore using Services`
 - [ ] `Complete IRepository with InMemory EFCore`
