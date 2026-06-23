@@ -249,9 +249,16 @@
 - [x] Validar arquivo inteiro, tipo inteiro, construtor, property, método, ranges e erros claros.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial03
+## Ciclo Concluído: Helper No Tutorial03
 
 - [x] Refatorar `StringPipeBuilderTutorial` para ler range real de `StringPipeBuilder.BuildAt`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 03`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial04
+
+- [x] Refatorar `NamedPipesTutorial` para ler ranges reais de `RunServerAsync` e `RunClientAsync`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 04`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

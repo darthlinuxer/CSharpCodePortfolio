@@ -35,18 +35,10 @@ public sealed class NamedPipesTutorial : ITutorial
             "Servidor nomeado",
             "Cria um `NamedPipeServerStream`, aguarda o cliente e responde a cada linha recebida.");
         TutorialConsole.WriteCodeSnippet(
-            "O servidor publica o nome do pipe e espera uma conexão.",
-            "ServidorNamedPipe.cs",
-            """
-            await using var server = new NamedPipeServerStream(
-                pipeName,
-                PipeDirection.InOut,
-                maxNumberOfServerInstances: 1,
-                PipeTransmissionMode.Byte,
-                PipeOptions.Asynchronous);
-
-            await server.WaitForConnectionAsync(cancellationToken);
-            """);
+            "Código real: o servidor publica o nome do pipe e espera uma conexão.",
+            typeof(NamedPipesTutorial),
+            nameof(RunServerAsync),
+            new CodeExcerpt(5, 12, "Criação do servidor e espera pelo cliente"));
 
         var exchange = await RunExchangeAsync(cancellationToken).ConfigureAwait(false);
 
@@ -61,19 +53,11 @@ public sealed class NamedPipesTutorial : ITutorial
             "Cliente do pipe",
             "Conecta ao nome publicado, envia uma linha e lê a confirmação do servidor.");
         TutorialConsole.WriteCodeSnippet(
-            "O cliente usa o mesmo nome para abrir o stream.",
-            "ClienteNamedPipe.cs",
-            """
-            await using var client = new NamedPipeClientStream(
-                ".",
-                pipeName,
-                PipeDirection.InOut,
-                PipeOptions.Asynchronous);
-
-            await client.ConnectAsync(cancellationToken);
-            await writer.WriteLineAsync(message);
-            var reply = await reader.ReadLineAsync(cancellationToken);
-            """);
+            "Código real: o cliente usa o mesmo nome para abrir o stream.",
+            typeof(NamedPipesTutorial),
+            nameof(RunClientAsync),
+            new CodeExcerpt(5, 11, "Abertura do cliente e conexão ao pipe"),
+            new CodeExcerpt(19, 22, "Envio, leitura da resposta e encerramento"));
         TutorialConsole.WriteEvidence(
             "Cliente",
             ("Mensagem enviada", exchange.ClientSentMessage),
