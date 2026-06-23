@@ -24,7 +24,7 @@ internal static class RavenDocumentStoreFactory
 
         var urls = SelectUrls(settings, runningInContainer);
 
-        // ponytail: do not call Initialize here; tests prove deterministic wiring without requiring a RavenDB server.
+        // ponytail: sem Initialize aqui; o teste valida a configuração sem exigir um servidor RavenDB.
         return new DocumentStore
         {
             Urls = urls.ToArray(),

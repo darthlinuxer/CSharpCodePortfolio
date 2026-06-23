@@ -18,8 +18,8 @@ public sealed class RavenDbConnectionTutorial : ITutorial
             ("Slug", "raven-db-connection"));
         TutorialConsole.WriteQuestion("Como preparar uma conexão RavenDB sem espalhar configuração e sessões pelo código?");
         TutorialConsole.WriteHypothesis(
-            "A configuração separa URLs do host e de container para evitar decisões espalhadas.",
-            "O `DocumentStore` concentra database e convenções de sessão.",
+            "A configuração separa URLs do host e do contêiner para evitar decisões espalhadas.",
+            "O `DocumentStore` concentra banco de dados e convenções de sessão.",
             "O CRUD fica previsível quando cada operação abre sessão, executa o comando e confirma com `SaveChanges`.");
         TutorialConsole.WritePreparation(
             "`RavenConnectionScenario` usa a mesma configuração do tutorial, mas não exige servidor RavenDB ativo.",
@@ -29,7 +29,7 @@ public sealed class RavenDbConnectionTutorial : ITutorial
         TutorialConsole.WriteExperiment(
             1,
             "Configuração por ambiente",
-            "Seleciona URLs diferentes quando o código roda no host ou dentro de container.");
+            "Seleciona URLs diferentes quando o código roda no host ou dentro de um contêiner.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: a seleção de URLs fica em um ponto único.",
             typeof(RavenDocumentStoreFactory),
@@ -38,16 +38,16 @@ public sealed class RavenDbConnectionTutorial : ITutorial
         TutorialConsole.WriteExperiment(
             2,
             "DocumentStore",
-            "Cria o store com database, URLs e convenções de sessão antes da conexão com o servidor.");
+            "Cria o store com banco de dados, URLs e convenções de sessão antes da conexão com o servidor.");
         TutorialConsole.WriteCodeSnippet(
-            "Código real: o store recebe URLs, database e convenções de sessão.",
+            "Código real: o store recebe URLs, banco de dados e convenções de sessão.",
             typeof(RavenDocumentStoreFactory),
             nameof(RavenDocumentStoreFactory.CreateConfiguredStore));
 
         TutorialConsole.WriteExperiment(
             3,
             "Fluxo de sessão",
-            "Representa o caminho usado por endpoints de criação, consulta paginada e carregamento por id.");
+            "Representa o caminho usado por endpoints de criação, consulta paginada e carregamento por ID.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: o roteiro mostra a ordem esperada de uma sessão RavenDB.",
             typeof(RavenSessionFlow),
@@ -57,9 +57,9 @@ public sealed class RavenDbConnectionTutorial : ITutorial
 
         TutorialConsole.WriteEvidence(
             "Store configurado",
-            ("Database", report.Database),
+            ("Banco de dados", report.Database),
             ("URL no host", string.Join(" | ", report.HostUrls)),
-            ("URL em container", string.Join(" | ", report.ContainerUrls)),
+            ("URL no contêiner", string.Join(" | ", report.ContainerUrls)),
             ("Requisições por sessão", report.MaxRequestsPerSession.ToString()),
             ("Concorrência otimista", report.UseOptimisticConcurrency ? "Sim" : "Não"));
         TutorialConsole.WriteEvidence(
@@ -75,7 +75,7 @@ public sealed class RavenDbConnectionTutorial : ITutorial
             "tests/CSharpCodePortfolio.Tutorials.Tutorial24.Tests/RavenConnectionScenarioTests.cs");
 
         TutorialConsole.WriteObservation(
-            "A criação real da database e as operações de rede pertencem ao ambiente que tem RavenDB disponível; o tutorial valida a parte que deve ser determinística no código.");
+            "A criação real do banco de dados e as operações de rede pertencem ao ambiente que tem RavenDB disponível; o tutorial valida a parte que deve ser determinística no código.");
         TutorialConsole.WriteConclusion(
             "A conexão RavenDB fica controlável quando configuração, `DocumentStore` e fluxo de sessão têm responsabilidades pequenas e verificáveis.",
             TutorialConclusionKind.Success);
