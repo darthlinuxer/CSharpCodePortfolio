@@ -32,11 +32,9 @@ public sealed class ComplexPipeBuilderTutorial : ITutorial
             "Consulta propriedades do mesmo objeto em blocos condicionais independentes.");
         TutorialConsole.WriteCodeSnippet(
             "Cada nova regra adiciona mais uma decisão ao mesmo ponto do código.",
-            "DirectPersonChecks.cs",
-            """
-            if (person.Name == "Camilo") messages.Add("Pessoa identificada como Camilo");
-            if (person.Name == "Aline") messages.Add("Pessoa identificada como Aline");
-            """);
+            typeof(ComplexPipeBuilderTutorial),
+            nameof(ExecuteDirectChecks),
+            new CodeExcerpt(5, 13, "Condições diretas"));
 
         var directMessages = ExecuteDirectChecks(person);
         TutorialConsole.WriteEvidence(
@@ -50,13 +48,9 @@ public sealed class ComplexPipeBuilderTutorial : ITutorial
             "Registra tipos de condição, constrói a cadeia e executa apenas os testes aprovados.");
         TutorialConsole.WriteCodeSnippet(
             "O builder concentra a composição das regras sem misturar as ações em um bloco condicional único.",
-            "IfBuilder.cs",
-            """
-            var matchedConditions = new IfBuilder(person)
-                .AddCheckCondition(typeof(PersonNameIsCamiloCondition))
-                .AddCheckCondition(typeof(PersonNameIsAlineCondition))
-                .Build();
-            """);
+            typeof(ComplexPipeBuilderTutorial),
+            nameof(ExecutePipeBuilder),
+            new CodeExcerpt(3, 7, "Registro e execução da cadeia"));
 
         var pipeReport = ExecutePipeBuilder(person);
         TutorialConsole.WriteEvidence(

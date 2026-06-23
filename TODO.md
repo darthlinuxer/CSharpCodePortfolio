@@ -290,7 +290,7 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
-- [ ] Aguardar feedback do usuário.
+- [x] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código
 
@@ -352,3 +352,10 @@
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 09`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial10
+
+- [x] Refatorar `ComplexPipeBuilderTutorial` para ler ranges reais de `ExecuteDirectChecks` e `ExecutePipeBuilder`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 10`.
+- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
