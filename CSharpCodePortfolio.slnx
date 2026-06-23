@@ -16,5 +16,6 @@
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial11/CSharpCodePortfolio.Tutorials.Tutorial11.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial12/CSharpCodePortfolio.Tutorials.Tutorial12.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial13/CSharpCodePortfolio.Tutorials.Tutorial13.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial14/CSharpCodePortfolio.Tutorials.Tutorial14.csproj" />
   </Folder>
 </Solution>

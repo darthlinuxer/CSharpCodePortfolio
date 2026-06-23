@@ -40,7 +40,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `Complete In-Memory IRepository without EF Library`
 - [x] `InMemory EFCore without IRepository`
 - [x] `InMemory EFCore using Services`
-- [ ] `Complete IRepository with InMemory EFCore`
+- [x] `Complete IRepository with InMemory EFCore`
 - [ ] `Dependency Injection .NET Core using Services`
 - [ ] `Dependency Inversion using Constructor and Property Dependency Injection Services`
 - [ ] `DotNet ZIP Library`
