@@ -283,9 +283,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 05`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial06
+## Ciclo Concluído: Helper No Tutorial06
 
 - [x] Refatorar `LambdaValidatorsTutorial` para ler ranges reais de `Rules`, `Validate` e `ValidationReport.IsValid`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 06`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial07
+
+- [x] Refatorar `ReflectionAttributesTutorial` para ler ranges reais de `ExecuteWithSwitch` e `ExecuteWithReflection`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 07`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

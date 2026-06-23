@@ -72,6 +72,19 @@ public sealed class CodeSnippetReaderTests
     }
 
     [TestMethod]
+    public void ReadMemberExcerpts_WithExpressionBodiedSwitch_IncludesClosingSemicolon()
+    {
+        var snippets = CodeSnippetReader.ReadMemberExcerpts(
+            typeof(SnippetSubject),
+            nameof(SnippetSubject.Label),
+            new CodeExcerpt(1, 5, "Switch"));
+
+        Assert.HasCount(1, snippets);
+        Assert.Contains("public static string Label(int value) => value switch", snippets[0].Code);
+        Assert.Contains("};", snippets[0].Code);
+    }
+
+    [TestMethod]
     public void ReadMemberExcerpts_WithRangePastMemberEnd_ThrowsArgumentOutOfRange()
     {
         var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
@@ -129,4 +142,10 @@ internal sealed class SnippetSubject
     {
         return $"Subject: {Name}";
     }
+
+    public static string Label(int value) => value switch
+    {
+        1 => "one",
+        _ => "other"
+    };
 }

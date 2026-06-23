@@ -203,7 +203,13 @@ public static class CodeSnippetReader
         }
 
         var closeBrace = FindMatchingBrace(typeCode, openBrace);
-        return typeCode[start..(closeBrace + 1)].TrimEnd();
+        var end = closeBrace + 1;
+        if (end < typeCode.Length && typeCode[end] == ';')
+        {
+            end++;
+        }
+
+        return typeCode[start..end].TrimEnd();
     }
 
     private static int FindMemberStart(string typeCode, string typeName, string memberName)

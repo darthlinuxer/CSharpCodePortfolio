@@ -40,18 +40,10 @@ public sealed class ReflectionAttributesTutorial : ITutorial
             "Decisão centralizada",
             "Mapeia cada estado para uma ação em um único `switch`.");
         TutorialConsole.WriteCodeSnippet(
-            "O bloco precisa conhecer todos os estados aceitos.",
-            "SwitchStateRouter.cs",
-            """
-            private static StateActionResult ExecuteWithSwitch(WorkflowState state) => state switch
-            {
-                WorkflowState.Init => new StateActionResult(1, "Preparar fluxo"),
-                WorkflowState.Running => new StateActionResult(4, "Executar fluxo"),
-                WorkflowState.Closed => new StateActionResult(3, "Encerrar fluxo"),
-                WorkflowState.Cancelled => new StateActionResult(2, "Cancelar fluxo"),
-                _ => throw new ArgumentOutOfRangeException(nameof(state))
-            };
-            """);
+            "Código real: o bloco precisa conhecer todos os estados aceitos.",
+            typeof(ReflectionAttributesTutorial),
+            nameof(ExecuteWithSwitch),
+            new CodeExcerpt(1, 8, "Todos os estados ficam no switch"));
 
         var switchResult = ExecuteWithSwitch(state);
         TutorialConsole.WriteEvidence(
@@ -65,16 +57,10 @@ public sealed class ReflectionAttributesTutorial : ITutorial
             "Catálogo por atributos",
             "Localiza a ação cujo atributo declara o estado solicitado.");
         TutorialConsole.WriteCodeSnippet(
-            "A reflexão busca classes que implementam a ação e possuem o atributo do estado.",
-            "AttributeStateRouter.cs",
-            """
-            var actionType = Assembly.GetExecutingAssembly()
-                .GetTypes()
-                .Where(IsConcreteStateAction)
-                .First(type => type.GetCustomAttribute<StateActionAttribute>()?.State == state);
-
-            var action = (IStateAction)Activator.CreateInstance(actionType, nonPublic: true)!;
-            """);
+            "Código real: a reflexão busca classes que implementam a ação e possuem o atributo do estado.",
+            typeof(ReflectionAttributesTutorial),
+            nameof(ExecuteWithReflection),
+            new CodeExcerpt(3, 8, "Busca do tipo e criação da ação"));
 
         var reflectionResult = ExecuteWithReflection(state);
         TutorialConsole.WriteEvidence(
