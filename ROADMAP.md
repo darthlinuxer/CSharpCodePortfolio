@@ -36,7 +36,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] Receber feedback do usuário para prosseguir após o Tutorial09.
 - [x] Aplicar a helper no Tutorial10 após validação do Tutorial09.
 - [ ] Aguardar feedback do usuário antes de aplicar a helper nos tutoriais restantes.
-- [ ] Migrar pastas de topo restantes, uma pasta por vez.
+- [x] Migrar pastas de topo restantes, uma pasta por vez.
 
 ## Arquitetura Alvo
 
@@ -93,7 +93,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `AspNet5 with Identity Framework`
 - [x] `Minimum OpenID Server`
 - [x] `Sending Emails with Gmail`
-- [ ] `Parallelism`
+- [x] `Parallelism`
 
 ## Regra De Execucao Para Cada Pasta
 
