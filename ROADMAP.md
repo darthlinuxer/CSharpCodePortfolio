@@ -91,7 +91,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `RazorTest`
 - [x] `RavenConnection`
 - [x] `AspNet5 with Identity Framework`
-- [ ] `Minimum OpenID Server`
+- [x] `Minimum OpenID Server`
 - [ ] `Sending Emails with Gmail`
 - [ ] `Parallelism`
 
