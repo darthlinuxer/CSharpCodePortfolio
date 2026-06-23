@@ -263,9 +263,9 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 04`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial05
+## Ciclo Concluído: Helper No Tutorial05
 
 - [x] Refatorar `AnonymousPipesTutorial` para ler ranges reais de `RunExchangeAsync` e `WriteMessagesAsync`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 05`.
-- [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
