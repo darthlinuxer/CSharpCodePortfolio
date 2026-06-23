@@ -54,10 +54,10 @@ internal static class MinimumOpenIdServerScenario
             ]);
     }
 
-    public static MinimumOpenIdServer CreateServer()
+    public static MinimumOpenIdServer CreateServer(Func<DateTimeOffset>? getNow = null)
     {
         return new MinimumOpenIdServer(
-            OpenIdServerOptions.TutorialDefaults(),
+            OpenIdServerOptions.TutorialDefaults(getNow),
             new OpenIdClient(
                 ClientId: "portfolio-console",
                 ClientSecret: "dev-secret",

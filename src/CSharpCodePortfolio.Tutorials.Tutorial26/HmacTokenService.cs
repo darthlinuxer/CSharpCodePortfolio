@@ -12,7 +12,7 @@ internal sealed class HmacTokenService(OpenIdServerOptions options)
         string scope,
         IReadOnlyDictionary<string, string> extraClaims)
     {
-        var now = options.IssuedAt;
+        var now = options.GetNow();
         var claims = new SortedDictionary<string, string>(StringComparer.Ordinal)
         {
             ["aud"] = audience,
@@ -69,7 +69,7 @@ internal sealed class HmacTokenService(OpenIdServerOptions options)
 
         if (!claims.TryGetValue("exp", out var expText)
             || !long.TryParse(expText, out var exp)
-            || DateTimeOffset.FromUnixTimeSeconds(exp) <= options.IssuedAt)
+            || DateTimeOffset.FromUnixTimeSeconds(exp) <= options.GetNow())
         {
             return TokenValidationResult.Fail("Token expirado.");
         }

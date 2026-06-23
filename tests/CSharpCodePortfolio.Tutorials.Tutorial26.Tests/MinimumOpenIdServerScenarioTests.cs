@@ -52,6 +52,23 @@ public sealed class MinimumOpenIdServerScenarioTests
     }
 
     [TestMethod]
+    public void Authorize_RejectsRequestWithoutOpenIdScope()
+    {
+        var server = MinimumOpenIdServerScenario.CreateServer();
+
+        var exception = Assert.ThrowsExactly<InvalidOperationException>(() => server.Authorize(new AuthorizationRequest(
+            "portfolio-console",
+            "https://client.local/callback",
+            "profile email",
+            "code",
+            "state-123",
+            Pkce.CreateChallenge("verifier-correto"),
+            "S256")));
+
+        Assert.AreEqual("A autorização OpenID mínima exige response_type=code e escopo openid.", exception.Message);
+    }
+
+    [TestMethod]
     public void Exchange_RejectsCodeReuse()
     {
         var server = MinimumOpenIdServerScenario.CreateServer();
@@ -81,6 +98,32 @@ public sealed class MinimumOpenIdServerScenarioTests
     }
 
     [TestMethod]
+    public void Exchange_RejectsExpiredCode()
+    {
+        var now = new DateTimeOffset(2026, 6, 23, 12, 0, 0, TimeSpan.Zero);
+        var server = MinimumOpenIdServerScenario.CreateServer(() => now);
+        var verifier = "portfolio-verifier-12345";
+        var authorization = server.Authorize(new AuthorizationRequest(
+            "portfolio-console",
+            "https://client.local/callback",
+            "openid profile email",
+            "code",
+            "state-123",
+            Pkce.CreateChallenge(verifier),
+            "S256"));
+
+        now = now.AddMinutes(6);
+
+        var exception = Assert.ThrowsExactly<InvalidOperationException>(() => server.Exchange(new TokenRequest(
+            "portfolio-console",
+            "dev-secret",
+            authorization.Code,
+            "https://client.local/callback",
+            verifier)));
+        Assert.AreEqual("Authorization code expirado ou emitido para outro redirect URI.", exception.Message);
+    }
+
+    [TestMethod]
     public void ValidateToken_RejectsTamperedToken()
     {
         var report = MinimumOpenIdServerScenario.Run();
@@ -90,5 +133,46 @@ public sealed class MinimumOpenIdServerScenarioTests
 
         Assert.IsFalse(validation.IsValid);
         Assert.AreEqual("Assinatura inválida.", validation.Error);
+    }
+
+    [TestMethod]
+    public void ValidateToken_RejectsExpiredAccessToken()
+    {
+        var now = new DateTimeOffset(2026, 6, 23, 12, 0, 0, TimeSpan.Zero);
+        var server = MinimumOpenIdServerScenario.CreateServer(() => now);
+        var verifier = "portfolio-verifier-12345";
+        var authorization = server.Authorize(new AuthorizationRequest(
+            "portfolio-console",
+            "https://client.local/callback",
+            "openid profile email",
+            "code",
+            "state-123",
+            Pkce.CreateChallenge(verifier),
+            "S256"));
+        var token = server.Exchange(new TokenRequest(
+            "portfolio-console",
+            "dev-secret",
+            authorization.Code,
+            "https://client.local/callback",
+            verifier));
+
+        now = now.AddMinutes(11);
+
+        var validation = server.ValidateToken(token.AccessToken, "access_token");
+
+        Assert.IsFalse(validation.IsValid);
+        Assert.AreEqual("Token expirado.", validation.Error);
+    }
+
+    [TestMethod]
+    public void ValidateToken_RejectsWrongTokenUse()
+    {
+        var report = MinimumOpenIdServerScenario.Run();
+        var validation = MinimumOpenIdServerScenario
+            .CreateServer()
+            .ValidateToken(report.Token.AccessToken, "id_token");
+
+        Assert.IsFalse(validation.IsValid);
+        Assert.AreEqual("Tipo de token inválido.", validation.Error);
     }
 }

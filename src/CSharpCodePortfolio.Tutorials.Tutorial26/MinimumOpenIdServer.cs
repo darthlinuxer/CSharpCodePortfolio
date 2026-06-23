@@ -57,7 +57,7 @@ internal sealed class MinimumOpenIdServer
             user.Subject,
             request.Scope,
             request.CodeChallenge,
-            options.IssuedAt.Add(options.CodeLifetime));
+            options.GetNow().Add(options.CodeLifetime));
 
         return new AuthorizationResult(
             BuildRedirectUri(request.RedirectUri, code, request.State),
@@ -77,7 +77,7 @@ internal sealed class MinimumOpenIdServer
             throw new InvalidOperationException("Authorization code inválido ou já utilizado.");
         }
 
-        if (grant.ExpiresAt <= options.IssuedAt || grant.RedirectUri != request.RedirectUri)
+        if (grant.ExpiresAt <= options.GetNow() || grant.RedirectUri != request.RedirectUri)
         {
             throw new InvalidOperationException("Authorization code expirado ou emitido para outro redirect URI.");
         }

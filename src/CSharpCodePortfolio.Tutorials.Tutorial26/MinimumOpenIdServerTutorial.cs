@@ -43,7 +43,9 @@ public sealed class MinimumOpenIdServerTutorial : ITutorial
         TutorialConsole.WriteCodeSnippet(
             "Código real: o authorization code fica vinculado ao cliente, redirect URI, usuário e code challenge.",
             typeof(MinimumOpenIdServer),
-            nameof(MinimumOpenIdServer.Authorize));
+            nameof(MinimumOpenIdServer.Authorize),
+            new CodeExcerpt(3, 22, "Validações do request"),
+            new CodeExcerpt(24, 37, "Emissão do authorization code"));
 
         TutorialConsole.WriteExperiment(
             3,
@@ -52,7 +54,9 @@ public sealed class MinimumOpenIdServerTutorial : ITutorial
         TutorialConsole.WriteCodeSnippet(
             "Código real: o token endpoint valida segredo, code, redirect URI e PKCE antes de emitir tokens.",
             typeof(MinimumOpenIdServer),
-            nameof(MinimumOpenIdServer.Exchange));
+            nameof(MinimumOpenIdServer.Exchange),
+            new CodeExcerpt(3, 21, "Validações do token endpoint"),
+            new CodeExcerpt(23, 34, "Emissão de id_token e access_token"));
         TutorialConsole.WriteCodeSnippet(
             "Código real: userinfo exige access_token válido.",
             typeof(MinimumOpenIdServer),
@@ -97,15 +101,7 @@ public sealed class MinimumOpenIdServerTutorial : ITutorial
             "Os testes validam discovery, PKCE, uso único do code, assinatura HMAC e userinfo.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: os testes travam o contrato principal do fluxo.",
-            "MinimumOpenIdServerScenarioTests.cs",
-            """
-            Assert.AreEqual("https://identity.local", report.Discovery.Issuer);
-            Assert.IsTrue(report.AuthorizationCodeReuseBlocked);
-            Assert.IsTrue(report.IdTokenValidation.IsValid);
-            Assert.IsTrue(report.AccessTokenValidation.IsValid);
-            Assert.AreEqual("ana.admin@portfolio.test", report.UserInfo.Email);
-            Assert.IsTrue(report.TamperedAccessTokenBlocked);
-            """);
+            "tests/CSharpCodePortfolio.Tutorials.Tutorial26.Tests/MinimumOpenIdServerScenarioTests.cs");
 
         TutorialConsole.WriteObservation(
             "Este tutorial ensina o contrato do fluxo. Um provedor real ainda precisa de HTTPS, armazenamento persistente, rotação de chaves, consentimento e proteção contra replay distribuído.");
