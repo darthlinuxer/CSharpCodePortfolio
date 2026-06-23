@@ -235,6 +235,19 @@
 - [x] Rodar validações da pasta.
 - [x] Commitar e mergear.
 - [x] Remover worktree.
+- [x] Aguardar feedback do usuário.
+
+## Pasta Concluída: `Unit Tests using Reflection and Moq`
+
+- [x] Criar worktree limpa para `Unit Tests using Reflection and Moq`.
+- [x] Criar `WORKTREE_GOAL.md` temporário.
+- [x] Identificar conceito principal da pasta.
+- [x] Migrar para tutorial/app `net10.0`.
+- [x] Remover arquivos sem função.
+- [x] Atualizar `ROADMAP.md` e este `TODO.md`.
+- [x] Rodar validações da pasta.
+- [x] Commitar e mergear.
+- [x] Remover worktree.
 - [ ] Aguardar feedback do usuário.
 
 ## Ciclo Concluído: Helper De Snippets De Código
