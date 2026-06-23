@@ -92,7 +92,7 @@ Transformar o repositório em um workspace .NET 10 guiado por um menu raiz de tu
 - [x] `RavenConnection`
 - [x] `AspNet5 with Identity Framework`
 - [x] `Minimum OpenID Server`
-- [ ] `Sending Emails with Gmail`
+- [x] `Sending Emails with Gmail`
 - [ ] `Parallelism`
 
 ## Regra De Execucao Para Cada Pasta
