@@ -1,591 +1,305 @@
-=== Basic Questions
+= .NET e C# - Perguntas básicas
+:toc:
+:toc-title: Sumário
+:toclevels: 2
 
-.What is the difference between C# and .NET ?
+== Objetivo do nível
+
+Este arquivo cobre fundamentos que um desenvolvedor iniciante em .NET precisa explicar com segurança: plataforma, runtime, tipos, coleções, exceções, LINQ e assincronismo básico.
+
+== Plataforma e runtime
+
+.Qual é a diferença entre C# e .NET?
 [%collapsible]
 ====
-* .NET is a Framework , C# is a programming language
-* .NET is a collection of libraries and it has a runtime
+C# é a linguagem. .NET é a plataforma de execução e bibliotecas.
+
+* C# define sintaxe, tipos, expressões, classes, interfaces e recursos da linguagem.
+* .NET fornece runtime, biblioteca base, SDK, ferramentas de build, gerenciamento de memória e suporte a vários tipos de aplicação.
+* Um programa C# normalmente é compilado para IL e executado pelo runtime .NET.
 ====
 
-.Differentiate between .NET Framework 4.x, .NET Core 3.x, .NET 5 and above
+.O que é o SDK do .NET?
 [%collapsible]
 ====
-* .NET Framework is ONLY for Windows, it is slow as compared to .NET Core (packaged as one big framework), it is desktop based with WPF and Winforms, does not support microservices
-* .NET Core 3.x is Cross Platform, has better performance (libraries are more modular and smaller in sizes, delivered via nuget), it is not desktop based, supports microservices, Full CLI command supported .NET 5> is the evolution of .NET Core , provides a uniform platform that unifies all .NET, it is multiplatform, developers no longer have to choose which platform they´re developing their applications
+O SDK é o conjunto de ferramentas para criar, compilar, testar, empacotar e executar projetos .NET.
 
-NOTE: .NET and .NET Core have better performance because it has divided large DLLs (libraries) into smaller specialized libraries so that the program can run only what is really necessary; e.g. what was previously a big System.Collections now has a span of options: .Concurrent, .Specialized, .Immutable
+Ele inclui a CLI `dotnet`, compiladores, templates, MSBuild, runtime de desenvolvimento e tarefas de restauração de pacotes.
+Em um repositório, o arquivo `global.json` pode fixar a versão esperada do SDK.
 ====
 
-.What is IL and what is the use of JIT?
+.O que é o runtime do .NET?
 [%collapsible]
 ====
-* Intermediate Language (IL): When you compile your C# code, the compiler reads your source code and produces Microsoft Intermediate Language (MSIL), sometimes abbreviated as IL. This is a CPU-independent set of instructions that can be efficiently converted to native code. IL is a lower-level language than C#, but it’s still higher-level than machine code. It’s used by the .NET Framework to generate machine-independent code as the output of the compilation of the source code written in any .NET programming language.
+O runtime executa aplicações .NET.
 
-* Just-In-Time (JIT) Compiler: The JIT compiler is a part of the Common Language Runtime (CLR) in .NET, which is responsible for managing the execution of .NET programs. The JIT compiler translates the MSIL code of an assembly into native code, specific to the computer environment that the JIT compiler runs on. This translation is done on a requirement basis, meaning the JIT compiler compiles the MSIL as required rather than compiling all of it at once. The compiled MSIL is stored so that it is available for subsequent calls. This process helps to speed up the
-code execution and provide support for multiple platforms.
-
-NOTE: In summary, when you write and compile C# code in the .NET environment, the code is first turned into IL. Then, when the program is run, the JIT compiler turns the IL into machine code that can be executed by the computer’s processor. This two-step process allows .NET to provide a high level of abstraction and portability, while still achieving good performance. Because of IL, .NET supports multiple languagues: C#, F#, VB
+Ele carrega assemblies, executa código gerenciado, aplica segurança de tipos, gerencia exceções, coordena threads e executa o garbage collector.
+O SDK é usado para desenvolver; o runtime é necessário para executar.
 ====
 
-.What is CLR and why it is important ? 
+.O que é CLR?
 [%collapsible]
 ====
-The Common Language Runtime (CLR) is a crucial component of the .NET Framework. It manages the execution of .NET applications and provides several important services
+CLR significa Common Language Runtime.
 
-* Managed Execution Environment: CLR provides a managed execution environment for .NET programs, regardless of the .NET programming language used12. This includes C#, VB.NET, F#, and others
-* Memory Management: CLR handles memory allocation and deallocation for .NET applications. It automatically manages object layout and releases objects when they’re no longer being used
-* Garbage Collection: CLR includes a garbage collector that
-automatically reclaims memory occupied by unused objects, eliminating common programming errors like memory leaks
-* Type Safety: CLR ensures that code only accesses the memory locations it is authorized to access
-* Exception Handling: CLR provides a framework for exception handling, allowing errors to be caught and handled in a structured manner14.
-* Security: CLR provides a security model to protect resources from unauthorized access
-* Just-In-Time (JIT) Compilation: CLR compiles the Microsoft
-Intermediate Language (MSIL) code into machine code on the fly as the program runs, optimizing performance
-* Cross-Language Integration: CLR makes it easy to design components and applications whose objects interact across languages
-
-NOTE: The CLR is responsible for ensuring that .NET applications are executed in a safe, secure, and efficient manner, making it a fundamental aspect of .NET programming
+Ele é o ambiente de execução do .NET: carrega código, executa IL compilado para código nativo, gerencia memória, exceções, interoperabilidade e segurança de tipos.
+No .NET moderno, o termo aparece como parte da arquitetura do runtime.
 ====
 
-.What is managed and unmanaged code ? 
+.O que é IL?
 [%collapsible]
 ====
-In the context of .NET and C#:
+IL, ou Intermediate Language, é a representação intermediária gerada pelo compilador C#.
 
-* *Managed Code*: This is code that is written to be managed by the Common Language Runtime (CLR) in the .NET Framework¹². Managed code is compiled into an intermediate language (MSIL), which is then executed by the CLR¹². The CLR provides various services to the managed code such as garbage collection, type checking, exception handling, bounds checking, and more². Managed code provides platform independence, improved security, automatic memory management, and easier debugging¹².
-* *Unmanaged Code*: This is code that is directly executed by the operating system¹². Unmanaged code is compiled to native code that is specific to the architecture². It provides low-level access to the programmer and direct access to system resources¹². However, unmanaged code does not provide runtime services like garbage collection, exception handling, etc., and memory management is handled by the programmer¹². Debugging unmanaged code can be harder due to the lack of
-debugging tools¹.
-
-In summary, managed code is controlled by the CLR and provides various benefits like automatic memory management and improved security, while unmanaged code is executed directly by the operating system and provides low-level access to the programmer¹².
-
-Source: + 
-(1) Difference between Managed and Unmanaged code in .NET.
-https://www.geeksforgeeks.org/difference-between-managed-and-unmanaged-code-in-net/. +
-(2) Managed code and Unmanaged code in .NET - GeeksforGeeks.
-https://www.geeksforgeeks.org/managed-code-and-unmanaged-code-in-net/. +
-(3) Interoperating with unmanaged code - .NET Framework.
-https://learn.microsoft.com/en-us/dotnet/framework/interop/. +
-(4) Managed
-and Unmanaged Code - Key Differences - ParTech.
-https://www.partech.nl/en/publications/2021/03/managed-and-unmanaged-code—key-differences.
+O código C# não vira diretamente código de máquina na compilação normal.
+Ele vira IL em assemblies; depois o runtime compila o IL para código nativo quando necessário.
 ====
 
-.What is the importance of CTS ?
+.O que é JIT?
 [%collapsible]
 ====
-The CTS ensures that data types defined in 2 different languages gets compiled to a common data type in IL
+JIT significa Just-In-Time compilation.
 
-The Common Type System (CTS) is a fundamental component of the .NET
-framework and plays a crucial role in ensuring interoperability between
-different programming languages that target the .NET framework¹²³⁴⁵.
-Here are some key points about its importance:
-
-[arabic]
-. *Cross-Language Integration*: CTS establishes a framework that enables
-cross-language integration¹. It ensures that objects written in
-different languages can interact with each other¹.
-. *Type Safety*: CTS provides a set of rules that all programming languages must follow when creating data types³. This ensures type safety, meaning that the code only accesses the memory locations it is authorized to access¹.
-. *High-Performance Code Execution*: By defining how types are declared, used, and managed in the runtime, CTS facilitates high-performance code execution².
-. *Standard Set of Data Types*: CTS represents a standard set of data types that can be used across all programming languages running on the .NET Framework³. This ensures that all languages using the .NET Framework can communicate and understand the same data types³.
-. *Object-Oriented Model*: CTS provides an object-oriented model that supports the complete implementation of many programming languages¹.
-
-NOTE: In summary, CTS is essential for ensuring language independence, type safety, and efficient code execution in the .NET environment¹²³⁴⁵.
-
-Source: +
-(1) Common Type System - .NET | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/standard/base-types/common-type-system. +
-(2) What Are CTS And CLS In .NET - C# Corner.
-https://www.c-sharpcorner.com/blogs/what-are-cts-and-cls-in-net. +
-(3)
-Exploring The Key Components Of .NET - CLR, CTS, And CLS - C# Corner.
-https://www.c-sharpcorner.com/article/exploring-the-key-components-of-net-clr-cts-and-cls/. +
-(4) What is CTS in Dot Net core - C# Corner.
-https://www.c-sharpcorner.com/interview-question/what-is-cts-in-dot-net-core. +
-(5) What is Common Type System (CTS) In .Net - Medium.
-https://nalawadeshivani98.medium.com/what-is-common-type-system-cts-in-net-cf56ba82fef.
+É o processo em que o runtime converte IL em código nativo durante a execução.
+Isso permite portabilidade entre arquiteturas e otimizações feitas conforme o ambiente real de execução.
 ====
 
-.Explain the importance of CLS ?
+.O que é um assembly?
 [%collapsible]
 ====
-NOTE: Basically: CLS is a set of rules or guidelines that a language has to follow in order to be consumed by .NET
+Um assembly é uma unidade de implantação e versionamento no .NET.
 
-The Common Language Specification (CLS) is a key component of the .NET framework and plays a vital role in ensuring interoperability between different programming languages that target the .NET framework¹²⁴⁵⁶.
-Here are some key points about its importance:
-
-[arabic]
-. *Interoperability*: CLS defines a set of rules that every .NET language must follow, which enables smooth communication between different .NET supported programming languages¹²⁴⁵⁶.
-. *Cross-Language Integration*: CLS ensures that language specifications defined in two different languages get compiled into a common language specification¹. This allows for cross-language integration or interoperability²⁴⁵⁶.
-. *Common Rules*: CLS defines some set of rules that must be followed by each .NET language to be a .NET compliant language²³⁵. These rules enable different .NET languages to use each other’s framework class library for application development³⁵.
-. *Language Independence*: The language specification of CLR is common for all programming languages and this is known as Common Language Specifications (CLS)¹. This helps in supporting language independence in .NET².
-
-In summary, CLS is essential for ensuring language independence, interoperability, and efficient code execution in the .NET environment¹²⁴⁵⁶.
-
-Source: +
-(1) Common Language Specification in .NET - Dot Net Tutorials.
-https://dotnettutorials.net/lesson/common-language-specification/. +
-(2)
-What Are CTS And CLS In .NET - C# Corner.
-https://www.c-sharpcorner.com/blogs/what-are-cts-and-cls-in-net. +
-(3) CLS
-in .Net Framework: What is Common Language Specification?.
-https://www.webtrainingroom.com/dotnetframework/cls. +
-(4) What are CTS
-and CLS In .NET? - Includehelp.com.
-https://www.includehelp.com/dot-net/define-cls-and-cts.aspx. +
-(5) Common
-Language Specification (CLS)) - Computer Notes.
-https://ecomputernotes.com/csharp/dotnet/common-language-specification. +
-(6) What are CTS and CLS In .NET? - Includehelp.com.
-https://bing.com/search?q=Importance+of+CLS+in+.NET.
+Normalmente aparece como `.dll` ou `.exe` e contém IL, metadados, referências e informações de versão.
+Projetos C# compilados geram assemblies.
 ====
 
-.What is the difference between STACK and HEAP ?
+.Qual é a diferença entre projeto e solução?
 [%collapsible]
 ====
-NOTE: Stack and Heap are memory types in an application. Stack memory stores datatypes like int, double, boolean etc.. while Heap store data types like strings, objects, arrays, etc..
+Um projeto descreve como compilar uma unidade de código, geralmente por meio de um arquivo `.csproj`.
 
-* `Things` declared with the following list of type declarations are Value Types (because they are from System.ValueType): bool, byte, char, decimal, double, enum, float, int, long, sbyte, short, struct, uint, ulong, ushort
-* `Things` declared with following list of type declarations are Reference Types (and inherit from System.Object… except, of course, for object which is the System.Object object): class, interface, delegate, object, string
-
-[width="100%",cols="13%,43%,44%",options="header",]
-|===
-|Category |Stack |Heap
-|Memory Allocation |Static, stored directly, variables can´t be resized, fast access |Dynamic, stored indirectly, variables can be resized, slow access
-
-|Visibility |visible to the owner thread only |visible to all threads
-
-|When wiped out ? |Local variables get wiped off once they loose the scope |when collected by the garbage collector
-|===
+Uma solução agrupa vários projetos para build, execução e organização.
+Neste repositório, a solução raiz é `CSharpCodePortfolio.slnx`.
 ====
-.What is the concept of boxing and unboxing ? 
+
+.O que é NuGet?
 [%collapsible]
 ====
-In the context of C# and .NET:
+NuGet é o gerenciador de pacotes usado pelo ecossistema .NET.
 
-* *Boxing*: Boxing is the process of converting a value type to a reference type¹². When the Common Language Runtime (CLR) boxes a value type, it wraps the value inside a System.Object instance and stores it on the managed heap¹². Boxing is an implicit conversion process¹².
-
-Here’s an example of boxing:
-
-[source,csharp]
-----
-int i = 123; // The following line boxes i.
-object o = i;
-----
-
-* *Unboxing*: Unboxing is the process of converting a reference type back into a value type¹². Unboxing extracts the value type from the object¹². Unboxing is an explicit conversion process¹². Here’s an example of unboxing:
-
-[source,csharp]
-----
-object o = 123;
-int i = (int)o; // unboxing
-----
-
-In summary, boxing and unboxing allow value types to be treated as objects, providing a unified view of the type system¹². However, they are computationally expensive processes. When a value type is boxed, a new object must be allocated and constructed. The cast required for unboxing is also computationally expensive¹.
-
-Source: +
-(1) Boxing and Unboxing - C# Programming Guide - C# | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing.+
-(2) C# | Boxing And Unboxing - GeeksforGeeks.
-https://www.geeksforgeeks.org/c-sharp-boxing-unboxing/. +
-(3) Boxing and Unboxing in C# - C# Corner.
-https://www.c-sharpcorner.com/article/boxing-and-unboxing-in-C-Sharp/.
+Ele permite referenciar bibliotecas externas, restaurar versões específicas e distribuir pacotes.
+As referências ficam normalmente em arquivos `.csproj`.
 ====
 
-.Explain casting, implicit casting and explicit casting in the context of .NET C# ? 
+.O que significa código gerenciado?
 [%collapsible]
 ====
-In the context of .NET and C#, casting is the process of
-converting a value of one data type to another¹²³⁴⁵. There are two types of casting:
+Código gerenciado é executado sob controle do runtime .NET.
 
-* *Implicit Casting*: This is automatically performed by the compiler when the conversion is safe and no data will be lost¹²³⁴⁵. For example, converting a smaller type to a larger type size (char -> int -> long -> float -> double) is an implicit cast¹²³⁴⁵. Here’s an example of implicit casting:
-
-[source,csharp]
-----
-int i = 123;
-long l = i; // Implicit casting from int to long
-----
-
-* *Explicit Casting*: This is performed manually by the programmer using the cast operator¹²³⁴⁵. Explicit casting is required when the conversion could lose data or when the conversion might not succeed for other reasons¹²³⁴⁵. For example, converting a larger type to a smaller size type (double -> float -> long -> int -> char) is an explicit cast¹²³⁴⁵.
-Here’s an example of explicit casting:
-
-[source,csharp]
-----
-double d = 123.45;
-int i = (int)d; // Explicit casting from double to int
-----
-
-In summary, implicit casting is done automatically when the conversion is safe and no data will be lost, while explicit casting is done manually when there’s a risk of data loss¹²³⁴⁵.
-
-Source: +
-(1) Casting and type conversions - C# Programming Guide - C#.
-https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/casting-and-type-conversions. +
-(2) c# - What is the difference between explicit and implicit type casts
-….
-https://stackoverflow.com/questions/1584293/what-is-the-difference-between-explicit-and-implicit-type-casts. +
-(3) C# Type Casting - W3Schools.
-https://www.w3schools.com/cs/cs_type_casting.php. +
-(4) Type Casting in C#
-- Simple2Code.
-https://simple2code.com/csharp-tutorial/type-casting-in-csharp/. +
-(5)
-Understanding Type Casting in C# with Examples - Techieclues.
-https://www.techieclues.com/blogs/type-casting-in-c-sharp.
+Ele recebe serviços como garbage collection, verificação de tipos, exceções, metadados e interoperabilidade controlada.
+Código não gerenciado é executado diretamente fora desse modelo, como código nativo C/C++.
 ====
 
-.Explain Array vs ArrayList 
+== Tipos e memória
+
+.Qual é a diferença entre value type e reference type?
 [%collapsible]
 ====
-Comparison table between `Array` and `ArrayList` in C#:
-[width="100%",cols="10%,38%,52%",options="header",]
-|===
-|Feature |Array |ArrayList
-|*Type Safety* |Strongly-typed (can only store elements of the same data type) |Not strongly-typed (can store elements of any data type)
+Value types representam o valor diretamente; reference types armazenam uma referência para um objeto.
 
-|*Size* |Fixed (determined at creation) |Dynamic (can grow or shrink at runtime)
-
-|*Access Speed* |Fast (due to contiguous memory allocation) |Slower (due to non-contiguous memory allocation)
-
-|*Flexibility* |Less flexible (due to fixed size and type safety) |More flexible (due to dynamic size and ability to store different data types)
-
-|*Namespace* |System.Array |System.Collections
-
-|*Example*
-|`int[] intArray = new int[] {2}; intArray[0] = 1; intArray[2] = 2;`
-|`ArrayList Arrlst = new ArrayList(); Arrlst.Add("Sagar"); Arrlst.Add(1); Arrlst.Add(null);`
-|===
-
-* If you need a fixed-size collection of elements of the same data type, then an array may be the better choice.
-* If you need a dynamic collection that can grow or shrink in size and can hold elements of any data type, then an ArrayList may be a better choice.
+* Exemplos de value types: `int`, `bool`, `DateTime`, `decimal`, `struct`.
+* Exemplos de reference types: `class`, `string`, arrays, delegates e interfaces em tempo de execução.
+* A diferença afeta cópia, igualdade, nulidade e alocação.
 ====
 
-.Generic Collections
+.O que são stack e heap em termos práticos?
 [%collapsible]
 ====
+Stack é usada para frames de chamadas, variáveis locais e controle de execução.
+Heap é usada para objetos gerenciados que precisam sobreviver além do escopo imediato.
 
-TIP: Provides the benefits of having a typed collection (no boxing and unboxing are necessary) and the benefits of being a dynamic collection with no fixed size
-
-List of some of the most used generic collections in .NET C#, when they should be used, and an example of each:
-
-[width="100%",cols="10%,33%,19%,38%",options="header",]
-|===
-|Collection |Description |When to Use |Example
-|*List* |A generic list that contains elements of a specified type. It grows automatically as you add elements in it¹. |When you need a dynamic-size, ordered collection of elements¹.
-|`List<int> numbers = new List<int>(); numbers.Add(1); numbers.Add(2); numbers.Add(3);`
-
-|*Dictionary<TKey,TValue>* |Contains key-value pairs¹. |When you need a collection of key-value pairs¹.
-|`Dictionary<string, int> dict = new Dictionary<string, int>(); dict.Add("apple", 1); dict.Add("banana", 2);`
-
-|*SortedList<TKey,TValue>* |Stores key and value pairs. It automatically adds the elements in ascending order of key by default¹. |When you need a sorted collection of key-value pairs¹. |`SortedList<int, string> sortedList = new SortedList<int, string>(); sortedList.Add(1, "apple"); sortedList.Add(2, "banana");`
-
-|*Queue* |Stores the values in FIFO style (First In First Out). It keeps the order in which the values were added¹. |When you need a first-in, first-out collection of objects¹.
-|`Queue<int> queue = new Queue<int>(); queue.Enqueue(1); queue.Enqueue(2); queue.Enqueue(3);`
-
-|*Stack* |Stores the values as LIFO (Last In First Out)¹. |When you need a last-in, first-out collection of objects¹.
-|`Stack<int> stack = new Stack<int>(); stack.Push(1); stack.Push(2); stack.Push(3);`
-
-|*HashSet* |Contains non-duplicate elements. It eliminates duplicate elements¹. |When you need a collection of unique elements¹. |`HashSet<int> set = new HashSet<int>(); set.Add(1); set.Add(2); set.Add(3);`
-|===
-
-These generic collections are recommended to use over non-generic collections because they perform faster and also minimize exceptions by giving compile-time errors¹. They are more type-safe, meaning you can’t insert an element of the wrong type into a collection by mistake, and you don’t have to cast elements to the correct type when you retrieve them².
-
-Source: +
-(1) Generic List Collection in C# with Examples - Dot Net
-Tutorials. https://dotnettutorials.net/lesson/list-collection-csharp/. +
-(2) List Class (System.Collections.Generic) | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1?view=net-8.0. +
-(3) 6 Generic Collections in C# with Examples - DotNetCrunch.
-https://dotnetcrunch.in/generic-collections-in-csharp/. +
-(4) When to Use
-Generic Collections - .NET | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/standard/collections/when-to-use-generic-collections. +
-(5) Generic Collections in .NET - .NET | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/standard/generics/collections.
+Essa explicação é uma simplificação: o compilador e o runtime podem otimizar alocações.
+O ponto essencial é entender tempo de vida, referência e custo de alocação.
 ====
 
-.What is Threading (Multithreading) in C# and what is a Task ?
+.O que é boxing?
 [%collapsible]
 ====
+Boxing é converter um value type em `object` ou em uma interface implementada por ele.
 
-TIP: Basically: If you want to run code parallely in a multicore processor...use Threads
-
-[source,csharp]
-....
-using System.Threading;
-
-Thread newThread = new Thread(() =>
-{
-    // Code to be executed by the new thread
-});
-
-newThread.Start();
-....
-
-In C#, a *Thread* and a *Task* are both used to create parallel programs, but they serve different purposes and have different use cases¹².
-
-*Thread*: + 
-[]
-- A Thread is a single sequence of instructions that a process can execute¹. 
-- The `System.Threading.Thread` class is used for creating and manipulating a thread in Windows². 
-- Threads are used to perform multiple operations at the same time². 
-
-Example of creating a thread:
-
-[source,csharp]
-----
-Thread thread = new Thread(new ThreadStart(getMyName));
-thread.Start();
-----
-
-*Task*: 
-[]
-- A Task represents some asynchronous operation¹
-- Tasks are part of the Task Parallel Library, a set of APIs for running tasks asynchronously and in parallel²
-- Tasks can return a result¹
-- Tasks support cancellation through the use of cancellation tokens²
-
-Example of creating a task:
-
-[source,csharp]
-----
-Task<string> obTask = Task.Run(() => (return "Hello"));
-Console.WriteLine(obTask.result);
-----
-
-*Key Differences*: +
-[]
-- Tasks utilizes your multicore processor properly while Thread have CPU affinity 
-- A Task can have multiple processes happening at the same time, while Threads can only have one task running at a time²
-- Tasks can return a result, while there is no direct mechanism to return the result from a thread². If you want to get a result from a thread you have to use delegates, events and so on. 
-- Tasks support cancellation through the use of cancellation tokens, but Threads don’t². 
-- Tasks are generally preferred over threads for IO-bound operations (like reading and writing to a database), while threads are typically used for CPU-bound operations (like computations)¹.
-
-NOTE: A Task is a higher-level concept than a Thread. While a Thread represents a single sequence of instructions, a Task is an abstraction of a series of operations that will be executed¹². 
-
-IMPORTANT: Because of the benefits of Tasks, always use the TPL (Task Parallel Library) whenever you have a chance … 
-
-The TPL dynamically scales the degree of concurrency to use all the available processors most efficiently. It handles the partitioning of the work, the scheduling of threads on the ThreadPool, cancellation support, state management, and other low-level details. By using TPL, you can maximize the performance of your code while focusing on the work that your program is designed to accomplish.
-
-Source: +
-(1) c# - What is the difference between task and thread? - Stack Overflow. https://stackoverflow.com/questions/4130194/what-is-the-difference-between-task-and-thread. +
-(2) Task And Thread In C# - C# Corner. https://www.c-sharpcorner.com/article/task-and-thread-in-c-sharp/. +
-(3) Difference Between Task and Thread - Net-Informations.Com.
-https://net-informations.com/csharp/language/task.htm.
+Isso normalmente cria uma alocação no heap.
+Exemplo: `object valor = 42;`.
 ====
 
-.Why to use OUT in C# ? 
+.O que é unboxing?
 [%collapsible]
 ====
-Usually a method has only one return type, with out, you can return multiple types
+Unboxing é recuperar o value type de dentro de um objeto boxed.
 
-[source,csharp]
-....
-class OutReturnExample
-{
-    static void Method(out int i, out string s1, out string s2)
-    {
-        i = 44;
-        s1 = "I've been returned";
-        s2 = null;
-    }
-
-    static void Main()
-    {
-        int value;
-        string str1, str2;
-        Method(out value, out str1, out str2);
-
-        // value is now 44
-        // str1 is now "I've been returned"
-        // str2 is (still) null;
-    }
-}
-....
+Exemplo: `int numero = (int)valor;`.
+O tipo precisa ser compatível; caso contrário, ocorre exceção em tempo de execução.
 ====
-.Why do we need constructors ?
+
+.O que é nullable reference type?
 [%collapsible]
 ====
-A constructor is a special method of a class that get´s called automatically when an instance of class is created.
+Nullable reference types são anotações e análises do compilador para reduzir erros de `null`.
+
+Com `Nullable` habilitado, `string` significa referência esperada como não nula, enquanto `string?` permite nulo.
+O recurso ajuda no design de contratos e evita muitas falhas por `NullReferenceException`.
 ====
 
-.Which constructor fires first in a Parent-Child relationship ?
+.Qual é a diferença entre `var` e `dynamic`?
 [%collapsible]
 ====
-In a parent-child relationship in .NET C#, the constructor of the parent class is called first. This is because when a child class is initialized, it may need to use members of the parent class. Therefore, the parent class constructor is called first to initialize all the inherited members⁴. 
+`var` é tipagem estática com inferência em tempo de compilação.
+`dynamic` adia a resolução de membros para tempo de execução.
 
-Here's a simple example:
-
-```csharp
-public class Parent
-{
-    public Parent()
-    {
-        Console.WriteLine("Parent Constructor.");
-    }
-}
-
-public class Child : Parent
-{
-    public Child()
-    {
-        Console.WriteLine("Child Constructor.");
-    }
-}
-```
-
-When you create an instance of `Child`, the output will be:
-
-```
-Parent Constructor.
-Child Constructor.
-```
-
-This shows that the `Parent` constructor is called before the `Child` constructor².
-
-Source: +
-(1) Order Of Constructors Calling With Inheritance In C# - C# Corner. https://www.c-sharpcorner.com/article/order-of-constructors-calling-with-inheritance-in-c-sharp/. +
-(2) c# - Which constructor will called first in the below example - Stack .... https://stackoverflow.com/questions/6479098/which-constructor-will-called-first-in-the-below-example. +
-(3) Enforcing parent-child relationship in C# and .Net. https://stackoverflow.com/questions/982796/enforcing-parent-child-relationship-in-c-sharp-and-net. +
-(4) Constructor and Inheritance in C# | by Tam H. Doan | Medium. https://nhoxbypass.medium.com/constructor-and-inheritance-in-c-4a43ef68582. +
-
+Use `var` quando o tipo for evidente pelo lado direito.
+Use `dynamic` apenas em cenários específicos, como interoperabilidade dinâmica.
 ====
 
-.Which field initializers fires first in a Parent-Child relationship ?
+.O que são `const` e `readonly`?
 [%collapsible]
 ====
-Consider the following
-``` csharp
-void Main()
-{
-	var child = new Child();
+`const` define um valor constante em tempo de compilação.
+`readonly` define um campo que só pode ser atribuído na declaração ou no construtor.
 
-}
-
-public class Parent
-{
-	public string parentField = Log("Parent Field Initialization");
-
-	public Parent()
-	{
-		Log("Parent Constructor");
-	}
-
-	public static string Log(string message)
-	{
-		Console.WriteLine(message);
-		return message;
-	}
-}
-
-public class Child : Parent
-{
-	public string childField = Log("Child Field Initialization");
-
-	public Child()
-	{
-		Log("Child Constructor");
-	}
-}
-```
-
-The output is:
-```
-Child Field Initialization
-Parent Field Initialization
-Parent Constructor
-Child Constructor
-```
+Use `const` para valores realmente imutáveis e universais.
+Use `readonly` para valores definidos em tempo de construção.
 ====
 
-.How are static constructors executed in Parent-Child relationship?
+.O que é uma propriedade em C#?
 [%collapsible]
 ====
+Uma propriedade expõe acesso controlado a dados de um objeto.
 
-Static constructors fire whenever any other static method of the class is called or when the class is instantiated.
-
-``` csharp
-void Main()
-{
-	var child = new Child();
-
-}
-
-public class Parent
-{
-	public string parentField = Log("Parent Field Initialization");
-
-	public Parent()
-	{
-		Log("Parent Constructor");
-	}
-	
-	static Parent()
-	{
-		Log("STATIC Parent Constructor");
-	}
-
-	public static string Log(string message)
-	{
-		Console.WriteLine(message);
-		return message;
-	}
-}
-
-public class Child : Parent
-{
-	public string childField = Log("Child Field Initialization");
-
-	public Child()
-	{
-		Log("Child Constructor");
-	}
-	
-	static Child()
-	{
-		Log("STATIC Child Constructor");
-	}
-}
-```
-OUTPUT:
-```
-STATIC Parent Constructor
-STATIC Child Constructor
-Child Field Initialization
-Parent Field Initialization
-Parent Constructor
-Child Constructor
-```
-
-Another example:
-``` csharp
-void Main()
-{
-	Child.Hello();
-}
-
-public class Parent
-{
-	public string parentField = Log("Parent Field Initialization");
-	public Parent() => Log("Parent Constructor");
-	static Parent() => Log("STATIC Parent Constructor");
-	public static string Log(string message)
-	{
-		Console.WriteLine(message);
-		return message;
-	}
-}
-
-public class Child: Parent {
-	static Child() => Log("STATIC Child Constructor");
-	public static void Hello() => Log("Static Hello method called!");
-}
-```
-
-OUTPUT
-```
-STATIC Parent Constructor
-STATIC Child Constructor
-Static Hello method called!
-```
-
-
+Ela pode encapsular validação, cálculo ou armazenamento interno.
+Exemplo: `public string Nome { get; init; } = "";`.
 ====
+
+.Qual é a diferença entre campo e propriedade?
+[%collapsible]
+====
+Campo é armazenamento direto dentro do tipo.
+Propriedade é uma API pública ou interna para acesso a dados.
+
+Como regra, exponha propriedades e mantenha campos como detalhe de implementação.
+====
+
+.O que é `string` em C#?
+[%collapsible]
+====
+`string` é um tipo de referência imutável que representa texto Unicode.
+
+Operações que parecem modificar uma string normalmente criam outra instância.
+Para muitas concatenações em loop, `StringBuilder` pode ser mais adequado.
+====
+
+== Fluxo, coleções e LINQ
+
+.Qual é a diferença entre array e `List<T>`?
+[%collapsible]
+====
+Array tem tamanho fixo depois de criado.
+`List<T>` é uma coleção genérica redimensionável.
+
+Use arrays quando o tamanho é fixo ou quando uma API exige array.
+Use `List<T>` para coleções que crescem ou encolhem durante o fluxo.
+====
+
+.Por que preferir coleções genéricas?
+[%collapsible]
+====
+Coleções genéricas como `List<T>` e `Dictionary<TKey,TValue>` preservam tipo em tempo de compilação.
+
+Elas evitam casts desnecessários, reduzem boxing e tornam o código mais claro.
+`ArrayList` existe por compatibilidade, mas raramente é a escolha correta em código moderno.
+====
+
+.O que é `Dictionary<TKey,TValue>`?
+[%collapsible]
+====
+É uma coleção de chave e valor otimizada para busca por chave.
+
+Use quando você precisa localizar valores rapidamente por identificador.
+A chave deve ter igualdade e hash coerentes.
+====
+
+.O que é LINQ?
+[%collapsible]
+====
+LINQ é um conjunto de recursos para consultar dados em C#.
+
+Ele permite filtrar, projetar, ordenar, agrupar e transformar coleções com métodos como `Where`, `Select`, `OrderBy` e `GroupBy`.
+====
+
+.Qual é a diferença entre `IEnumerable<T>` e `List<T>`?
+[%collapsible]
+====
+`IEnumerable<T>` representa uma sequência que pode ser enumerada.
+`List<T>` é uma coleção concreta em memória.
+
+Use `IEnumerable<T>` em APIs que só precisam percorrer dados.
+Use `List<T>` quando precisa adicionar, remover, indexar ou materializar resultados.
+====
+
+.O que é deferred execution no LINQ?
+[%collapsible]
+====
+Deferred execution significa que a consulta só executa quando é enumerada.
+
+Exemplo: uma chamada a `Where` monta a consulta; `ToList`, `foreach` ou `Count` executam.
+Esse comportamento é útil, mas pode causar surpresas se a fonte mudar antes da enumeração.
+====
+
+.O que é uma exceção?
+[%collapsible]
+====
+Exceção é um mecanismo para sinalizar erro ou condição inesperada durante a execução.
+
+Use exceções para falhas reais, não para fluxo normal.
+Capture exceções quando puder recuperar, adicionar contexto ou converter para uma falha mais adequada.
+====
+
+.Qual é a diferença entre `throw` e `throw ex`?
+[%collapsible]
+====
+`throw` preserva o stack trace original dentro de um `catch`.
+`throw ex` reinicia parte do stack trace e dificulta diagnóstico.
+
+Ao relançar a mesma exceção, prefira `throw;`.
+====
+
+.O que é `using` statement?
+[%collapsible]
+====
+`using` garante que `Dispose` seja chamado ao final do escopo.
+
+Ele é usado com tipos que implementam `IDisposable`, como streams, conexões e outros recursos que exigem liberação determinística.
+====
+
+.O que é `async` e `await`?
+[%collapsible]
+====
+`async` marca um método que pode aguardar operações assíncronas.
+`await` libera o fluxo enquanto uma operação assíncrona não termina.
+
+Esse modelo é útil para I/O, rede, banco de dados e arquivos, sem bloquear a thread durante a espera.
+====
+
+.Qual é a diferença entre `Task` e `Thread`?
+[%collapsible]
+====
+`Thread` representa uma thread do sistema operacional.
+`Task` representa uma unidade de trabalho assíncrona ou paralela no modelo TPL.
+
+Na maioria dos códigos modernos, use `Task` e APIs assíncronas em vez de gerenciar threads manualmente.
+====
+
+== Referências de apoio
+
+* https://learn.microsoft.com/dotnet/core/introduction[Introdução ao .NET]
+* https://learn.microsoft.com/dotnet/csharp/fundamentals/types/[Sistema de tipos do C#]
+* https://learn.microsoft.com/dotnet/csharp/linq/[LINQ em C#]
+* https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/[Programação assíncrona em C#]

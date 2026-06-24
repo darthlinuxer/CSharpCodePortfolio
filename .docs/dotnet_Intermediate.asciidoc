@@ -1,352 +1,302 @@
-=== Intermediate Questions
+= .NET e C# - Perguntas intermediárias
+:toc:
+:toc-title: Sumário
+:toclevels: 2
 
-.What is a Delegate ? 
+== Objetivo do nível
+
+Este arquivo cobre recursos que exigem experiência prática: delegates, eventos, generics, LINQ com avaliação adiada, assincronismo com cancelamento, DI, testes, reflection e APIs modernas de C#.
+
+== Linguagem e tipos
+
+.Quando usar delegates em C#?
 [%collapsible]
 ====
-A Delegate is a Pointer to a Function, created to
-serve as callbacks which acts as a communication channel between
-concurrent async or parallel processes
+Use delegates para representar métodos como valores.
+
+Eles aparecem em callbacks, eventos, LINQ, `Func<>`, `Action<>`, estratégias simples e pontos de extensão.
+Em código moderno, normalmente usamos `Func<T>`, `Action<T>` ou eventos em vez de declarar delegates próprios.
 ====
-.What is the need of Delegates ? 
+
+.Qual é a diferença entre delegate e event?
 [%collapsible]
 ====
-Delegates in C# are used for several reasons:
+Delegate é o tipo que representa uma chamada.
+Event é uma camada de encapsulamento para publicação e assinatura.
 
-[arabic]
-. *Encapsulate a method*: Delegates are objects that encapsulate a
-method¹². They allow methods to be passed as parameters¹²⁵, which can be
-useful when you want to pass a method as an argument to another method¹.
-
-[source,csharp]
-----
-public delegate void MyDelegate(string msg);  // declare a delegate
-
-// set the delegate to a method
-MyDelegate del = new MyDelegate(MethodA);
-
-// invoke the method through the delegate
-del("Hello World");
-
-public void MethodA(string message)
-{
-    Console.WriteLine("MethodA says: " + message);
-}
-----
-
-[arabic, start=2]
-. *Callback Mechanism*: Delegates can be used to define callback
-methods¹²⁴. This is useful in event-driven programming where you want a
-certain method to be called upon the occurrence of an event¹.
-
-[source,csharp]
-----
-public delegate void MyDelegate(string msg);  // declare a delegate
-
-public static void MethodWithCallback(int param1, int param2, MyDelegate callback)
-{
-    callback("The number is: " + (param1 + param2).ToString());
-}
-
-public static void DelegateMethod(string message)
-{
-    Console.WriteLine(message);
-}
-
-void Main()
-{
-    // Instantiate the delegate.
-    MyDelegate handler = DelegateMethod;
-
-    // Call the method with a callback
-    MethodWithCallback(1, 2, handler);
-}
-----
-
-[arabic, start=3]
-. *Abstract and Decouple Methods*: Delegates provide a way to abstract a
-method from the caller². This means the caller doesn’t need to know the
-details of the method being called².
-
-[source,csharp]
-----
-public delegate void MyDelegate(string msg);
-
-public class MyClass
-{
-    private MyDelegate del;
-
-    public MyClass(MyDelegate del)
-    {
-        this.del = del;
-    }
-
-    public void Run()
-    {
-        del("Hello World");
-    }
-}
-
-public void MethodA(string message)
-{
-    Console.WriteLine("MethodA says: " + message);
-}
-
-public void Main()
-{
-    MyClass myClass = new MyClass(new MyDelegate(MethodA));
-    myClass.Run();
-}
-----
-
-[arabic, start=4]
-. *Event Handling*: Delegates are the foundation of .NET event
-handling². The .NET event model is based on delegates and is used to
-respond to user actions like button clicks or menu selections².
-
-[source,csharp]
-----
-public delegate void MyDelegate(string msg);
-
-public class MyClass
-{
-    public event MyDelegate MyEvent;
-
-    public void Run()
-    {
-        MyEvent?.Invoke("Hello World");
-    }
-}
-
-public void MethodA(string message)
-{
-    Console.WriteLine("MethodA says: " + message);
-}
-
-void Main()
-{
-    MyClass myClass = new MyClass();
-    myClass.MyEvent += new MyDelegate(MethodA);
-    myClass.Run();
-}
-----
-
-[arabic, start=5]
-. *Asynchronous Programming*: Delegates are used in asynchronous
-programming to call methods asynchronously².
-
-[source,csharp]
-----
-using System.Threading.Tasks;
-
-public static async Task Main()
-{
-    Func<int, int, int> del = Sum;
-    var task = Task.Run(() => del(1, 2));
-
-    // You can do other work here while waiting
-
-    int result = await task;
-    Console.WriteLine("The result is: " + result);
-}
-
-public static int Sum(int num1, int num2)
-{
-    return num1 + num2;
-}
-----
-
-[arabic, start=6]
-. *LINQ and Lambda Expressions*: Delegates are used extensively in LINQ
-queries and lambda expressions².
-
-[source,csharp]
-----
-Func<int, bool> isEven = num => num % 2 == 0;
-int[] numbers = { 1, 2, 3, 4, 5, 6 };
-IEnumerable<int> evenNumbers = numbers.Where(isEven);
-evenNumbers.Dump(); //LinqPad execution
-----
-
-Source: +
-(1) c# - When & why to use delegates? - Stack Overflow.
-https://stackoverflow.com/questions/2019402/when-why-to-use-delegates. +
-(2) Why do we need C# delegates - Stack Overflow.
-https://stackoverflow.com/questions/4284493/why-do-we-need-c-sharp-delegates. +
-(3) Delegates - C# Programming Guide - C# | Microsoft Learn.
-https://learn.microsoft.com/en-US/dotnet/csharp/programming-guide/delegates/. +
-(4) C# delegates (With Examples) - Programiz.
-https://www.programiz.com/csharp-programming/delegates. +
-(5) c# - what is
-the need of delegates? - Stack Overflow.
-https://stackoverflow.com/questions/36001027/what-is-the-need-of-delegates.
+Com `event`, consumidores externos podem assinar e desassinar, mas não podem disparar o evento diretamente.
 ====
 
-.What is a Multicast Delegate ? 
+.O que é um multicast delegate?
 [%collapsible]
 ====
-A multicast delegate in C# is a delegate that holds the references of more than one function. When you invoke the multicast delegate, all the functions which are referenced by the delegate are going to be invoked. Here’s an example:
+É um delegate com uma lista de invocação contendo mais de um método.
 
-[source,csharp]
-----
-public delegate void MyDelegate(string msg);
-public MyDelegate mydelegate = null;
-
-void Main()
-{
-    mydelegate += PrintToConsole;
-    mydelegate += PrintToConsole;
-    
-    mydelegate("Hello World!");
-    
-    void PrintToConsole(string msg) => Console.WriteLine(msg);
-    
-    mydelegate = null;
-}
-----
+Ao invocar, os handlers são chamados em sequência.
+Esse comportamento é a base de muitos eventos em .NET.
 ====
 
-.What are events ? 
+.Como tratar exceções em eventos multicast?
 [%collapsible]
 ====
-Events are encapsulation over delegates, they use delegates internally. Events helps you implement Publisher-Subscriber mode.
+Se um handler lança exceção, a invocação direta pode interromper os próximos handlers.
 
-Events in C# are a way for an object to notify other classes or objects
-when something of interest occurs¹². The class that sends (or raises)
-the event is called the publisher and the classes that receive (or
-handle) the event are called subscribers¹².
-
-Events are typically used to signal user actions such as button clicks
-or menu selections in graphical user interfaces². When an event has
-multiple subscribers, the event handlers are invoked synchronously when
-an event is raised².
-
-In C#, an event is an encapsulated delegate¹. It is dependent on the
-delegate. The delegate defines the signature for the event handler
-method of the subscriber class¹.
-
-Here are some examples of declaring, raising, and consuming an event in
-C#:
-
-*Declaring an Event*:
-
-[source,csharp]
-----
-public delegate void Notify(); // delegate
-
-public class ProcessBusinessLogic
-{
-    public event Notify ProcessCompleted; // event
-}
-----
-
-In this example, a delegate `Notify` is declared and then an event
-`ProcessCompleted` of delegate type `Notify` is declared using the
-`event` keyword in the `ProcessBusinessLogic` class¹.
-
-*Raising an Event*:
-
-[source,csharp]
-----
-public delegate void Notify(); // delegate
-
-public class ProcessBusinessLogic
-{
-    public event Notify ProcessCompleted; // event
-
-    public void StartProcess()
-    {
-        Console.WriteLine("Process Started!");
-
-        // some code here..
-
-        OnProcessCompleted();
-    }
-
-    protected virtual void OnProcessCompleted() //protected virtual method
-    {
-        //if ProcessCompleted is not null then call delegate
-        ProcessCompleted?.Invoke();
-    }
-}
-----
-
-In this example, the `StartProcess()` method calls the method
-`OnProcessCompleted()` at the end, which raises an event¹.
-
-*Consuming an Event*:
-
-[source,csharp]
-----
-class Program
-{
-    public static void Main()
-    {
-        ProcessBusinessLogic bl = new ProcessBusinessLogic();
-
-        bl.ProcessCompleted += bl_ProcessCompleted; // register with an event
-
-        bl.StartProcess();
-    }
-
-    // event handler
-    public static void bl_ProcessCompleted()
-    {
-        Console.WriteLine("Process Completed!");
-    }
-}
-----
-
-In this example, the subscriber class registers to `ProcessCompleted`
-event and handles it with the method `bl_ProcessCompleted` whose
-signature matches `Notify` delegate¹.
-
-Source: +
-(1) Events in C# - TutorialsTeacher.com.
-https://www.tutorialsteacher.com/csharp/csharp-event. +
-(2) Events - C#
-Programming Guide - C# | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/events/. +
-(3) Events in C# - javatpoint.
-https://www.javatpoint.com/events-in-c-sharp. +
-(4) C# - Events - Online
-Tutorials Library.
-https://www.tutorialspoint.com/csharp/csharp_events.htm. +
-(5) Events,
-Delegates and Event Handler in C# - Dot Net Tutorials.
-https://dotnettutorials.net/lesson/events-delegates-and-event-handler-in-csharp/. +
-(6) Events in C# - Code Maze. https://code-maze.com/csharp-events/. +
-(7) Introduction to events - C# | Microsoft Learn.
-https://learn.microsoft.com/en-us/dotnet/csharp/events-overview. +
-(8) github.com.
-https://github.com/nccasia/ncc-net-basic/tree/03d28a32af69216c72b701d22d2b9eebc12f1af6/CSharpAdvanced%2FEvents%2FREADME.md. +
-(9) github.com.
-https://github.com/ravuri-malleswari/.net-programming/tree/14c161f5bfe57b17641f2efc9e6c3cf78a222eb7/events.cs.
+Quando cada assinante precisa ser isolado, percorra `GetInvocationList()` e trate falhas individualmente.
+Isso é importante em infraestrutura, plugins e notificações internas.
 ====
 
-.Events vs Delegates
+.O que são generics?
 [%collapsible]
 ====
-* Events uses Delegates
-* Delegates are for callbacks, not encapsulated
-* Events are encapsulated Delegates to help implement Pub-Sub mode
+Generics permitem escrever tipos e métodos parametrizados por tipo.
+
+Eles preservam segurança de tipos, reduzem casts, evitam boxing em muitos cenários e deixam APIs reutilizáveis.
+Exemplo: `List<string>` e `Dictionary<int, Cliente>`.
 ====
-.Why multiple class inheritance is not allowed on C#? What was the problems it was trying to avoid ?
+
+.Para que servem constraints em generics?
 [%collapsible]
 ====
-Multiple inheritance is not supported in C# due to the complexity and issues it can introduce¹²³⁴⁵. Here are some of the problems it was trying to avoid:
+Constraints limitam os tipos aceitos por um parâmetro genérico.
 
-1. **Diamond Problem**: This occurs when a class inherits from two or more classes that have a common base class². If a method is overridden in both of these classes, it becomes ambiguous which version of the method the derived class should inherit².
-
-2. **Increased Complexity**: Multiple inheritance can make the implementation more complex, impacting casting, layout, dispatch, field access, serialization, identity comparisons, verifiability, reflection, generics, and many other areas⁴⁵.
-
-3. **Conflicting Base Class Members**: If there is a method or property with the same name in two base classes and both are doing different things, it can lead to confusion and unexpected behavior³.
-
-To avoid these issues, C# supports single class inheritance and multiple interface implementation¹²³⁴⁵. This approach provides much of the flexibility of multiple inheritance while avoiding its pitfalls¹²³⁴⁵.
-
-Source: +
-(1) Does C# support multiple inheritance? - Stack Overflow. https://stackoverflow.com/questions/2456154/does-c-sharp-support-multiple-inheritance. +
-(2) Why C# doesn’t support multiple inheritance? - Dot Net For All. https://www.dotnetforall.com/why-c-sharp-doesnt-support-multiple-inheritance/. +
-(3) Why multiple inheritance not allowed in C#? - CodeHunger | Blog. https://blog.codehunger.in/why-multiple-inheritance-not-allowed-in-c/. +
-(4) Why no multiple inheritance allowed in C#?. https://social.msdn.microsoft.com/Forums/vstudio/en-US/4af95fb4-fa94-43c6-a611-723389350267/why-no-multiple-inheritance-allowed-in-c?forum=csharpgeneral. +
-(5) c# - Why can't I inherit from multiple classes? - Stack Overflow. https://stackoverflow.com/questions/45950324/why-cant-i-inherit-from-multiple-classes. +
+Exemplos: `where T : class`, `where T : struct`, `where T : new()`, `where T : IDisposable`.
+Elas permitem usar membros e garantias específicas dentro do código genérico.
 ====
+
+.Qual é a diferença entre covariance e contravariance?
+[%collapsible]
+====
+Covariance preserva compatibilidade do tipo mais específico para o mais geral, como `IEnumerable<string>` para `IEnumerable<object>`.
+
+Contravariance inverte a direção para entradas, como `Action<object>` podendo ser usado onde se espera `Action<string>`.
+Em C#, interfaces e delegates podem declarar isso com `out` e `in`.
+====
+
+.O que são extension methods?
+[%collapsible]
+====
+São métodos estáticos que parecem métodos de instância.
+
+Eles ajudam a adicionar operações a tipos existentes sem herança.
+LINQ usa extension methods extensivamente.
+====
+
+.Quando usar records?
+[%collapsible]
+====
+Use records para modelos orientados a valor, especialmente DTOs, mensagens, resultados e objetos imutáveis simples.
+
+Records fornecem igualdade por valor, `with` expressions e uma sintaxe concisa.
+Para entidades com identidade e ciclo de vida, classes costumam ser mais adequadas.
+====
+
+.O que é pattern matching?
+[%collapsible]
+====
+Pattern matching permite testar forma, tipo e propriedades de valores.
+
+Ele aparece em `is`, `switch`, padrões relacionais, padrões de propriedade e padrões posicionais.
+O benefício é expressar decisões complexas de forma declarativa e legível.
+====
+
+== LINQ, coleções e dados
+
+.Como deferred execution pode causar bugs?
+[%collapsible]
+====
+Uma consulta LINQ pode capturar a fonte e executar só depois.
+
+Se a fonte muda antes da enumeração, o resultado muda.
+Se a consulta acessa banco ou rede, múltiplas enumerações podem repetir trabalho.
+Materialize com `ToList()` quando precisar congelar o resultado.
+====
+
+.Quando evitar múltipla enumeração de `IEnumerable<T>`?
+[%collapsible]
+====
+Evite quando a sequência é cara, depende de I/O, tem efeitos colaterais ou só pode ser lida uma vez.
+
+Chamadas como `Count()`, `Any()` e `foreach` podem reexecutar a consulta.
+Se necessário, materialize uma vez.
+====
+
+.Qual é a diferença entre `Select` e `SelectMany`?
+[%collapsible]
+====
+`Select` projeta cada item para um resultado.
+`SelectMany` projeta cada item para uma sequência e achata o resultado.
+
+Use `SelectMany` para transformar uma lista de listas em uma sequência única.
+====
+
+.Como escolher entre `Any`, `Count` e `FirstOrDefault`?
+[%collapsible]
+====
+Use `Any` para saber se existe ao menos um item.
+Use `Count` quando precisa da quantidade total.
+Use `FirstOrDefault` quando precisa do primeiro valor ou de um padrão.
+
+Para existência, `Any` costuma ser mais eficiente porque pode parar no primeiro item.
+====
+
+.O que é `IQueryable<T>`?
+[%collapsible]
+====
+`IQueryable<T>` representa uma consulta que pode ser traduzida por um provedor, como Entity Framework Core.
+
+Expressões LINQ podem virar SQL ou outra linguagem de consulta.
+Isso é poderoso, mas nem todo código C# pode ser traduzido.
+====
+
+== Assincronismo e concorrência
+
+.Como funciona `CancellationToken`?
+[%collapsible]
+====
+`CancellationToken` comunica pedido de cancelamento cooperativo.
+
+Ele não mata a operação à força.
+O código precisa observar o token, repassá-lo para APIs assíncronas e parar de forma consistente.
+====
+
+.Quando usar `Task.WhenAll`?
+[%collapsible]
+====
+Use quando várias operações assíncronas independentes podem iniciar juntas.
+
+Ele aguarda todas terminarem e agrega falhas.
+É adequado para fan-out de I/O, desde que o volume não sobrecarregue o recurso externo.
+====
+
+.Quando limitar concorrência?
+[%collapsible]
+====
+Limite concorrência quando há risco de saturar banco, HTTP, CPU, memória, fila ou serviço externo.
+
+Ferramentas comuns incluem `SemaphoreSlim`, `Parallel.ForEachAsync`, channels ou filas.
+O objetivo é controlar pressão, não apenas iniciar tudo ao mesmo tempo.
+====
+
+.Qual é o risco de usar `.Result` ou `.Wait()` em código assíncrono?
+[%collapsible]
+====
+Essas chamadas bloqueiam a thread e podem causar deadlocks em ambientes com contexto de sincronização.
+
+Também prejudicam escalabilidade em servidores.
+Prefira propagar `async` e usar `await`.
+====
+
+.O que é `ConfigureAwait(false)`?
+[%collapsible]
+====
+Ele indica que a continuação não precisa voltar ao contexto capturado.
+
+É comum em bibliotecas para evitar dependência de contexto de UI ou requisição.
+Em ASP.NET Core moderno, o impacto é menor, mas ainda pode ser relevante em bibliotecas reutilizáveis.
+====
+
+== APIs, DI e testes
+
+.O que é dependency injection?
+[%collapsible]
+====
+Dependency injection é fornecer dependências de fora do tipo, em vez de criá-las internamente.
+
+Isso reduz acoplamento, facilita testes e deixa o ciclo de vida das dependências sob controle do container.
+====
+
+.Qual é a diferença entre transient, scoped e singleton?
+[%collapsible]
+====
+Transient cria uma nova instância a cada resolução.
+Scoped reutiliza a instância dentro de um escopo, como uma requisição web.
+Singleton cria uma instância para toda a aplicação.
+
+O erro clássico é colocar dependência scoped dentro de singleton.
+====
+
+.Como testar código que usa `HttpClient`?
+[%collapsible]
+====
+Evite mockar `HttpClient` diretamente.
+
+Use um `HttpMessageHandler` customizado, um servidor de teste ou uma abstração pequena quando o domínio pedir.
+Assim o teste controla resposta, status code, headers e falhas.
+====
+
+.O que é reflection?
+[%collapsible]
+====
+Reflection permite inspecionar metadados e acessar tipos, membros e atributos em tempo de execução.
+
+É útil para descoberta dinâmica, serialização, frameworks e ferramentas.
+O custo é maior complexidade, menor segurança em tempo de compilação e impacto em trimming/AOT.
+====
+
+.Quando usar atributos personalizados?
+[%collapsible]
+====
+Use atributos para metadados declarativos.
+
+Eles são bons para marcação, validação, configuração leve e descoberta por reflection.
+Não devem virar um segundo sistema de programação escondido.
+====
+
+.Qual é a diferença entre unit test e integration test?
+[%collapsible]
+====
+Unit test valida uma unidade pequena com dependências controladas.
+Integration test valida a colaboração entre componentes reais, como banco, HTTP, fila ou container DI.
+
+Ambos são úteis; o ponto é saber qual risco cada teste cobre.
+====
+
+.O que é `InternalsVisibleTo`?
+[%collapsible]
+====
+É um atributo que permite a outro assembly acessar membros `internal`.
+
+É comum para expor detalhes internos a um projeto de testes sem tornar APIs públicas.
+Use com moderação para não testar implementação demais.
+====
+
+.Como versionar uma API pública em biblioteca?
+[%collapsible]
+====
+Evite remover membros ou mudar comportamento esperado sem versão maior.
+
+Prefira adicionar overloads, manter compatibilidade binária quando possível, documentar obsolescência com `[Obsolete]` e cobrir contratos públicos com testes.
+====
+
+.Quando criar uma abstração própria?
+[%collapsible]
+====
+Crie abstração quando houver variação real, teste difícil, fronteira externa ou contrato de domínio claro.
+
+Não crie interface para uma única implementação sem motivo.
+Abstração sem pressão real aumenta manutenção.
+====
+
+.Como lidar com opções de configuração em .NET?
+[%collapsible]
+====
+Use o padrão Options quando há configuração tipada, validação e injeção.
+
+Para valores simples e locais, uma constante ou objeto de configuração direto pode ser suficiente.
+O importante é validar configuração em fronteiras de inicialização.
+====
+
+.O que observar ao usar EF Core em serviços?
+[%collapsible]
+====
+`DbContext` representa unidade de trabalho e não é thread-safe.
+
+Use ciclo de vida scoped em aplicações web, não compartilhe contexto entre threads e evite consultas que carreguem mais dados que o necessário.
+====
+
+== Referências de apoio
+
+* https://learn.microsoft.com/dotnet/csharp/programming-guide/delegates/[Delegates]
+* https://learn.microsoft.com/dotnet/csharp/linq/[LINQ]
+* https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/[Programação assíncrona]
+* https://learn.microsoft.com/dotnet/core/extensions/dependency-injection[Dependency injection em .NET]

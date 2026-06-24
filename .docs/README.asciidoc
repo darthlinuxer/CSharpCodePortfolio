@@ -10,6 +10,16 @@ O ponto de entrada principal do projeto é o link:../README.asciidoc[README raiz
 
 * link:tutorial-catalog.asciidoc[Catálogo de tutoriais]
 
+== Taxonomia de níveis
+
+Use estes critérios ao criar ou revisar perguntas:
+
+* Básico: verifica vocabulário, sintaxe essencial e funcionamento direto de recursos comuns. A resposta deve caber em uma explicação curta com um exemplo simples.
+* Intermediário: exige uso prático, comparação entre alternativas, efeitos colaterais comuns e conhecimento de APIs modernas do C#/.NET.
+* Avançado: exige diagnóstico, trade-off, impacto de runtime, versionamento, performance, concorrência, compatibilidade, design de APIs ou análise de falhas.
+
+Uma pergunta avançada não deve perguntar apenas "o que é X?". Ela deve exigir decisão técnica, justificativa e consequências.
+
 == Acervo de estudo
 
 * link:dotnet_Basic.asciidoc[.NET C# - perguntas básicas]

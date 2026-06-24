@@ -1,296 +1,290 @@
-=== Advanced Questions
+= OOP em C# - Perguntas avançadas
+:toc:
+:toc-title: Sumário
+:toclevels: 2
 
+== Objetivo do nível
 
-.What is Shadowing or Method Hiding ?
+Este arquivo cobre decisões difíceis de modelagem: contratos comportamentais, LSP, versionamento de APIs, variância, imutabilidade, DDD, igualdade, pattern matching, limites arquiteturais, testabilidade e trade-offs entre abstração e simplicidade.
+
+== Contratos e substituição
+
+.Como detectar violação de LSP em uma hierarquia?
 [%collapsible]
 ====
-NOTE: Shadowing is when the child methods/properties will be hidden from the parent during polymorphism using the new keywork in c#
+Procure subtipos que não conseguem cumprir promessas do tipo base.
 
-Shadowing, also known as method hiding in C#, is a concept in Object-Oriented Programming (OOP) where a method or property in a derived class shares the same name as a method or property in its base class¹². In this case, the derived class's method or property shadows the base class's method or property¹².
-
-This means that the original implementation of the base class member gets shadowed (hidden) with the new implementation of the base class member provided in the derived class¹³. The shadowed element is not available for reference; instead, when the code uses the element name, the compiler resolves it to the shadowing element¹⁴.
-
-Here's an example in C#:
-
-```csharp
-public class BaseClass
-{
-    public string GetMethodOwnerName()
-    {
-        return "Base Class";
-    }
-}
-
-public class ChildClass : BaseClass
-{
-    public new string GetMethodOwnerName()
-    {
-        return "Child Class";
-    }
-}
-
-public static void Main(string[] args)
-{
-    ChildClass c = new ChildClass();
-    Console.WriteLine(c.GetMethodOwnerName());
-}
-```
-
-In this example, the `GetMethodOwnerName` method in the `ChildClass` shadows the `GetMethodOwnerName` method in the `BaseClass`. When the `GetMethodOwnerName` method is called on an instance of `ChildClass`, it prints "Child Class", not "Base Class"¹.
-
-Source: +
-(1) Overriding Vs Shadowing in C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/ff2f08/overriding-vs-shadowing-in-C-Sharp/.+
-(2) c# - What is Shadowing? - Stack Overflow. https://stackoverflow.com/questions/673779/what-is-shadowing.+
-(3) Difference Between Shadowing And Overriding In OOP Using C# - C# Corner. https://www.c-sharpcorner.com/article/difference-between-shadowing-and-overriding-in-oop/.+
-(4) Overriding Vs Shadowing in C# - Online Tutorials Library. https://www.tutorialspoint.com/Overriding-Vs-Shadowing-in-Chash.+
-(5) OOP Difference between Shadowing and Overriding - CodeProject. https://www.codeproject.com/articles/1081861/oop-difference-between-shadowing-and-overriding.+
-
+Sinais: override lançando `NotSupportedException`, pré-condições mais fortes, pós-condições mais fracas, invariantes quebradas ou comportamento que obriga o chamador a testar o tipo concreto.
 ====
-.Shadowing vs Overriding ?
+
+.Por que `NotSupportedException` em override costuma indicar problema de modelagem?
 [%collapsible]
 ====
-[options="header"]
-|===
-| | Shadowing | Overriding
-| Keyword | `new` | `override`
-| Purpose | Hides the base class method in the derived class | Changes the base class method's implementation in the derived class
-| Base Class Method Call | Calls the base class method | Calls the derived class method
-|===
+Porque o tipo base prometeu uma operação que o subtipo não consegue cumprir.
 
-
-This table shows that the `new` keyword is used for Shadowing and the `override` keyword is used for Overriding. Shadowing hides the base class method in the derived class, while Overriding changes the base class method's implementation in the derived class. When a method is called on the base class, Shadowing calls the base class method, while Overriding calls the derived class method.
+Às vezes a exceção é aceitável em APIs de propósito geral, mas em domínio próprio geralmente indica abstração errada.
+Separe capacidades em contratos menores.
 ====
-.When should you use Shadowing ?
+
+.Como preservar invariantes em tipos derivados?
 [%collapsible]
 ====
-TIP: Shadowing is a hack which developers use when the child class does not implement all the methods of the parent
+Defina invariantes no tipo base e deixe pontos de extensão pequenos e controlados.
 
-NOTE: This is also termed as LISKOV Problem and it happens due to wrong abstractions. "It looks like a duck, quacks like a Duck, but needs batteries.. you probably have the wrong abstraction", in other words, a Parent should always be able to execute all the methods of its child seamlessly. 
-
-Shadowing in C# can be useful in several scenarios:
-
-1. **Protecting Class Definitions**: Shadowing can protect the definitions of class members. If the base class undergoes a change that creates a member with the same name as one already defined in the child class, shadowing ensures that the child class's version is called¹³.
-
-2. **Maintaining Existing Functionality**: If a method in a class library is being used by various modules in a project and you want to change it, doing so might break existing functionality. By shadowing the method using the `new` keyword, you can introduce new functionality without breaking the old one².
-
-3. **Customizing Classes**: Shadowing can be a useful tool for customizing classes when you want to keep some properties hidden from a third party, but allow your own developers access to specific regions of an inherited class⁴.
-
-4. **Overriding Non-Virtual Methods**: If you want to "override" a non-virtual method, you can't actually override it, so instead you shadow it. It's not a perfect solution because it doesn't act like an overridden virtual method in all cases, but when called from the derived class, it will work as expected¹.
-
-Remember, while shadowing can be useful, it should be used judiciously as it can lead to confusion and unexpected behavior if not handled carefully.
-
-Source: C+
-(1) c# - What is Shadowing? - Stack Overflow. https://stackoverflow.com/questions/673779/what-is-shadowing. +
-(2) Shadowing | Method Hiding in C# - Tech Point Fundamentals. https://www.techpointfunda.com/2020/11/shadowing-or-method-hiding-csharp.html. +
-(3) c# - What's the purpose of Shadowing? - Stack Overflow. https://stackoverflow.com/questions/31714881/whats-the-purpose-of-shadowing. +
-(4) Using Shadowing in C# - CodeProject. https://www.codeproject.com/tips/231002/using-shadowing-in-csharp. +
-
+Evite permitir que derivados alterem estado essencial sem validação.
+Se a classe base não consegue proteger suas regras, talvez não deva ser extensível.
 ====
 
-.What are nested classes ? When to use them ?
+.Quando selar uma classe pública?
 [%collapsible]
 ====
-In C#, a nested class is a class that is defined within another class¹²³. A nested class can be either a static class or a non-static class¹. A nested class can have access to the private members of the outer class, which makes it useful for encapsulation and information hiding¹.
+Sele quando você não consegue garantir contrato para herdeiros ou não quer suportar extensão como API pública.
 
-Here's an example of a nested class in C#:
-
-```csharp
-public class OuterClass
-{
-    public class InnerClass
-    {
-        public void Display()
-        {
-            Console.WriteLine("This is a nested class method.");
-        }
-    }
-}
-```
-
-In this example, `InnerClass` is a nested class inside `OuterClass`. You can create an instance of `InnerClass` and call its `Display` method like this:
-
-```csharp
-OuterClass.InnerClass inner = new OuterClass.InnerClass();
-inner.Display();
-```
-
-Nested classes are typically used in the following scenarios:
-
-1. **Encapsulation**: Nested classes can be used to increase encapsulation¹⁴. They can access the private members of the outer class, which helps in hiding the information¹⁴.
-
-2. **Logical Grouping**: Nested classes allow you to logically group classes that are only used in one place¹⁴. This can lead to more readable and maintainable code¹⁴.
-
-3. **To Support the Outer Class**: If a class is useful only within a certain class, then it is a good idea to make it a nested class⁴.
-
-4. **To Reduce Name Clashes**: If a class is of no use for other classes and is being used by a single class only, then we can define it as a nested class⁴.
-
-Remember, while nested classes can be useful, they should be used judiciously as they can lead to complex and hard-to-read code if not handled carefully⁴.
-
-Source: +
-(1) Nested Classes in C# - GeeksforGeeks. https://www.geeksforgeeks.org/nested-classes-in-c-sharp/. +
-(2) Nested Types - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types. +
-(3) C# Nested Classes: What They Are and How to Use Them. https://www.programdoc.com/csharp/nested-class. +
-(4) . https://bing.com/search?q=When+to+use+nested+classes+in+C%23. +
-(5) Why/when should you use nested classes in .net? Or shouldn't you?. https://stackoverflow.com/questions/48872/why-when-should-you-use-nested-classes-in-net-or-shouldnt-you. +
-(6) Nested Types - Framework Design Guidelines | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/nested-types. +
-(7) C# Nested Class (With Examples) - Programiz. https://www.programiz.com/csharp-programming/nested-class. +
-(8) https://softwareengineering.stackexchange.com/questions/314043/when-and-why-to-use-nested-classes.
+Classes públicas não seladas criam superfície de compatibilidade maior.
+Permitir herança é assumir responsabilidade sobre comportamento de tipos derivados.
 ====
-.Can nested classes access outer class variables ?
+
+.Como desenhar uma classe base versionável?
 [%collapsible]
 ====
-Yes, in C#, a nested class can access the private members of the outer class¹⁴. This includes variables, methods, and properties¹⁴. This is one of the key features of nested classes and is useful for encapsulation and information hiding¹⁴.
+Mantenha poucos membros protegidos, documente pontos de extensão e preserve ordem de chamadas.
 
-However, it's important to note that the nested class does not have an inherent reference to an instance of the outer class¹². If you want to access a non-static member of the outer class, you need to have an instance of the outer class¹².
-
-Here's an example:
-
-```csharp
-public class OuterClass
-{
-    private int outerVariable = 10;
-
-    public class NestedClass
-    {
-        public void Display()
-        {
-            OuterClass outer = new OuterClass();
-            Console.WriteLine("Outer Variable: " + outer.outerVariable);
-        }
-    }
-}
-```
-
-In this example, `NestedClass` is able to access the private variable `outerVariable` of `OuterClass` by creating an instance of `OuterClass`¹².
-
-Source: +
-(1) c# - Can i access outer class objects in inner class - Stack Overflow. https://stackoverflow.com/questions/2957900/can-i-access-outer-class-objects-in-inner-class. +
-(2) Nested Classes in C# - GeeksforGeeks. https://www.geeksforgeeks.org/nested-classes-in-c-sharp/. +
-(3) C# Member Access from Nested Class to Containing Class. https://stackoverflow.com/questions/2373068/c-sharp-member-access-from-nested-class-to-containing-class. +
-(4) Nested Types - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types. +
+Evite chamar métodos virtuais em construtores.
+Mudanças em classe base podem quebrar derivados mesmo sem alterar assinatura pública.
 ====
-.Can we have public, protected access modifiers in nested classes ?
+
+.Qual é o risco de chamar método virtual no construtor?
 [%collapsible]
 ====
-Yes, in C#, nested classes can have various access modifiers¹²:
+O método derivado pode executar antes de o construtor derivado inicializar seu estado.
 
-- **Public**: The nested class can be accessed by any other code in the same assembly or another assembly that references it¹.
-- **Protected**: The nested class can be accessed only by code in the same class, or in a class that is derived from that class¹.
-- **Internal**: The nested class can be accessed by any code in the same assembly, but not from another assembly¹.
-- **Protected Internal**: The nested class can be accessed by any code in the assembly in which it's declared, or from within a derived class in another assembly¹.
-- **Private Protected**: The nested class can be accessed by types derived from the class that are declared within its containing assembly¹.
-- **Private**: The nested class can be accessed only by code in the same class or struct¹.
-
-Here's an example of a public nested class in C#:
-
-```csharp
-public class OuterClass
-{
-    public class NestedClass
-    {
-        public void Display()
-        {
-            Console.WriteLine("This is a public nested class method.");
-        }
-    }
-}
-```
-
-In this example, `NestedClass` is a public nested class inside `OuterClass`. You can create an instance of `NestedClass` and call its `Display` method like this:
-
-```csharp
-OuterClass.NestedClass inner = new OuterClass.NestedClass();
-inner.Display();
-```
-
-This will output: "This is a public nested class method."
-
-Remember, while nested classes can be useful, they should be used judiciously as they can lead to complex and hard-to-read code if not handled carefully¹².
-
-Source: +
-(1) Access Modifiers - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers.+
-(2) Nested Types - C# Programming Guide - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types.+
-(3) C# access modifier - controlling visibility of methods and ... - ZetCode. https://zetcode.com/csharp/access-modifier/.+
-
+Isso cria objetos parcialmente construídos observáveis.
+Prefira hooks explícitos após construção ou composição.
 ====
-.What are the different types of "USING/HAS A" relationship ?
+
+.Como testar contratos de uma hierarquia?
 [%collapsible]
 ====
-In object-oriented programming, the “USING/HAS A” relationship, also known as association, is a way to describe how classes relate to each other: Composition, Aggregation, Association
+Crie uma suíte de contrato que execute os mesmos cenários para todas as implementações.
+
+O teste deve usar o tipo base ou interface.
+Se cada subtipo precisa de exceções no teste, o contrato está mal definido.
 ====
-.What is a composition relationship ?
+
+.Quando substituir herança por composição?
 [%collapsible]
 ====
-TIP: Composition and Aggregation have PART-WHOLE relationship
+Quando a hierarquia muda por combinações de comportamento, políticas ou infraestrutura.
 
-NOTE: Composition is a part-whole relationship where both part and whole object have *SAME* lifetime. 
-
-Composition is a strong type of "HAS A" relationship, also known as a "death" relationship⁴. It's a specialized form of aggregation in object-oriented programming⁴. In composition, if the parent object is destroyed, then the child objects also cease to exist⁴. 
-
-In other words, it describes a class that references one or more objects of other classes in instance variables¹. This allows you to model a has-a association between objects¹. For example, a car has an engine, and a coffee machine has a grinder and a brewing unit¹.
-
-The main benefits of using composition include reusing existing code, designing clean APIs, and changing the implementation of a class used in a composition without adapting any external clients¹.
-
-Source: +
-(1) Association, aggregation, and composition in OOP explained. https://www.infoworld.com/article/3029325/exploring-association-aggregation-and-composition-in-oop.html. +
-(2) OOP Concepts for Beginners: What is Composition? - Stackify. https://stackify.com/oop-concepts-composition/. +
-(3) Association, Composition and Aggregation in Java - GeeksforGeeks. https://www.geeksforgeeks.org/association-composition-aggregation-java/. +
-(4) Composition over inheritance - Wikipedia. https://en.wikipedia.org/wiki/Composition_over_inheritance. +
-(5) https://github.com/thjanssen/Stackify-OopAbstraction.
+Composição permite combinar capacidades sem criar explosão de subclasses.
+Herança é melhor para relações estáveis de substituição.
 ====
-.Explain Aggregation
+
+.Como evitar hierarquias anêmicas?
 [%collapsible]
 ====
-NOTE: Aggregation is a part-whole relationship where the objects have different lifetimes. They can exist independently
-``` csharp
-class Patient
-{
-    public List<Problem> Problems {get;set;}
-    public Doctor Doctor {get;set;}
-    Public Patient(Doctor doc)
-    {
-        Doctor=doc;
-        Problems = new List<Problem>();
-    }
-}
-```
+Coloque comportamento próximo dos dados que ele protege.
 
-You can see that Patient-Problems is an example of Composition (the object cannot be shared with anyone else)
-
-Patient-Doctor is an aggregation. A doctor is not exclusive of a Patient and can be shared with other Patients.. also, have different lifetimes
+Se classes só têm propriedades e toda regra fica em serviços externos, invariantes ficam espalhadas.
+O equilíbrio é manter regra de domínio no modelo e infraestrutura fora dele.
 ====
-.Explain Association
+
+.Como lidar com requisitos que quebram a abstração atual?
 [%collapsible]
 ====
-NOTE: Association just defines that 2 objects are dependent on each other. This dependency could be a Composition or Aggregation (they are a subset of Association), but sometimes it´s just unrelated classes (e.g. helper classes), that are just short lived within a method
+Não force o novo caso na hierarquia existente.
+
+Reavalie o contrato, extraia capacidades menores ou use composição.
+O custo de mudar a abstração agora pode ser menor que acumular exceções e flags.
 ====
-.Composition vs Aggregation
+
+== Variance, igualdade e imutabilidade
+
+.O que é covariance em interfaces genéricas?
 [%collapsible]
 ====
+Covariance permite usar um tipo mais específico onde se espera um tipo mais geral.
 
-[cols="1,1,1,1,1"]
-|===
-| Relationship Type | Definition | Lifetime Dependency | Cardinality | Example
-
-| Aggregation
-| A type of "HAS A" relationship where the child can exist independently of the parent.
-| Child can exist independently.
-| One-to-one, one-to-many, many-to-one, many-to-many.
-| A `Teacher` class has a list of `Student` objects.
-
-| Composition
-| A stronger type of "HAS A" relationship where the child cannot exist independently of the parent.
-| Child cannot exist independently.
-| One-to-one, one-to-many.
-| A `Doctor` class creates and manages `Patient` objects.
-|===
-
-
+Em C#, `out` marca parâmetros usados como saída.
+Exemplo: `IEnumerable<string>` pode ser tratado como `IEnumerable<object>`.
 ====
-.UML Symbols for Composition, Aggregation, Association
+
+.O que é contravariance em delegates e interfaces?
 [%collapsible]
 ====
-. Association = Simple Arrow
-. Aggregation = Empty Diamond
-. Composition = Filled Diamond
+Contravariance permite usar consumidor de tipo mais geral onde se espera consumidor de tipo mais específico.
+
+Em C#, `in` marca parâmetros usados como entrada.
+Exemplo: `Action<object>` pode ser usado como `Action<string>`.
 ====
+
+.Por que variance não funciona com classes genéricas como `List<T>`?
+[%collapsible]
+====
+Porque `List<T>` permite entrada e saída de `T`.
+
+Se `List<string>` fosse `List<object>`, alguém poderia adicionar um `object` que não é string.
+Interfaces somente leitura, como `IEnumerable<out T>`, podem ser covariantes com segurança.
+====
+
+.Como records implementam igualdade?
+[%collapsible]
+====
+Records implementam igualdade baseada em valor por padrão.
+
+Dois records do mesmo tipo runtime com os mesmos componentes são iguais.
+Em hierarquias de records, o tipo runtime participa da igualdade.
+====
+
+.Quando igualdade por valor é perigosa?
+[%collapsible]
+====
+Quando o objeto representa entidade com identidade própria.
+
+Dois clientes com mesmo nome não são necessariamente o mesmo cliente.
+Use igualdade por valor para value objects; use identidade para entidades.
+====
+
+.Como projetar value objects imutáveis?
+[%collapsible]
+====
+Exija dados válidos na criação, não exponha setters mutáveis e implemente igualdade por valor.
+
+Records podem ajudar, mas invariantes ainda precisam ser explícitas.
+Um `Email` inválido não deve existir como objeto válido.
+====
+
+.Quando usar `required` e `init`?
+[%collapsible]
+====
+Use para exigir inicialização sem abrir mutabilidade permanente.
+
+Eles são úteis em DTOs e modelos de configuração.
+Para domínio com invariantes fortes, construtores ou factories podem expressar melhor a criação válida.
+====
+
+.Como imutabilidade ajuda concorrência?
+[%collapsible]
+====
+Objetos imutáveis podem ser compartilhados sem risco de alteração simultânea.
+
+Isso reduz locks e efeitos colaterais.
+O custo pode ser mais alocação ou necessidade de cópias estruturais.
+====
+
+.Quando mutabilidade é aceitável?
+[%collapsible]
+====
+Quando há ciclo de vida claro, dono único ou ganho de performance medido.
+
+Entidades de domínio frequentemente mudam estado por métodos controlados.
+Mutabilidade pública sem regra costuma ser o problema, não a mutabilidade em si.
+====
+
+.Como modelar estado sem expor setters públicos?
+[%collapsible]
+====
+Use métodos de intenção, como `Confirmar`, `Cancelar` e `AdicionarItem`.
+
+Esses métodos validam transições e preservam invariantes.
+Setters públicos deixam qualquer código montar estados inválidos.
+====
+
+== Modelagem avançada e limites
+
+.Quando pattern matching substitui polimorfismo?
+[%collapsible]
+====
+Pattern matching é bom quando o conjunto de casos é pequeno, fechado e local.
+
+Polimorfismo é melhor quando o comportamento deve crescer por novas implementações.
+Se todo `switch` precisa mudar ao adicionar tipo, talvez falte polimorfismo.
+====
+
+.Quando polimorfismo atrapalha mais do que ajuda?
+[%collapsible]
+====
+Quando cria muitos tipos pequenos sem variação real ou esconde fluxo simples.
+
+Se há dois casos estáveis e a lógica é local, um `switch` claro pode ser melhor.
+Abstração deve reduzir complexidade, não apenas trocar `if` por arquivos.
+====
+
+.Como aplicar DDD sem supermodelar?
+[%collapsible]
+====
+Modele invariantes e linguagem do domínio onde há regra real.
+
+Não crie agregado, repository, factory e domain service para CRUD simples sem comportamento.
+Comece pelo domínio que muda e dói.
+====
+
+.O que é agregado em DDD?
+[%collapsible]
+====
+Agregado é um conjunto de objetos tratado como unidade de consistência.
+
+Ele tem uma raiz que controla acesso e preserva invariantes.
+Nem todo relacionamento entre entidades precisa estar no mesmo agregado.
+====
+
+.Como escolher limites entre domínio e infraestrutura?
+[%collapsible]
+====
+Domínio deve conhecer regras e linguagem de negócio.
+Infraestrutura deve lidar com banco, HTTP, arquivos, fila e frameworks.
+
+Quando domínio depende diretamente de detalhes de infraestrutura, testes e evolução ficam mais caros.
+====
+
+.Como evitar uma camada de serviços anêmica?
+[%collapsible]
+====
+Não coloque todas as regras em serviços proceduralmente enquanto entidades ficam passivas.
+
+Use serviços para orquestração e dependências externas.
+Coloque invariantes e transições no modelo quando elas pertencem ao estado.
+====
+
+.Como avaliar se uma abstração deve existir?
+[%collapsible]
+====
+Pergunte qual variação ela protege, qual consumidor precisa dela e qual teste ou boundary melhora.
+
+Se não há resposta concreta, a abstração é especulativa.
+Código simples sem interface pode ser melhor até existir pressão real.
+====
+
+.Como modelar erros de domínio?
+[%collapsible]
+====
+Erros esperados do domínio podem ser resultados explícitos.
+Falhas inesperadas podem ser exceções.
+
+O importante é não misturar validação comum com exceções genéricas sem contexto.
+====
+
+.Como projetar APIs testáveis sem expor detalhes internos?
+[%collapsible]
+====
+Teste comportamento público e contratos observáveis.
+
+Use dependências injetadas nas fronteiras externas.
+Evite tornar tudo público apenas para teste; quando necessário, use `internal` com critério.
+====
+
+.Como revisar acoplamento em OOP avançado?
+[%collapsible]
+====
+Observe direção das dependências, tipos concretos atravessando camadas, objetos conhecendo detalhes demais e mudanças que se propagam.
+
+Baixo acoplamento não significa ausência de dependência.
+Significa dependências explícitas, estáveis e justificadas.
+====
+
+== Referências de apoio
+
+* https://learn.microsoft.com/dotnet/csharp/programming-guide/concepts/covariance-contravariance/[Covariance e contravariance]
+* https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/record[Records]
+* https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns[Pattern matching]
+* https://learn.microsoft.com/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/[DDD e arquitetura em .NET]

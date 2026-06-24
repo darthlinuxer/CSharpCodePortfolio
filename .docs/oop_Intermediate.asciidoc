@@ -1,361 +1,289 @@
-=== Intermediate Questions
+= OOP em C# - Perguntas intermediárias
+:toc:
+:toc-title: Sumário
+:toclevels: 2
 
-.Why do we need Abstract Classes?
+== Objetivo do nível
+
+Este arquivo cobre modelagem aplicada: interfaces, classes abstratas, records, `virtual`, `override`, `sealed`, composição, associação, agregação, versionamento simples e escolhas de design que aparecem em código real.
+
+== Herança, contratos e polimorfismo
+
+.Quando usar uma classe abstrata?
 [%collapsible]
 ====
-TIP: Abstract class is a half defined parent class, that cannot be instantiated BECAUSE it is partially defined. You deffered the implementation of the abstract methods to the children
+Use classe abstrata quando existe uma base comum com comportamento compartilhado e partes que precisam ser especializadas.
 
-In .NET C#, abstract classes serve several important purposes:
-
-1. **Abstraction and Reuse**: Abstract classes allow you to write a common piece of code that will defer specific implementations to derived classes
-
-2. **Blueprint for Derived Classes**: They provide a blueprint for derived classes and set some rules that the derived classes must implement when they inherit an abstract class³⁴.
-
-3. **Base Class**: They can be used as a base class, and all derived classes must implement abstract definitions³.
-
-4. **Inheritance Tree**: You may need abstract classes when you create an inheritance tree, with a single ancestor that cannot be instantiated, simply because it is unknown how some methods could be implemented¹.
-
-Source: +
-(1) c# - Why abstract classes necessary? - Stack Overflow. https://stackoverflow.com/questions/2713308/why-abstract-classes-necessary. +
-(2) Why Do We Use Abstract Class? - C# Corner. https://www.c-sharpcorner.com/article/why-do-we-use-abstract-class2/. +
-(3) C# | Abstract Classes - GeeksforGeeks. https://www.geeksforgeeks.org/c-sharp-abstract-classes/. +
-(4) Abstract and Sealed Classes and Class Members - C# Programming Guide - C#. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/abstract-and-sealed-classes-and-class-members. +
-
+Ela é adequada para uma família real de tipos.
+Se o objetivo é apenas permitir substituição de implementação, uma interface pode ser melhor.
 ====
 
-.Are Abstract methods virtual?
+.Quando usar interface em vez de classe abstrata?
 [%collapsible]
 ====
-Yes. + 
-[]
-* If you define a method virtual, you *HAVE* to implement it immediatelly, but you *MIGHT* choose to override it in the descendents. 
-* If you define the method abstract, you *CAN'T* implement it in the same class, and you *HAVE* to override it in the descendents.
+Use interface quando precisa definir um contrato sem impor hierarquia ou estado base.
+
+Interfaces são boas para fronteiras entre camadas, plugins, adaptadores e testes.
+Classes abstratas são melhores quando há estado ou algoritmo comum relevante.
 ====
 
-.Can we create an instance of an Abstract class?
+.Métodos abstratos são virtuais?
 [%collapsible]
 ====
-*NO*. The Compiler with throw an exception
+Sim, no sentido de que devem ser implementados por tipos derivados.
+
+A diferença é que um método `abstract` não tem implementação na classe base.
+Um método `virtual` tem implementação base e pode ser sobrescrito.
 ====
 
-.Is it compulsory to implement Abstract methods?
+.O que é `virtual`?
 [%collapsible]
 ====
-*YES*. It is compulsory!
+`virtual` permite que um membro seja sobrescrito por tipos derivados.
+
+Use quando a classe base foi projetada para extensão naquele ponto.
+Não marque tudo como virtual por padrão.
 ====
 
-.Why simple base class can replace Abstract class?
+.O que é `override`?
 [%collapsible]
 ====
-NOTE: A simple base class cannot be defined in a PURE HALF WAY. 
+`override` fornece a implementação de um membro virtual ou abstrato herdado.
 
-You might make it work by using virtual methods and throw not implemented exceptions on these methods that are going to be overridden later, but then, you are enabling the possibility to create a base class with a method that if called will throw an exception because it was not supposed to be defined there.
+O override deve preservar o contrato esperado do membro base.
+Se muda a semântica de forma incompatível, há risco de violar LSP.
 ====
 
-.Explain interfaces and why do we need it?
+.O que é `new` em method hiding?
 [%collapsible]
 ====
-NOTE: Interface is a contract
+`new` esconde um membro herdado em vez de sobrescrevê-lo polimorficamente.
 
-In .NET C#, interfaces are a powerful tool that serve several important purposes:
-
-1. **Common Functionality**: Interfaces allow different objects to expose common functionality. This allows the programmer to write simpler, shorter code that programs to an interface, then as long as the objects implement that interface it will work².
-
-2. **Extensibility**: We can satisfy extensibility using interfaces. In C#, you can easily extend the interfaces to create new classes that implement the same contract functionalities¹.
-
-3. **Loose Coupling**: Using interface-based design concepts provides loose coupling, component-based programming, easier maintainability, makes your code base more scalable and makes code reuse much more accessible because the implementation is separated from the interface⁴.
-
-4. **Multiple Inheritance**: C# doesn't support multiple inheritance of classes. However, by using interfaces, you can include behavior from multiple sources in a class³.
-
-Here's an example of an interface in C#:
-
-```csharp
-public interface IAnimal 
-{
-    void Eat();
-    void Sleep();
-}
-```
-
-In this example, `IAnimal` is an interface that declares two methods: `Eat` and `Sleep`. Any class that implements this interface must provide an implementation for these two methods².
-
-Source: +
-(1) c# - Why I need Interface? - Stack Overflow. https://stackoverflow.com/questions/9451868/why-i-need-interface. +
-(2) Why We Use Interfaces in C# - C# Corner. https://www.c-sharpcorner.com/UploadFile/vikie4u/why-do-we-use-interfaces-in-C-Sharp/. +
-(3) C# Interfaces, What Are They and Why Use Them - DZone. https://dzone.com/articles/c-interfaces-what-are-they-and. +
-(4) Interfaces - define behavior for multiple types - C#. https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/interfaces. +
+Isso pode confundir chamadas feitas por referência do tipo base.
+Use raramente e prefira corrigir a abstração quando possível.
 ====
 
-.Can we write logic in interfaces?
+.Qual é a diferença entre overriding e hiding?
 [%collapsible]
 ====
+Overriding mantém despacho polimórfico.
+Hiding escolhe o membro conforme o tipo da referência em tempo de compilação.
 
-Yes, we can write some logic inside interfaces in .NET. This feature is known as **default interface methods**². It was introduced in **C# 8.0** and **.NET Core 3.0**². This feature allows an interface to define a method with a default implementation that will be used if a class implementing the interface does not provide an implementation for that method¹².
-
-Here's an example:
-
-```csharp
-public interface IExampleInterface
-{
-    // Property declaration
-    string Name { get; set; }
-
-    void RegularMethod();
-
-    // Default interface method
-    void DefaultMethod()
-    {
-        Console.WriteLine("Default implementation of the method.");
-    }
-}
-```
-In this example, `ISampleInterface` is an interface that declares a property Name. Any class that implements this interface must provide an implementation for this property.
-
-In this example, `DefaultMethod` is a default interface method. If a class implements `IExampleInterface` and does not provide an implementation for `DefaultMethod`, the default implementation is used².
-
-Moreover, starting with **C# 11** and **.NET 6**, interfaces can declare **static abstract** and **static virtual** members¹. This feature enables interfaces to declare that implementing types must define operators or other static members¹.
-
-As for the rules of default methods defined in interfaces:
-
-. *Compatibility*: Default interface methods were introduced to allow adding new methods to an interface without breaking existing implementations.
-. *Access Modifiers*: Default interface members can have public, internal, protected, or private modifiers, just like any other class implementation.
-. *Static or Non-static*: The default interface members themselves can be either static or non-static.
-. *Virtual Members*: The members can be virtual, allowing any derived interface or class to extend the member.
-. *No Instance State*: Interfaces may not contain instance state. While static fields are now permitted, instance fields are not permitted in interfaces. Instance auto-properties are not supported in interfaces, as they would implicitly declare a hidden field.
-
-Source: +
-(1) Default implementations in interfaces - .NET Blog. https://devblogs.microsoft.com/dotnet/default-implementations-in-interfaces/. +
-(2) Interfaces - define behavior for multiple types - C#. https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/interfaces. +
-(3) Adding operator support to interfaces (Preview Feature in .NET 6). https://stackoverflow.com/questions/69238213/adding-operator-support-to-interfaces-preview-feature-in-net-6. +
-(4) Can we add variables and properties in interfaces in C#.NET?. https://stackoverflow.com/questions/1944432/can-we-add-variables-and-properties-in-interfaces-in-c-net. +
-(5) interface - C# Reference - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interface. +
-(6) c# - How to implement a property in an interface - Stack Overflow. https://stackoverflow.com/questions/1593413/how-to-implement-a-property-in-an-interface. +
-(7) C# Interface - W3Schools. https://www.w3schools.com/cs/cs_interface.php. +
-
+Se `Base x = new Derivada()`, um método sobrescrito chama a derivada; um método escondido pode chamar a base.
 ====
 
-.Can we define private methods in Interfaces?
+.O que é `sealed`?
 [%collapsible]
 ====
-*Yes* 
+`sealed` impede herança de uma classe ou novo override de um método.
 
-In C#, prior to version 8.0, you could not define private methods in interfaces. An interface was considered a contract for public methods¹⁴⁵.
-
-However, starting with C# 8.0, you can define private methods in interfaces, but they must be default methods, meaning they must have an implementation¹². This change allows for useful refactoring and organization of code used to implement the interface's public API².
-
-Here's an example:
-
-```csharp
-public interface IExample
-{
-    void PublicMethod()
-    {
-        // Call the private method
-        PrivateMethod();
-    }
-
-    private void PrivateMethod()
-    {
-        Console.WriteLine("Private method in interface");
-    }
-}
-```
-
-In this example, `PrivateMethod` is a private method in the `IExample` interface. It's called by `PublicMethod`, which is a public method in the same interface².
-
-Please note that private methods in interfaces are a feature of C# 8.0 and later, so you'll need to be using a compatible version of the .NET framework². Also, remember that private methods in interfaces cannot be accessed in the implementing class¹². They are only for use within the interface itself².
-
-Source: +
-(1) c# - How can I make a method private in an interface? - Stack Overflow. https://stackoverflow.com/questions/1383434/how-can-i-make-a-method-private-in-an-interface. +
-(2) c# interface public private - Stack Overflow. https://stackoverflow.com/questions/25033751/c-sharp-interface-public-private. +
-(3) c# - Private class method or interface? - Stack Overflow. https://stackoverflow.com/questions/72228471/private-class-method-or-interface. +
-(4) c# - private members in interface - Stack Overflow. https://stackoverflow.com/questions/59455727/private-members-in-interface. +
-(5) c# - Private members of the interface - Stack Overflow. https://stackoverflow.com/questions/23545232/private-members-of-the-interface. +
+Use quando a extensão não é suportada, quando invariantes não podem ser preservados por herdeiros ou para deixar o contrato explícito.
 ====
 
-.What is the purpose of a private method within an Interface ?
+.Quando herança vira problema?
 [%collapsible]
 ====
-Private methods in interfaces, introduced in C# 8.0, serve a couple of important purposes:
+Herança vira problema quando tipos derivados não conseguem cumprir o contrato do tipo base.
 
-1. **Code Organization and Reusability**: Private methods in interfaces allow you to organize and reuse code within the interface itself¹. They can be used to break down complex default methods into smaller, more manageable pieces¹.
-
-2. **Encapsulation**: Private methods in interfaces help encapsulate implementation details that are not meant to be exposed to the classes implementing the interface¹³. They help reduce the size of an object’s API and indicate what’s safe to refactor⁵.
-
-Remember, private methods in interfaces are only for use within the interface itself¹². They are not accessible in the implementing class¹². This helps to maintain the abstraction that interfaces provide¹²³.
-
-Source: +
-(1) c# - How can I make a method private in an interface? - Stack Overflow. https://stackoverflow.com/questions/1383434/how-can-i-make-a-method-private-in-an-interface.+
-(2) c# – Why can't an interface's implemented methods be private?. https://yeahexp.com/why-cant-an-interfaces-implemented-methods-be-private/.+
-(3) The purpose of private methods and when to use them. https://www.codewithjason.com/purpose-private-methods-use/.+
-(4) c# - What is a private interface? - Stack Overflow. https://stackoverflow.com/questions/792908/what-is-a-private-interface.+
-(5) c# interface public private - Stack Overflow. https://stackoverflow.com/questions/25033751/c-sharp-interface-public-private.+
+Sinais: overrides que lançam `NotSupportedException`, propriedades ignoradas, métodos com semântica diferente e hierarquias criadas só para reaproveitar código.
 ====
 
-.What are best practices to change an Interface ?
+.Como validar polimorfismo em testes?
 [%collapsible]
 ====
-1. **Avoid Breaking Changes**: If possible, avoid making changes that would break existing implementations¹²³.
+Crie testes que exercem o contrato pelo tipo base ou pela interface.
 
-2. **Use Default Interface Methods**: Starting from C# 8.0 and .NET Core 3.0, you can add new methods to an interface without breaking existing implementations by using default interface methods³.
-
-3. **Interface Segregation**: If the changes are significant, consider creating a new interface. This aligns with the Interface Segregation Principle (ISP), which suggests having many small, specific interfaces instead of one large, general interface¹².
-
-4. **Interface Inheritance**: You can also use interface inheritance to extend the interface¹.
-
-5. **Versioning**: Another approach is to create a new version of the interface and slowly deprecate the old one³.
-
-Remember, any change to an interface should be carefully considered due to the widespread impact it can have on your codebase¹²³.
-
-Source: +
-(1) Safely update interfaces using default interface methods in C# - C# .... https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/interface-implementation/default-interface-methods-versions. +
-(2) c# - Best practices when using an interface - Stack Overflow. https://stackoverflow.com/questions/5744927/best-practices-when-using-an-interface. +
-(3) C# Interface: Definition, Examples, Best Practices, and Pitfalls. https://blog.submain.com/c-interface-definition-examples/. +
-(4) c# - How can I avoid constantly having to change an interface when .... https://stackoverflow.com/questions/52196060/how-can-i-avoid-constantly-having-to-change-an-interface-when-adding-new-feature. +
+Se cada implementação exige tratamento especial no chamador, o polimorfismo não está entregando seu objetivo.
 ====
 
-.Explain ISP (Interface Segregation Principle) ?
+== Composição e relações
+
+.O que é associação?
 [%collapsible]
 ====
+Associação indica que dois objetos se relacionam ou colaboram.
 
-The Interface Segregation Principle (ISP) is one of the five principles of SOLID in object-oriented programming¹². It states that no class should be forced to implement any methods of an interface they don’t use¹²³. Instead of creating large interfaces, it's better to create multiple smaller interfaces, each serving a specific purpose¹².
-
-This principle ensures that the classes and the whole application are robust, easy to maintain, and expand if required³. It promotes the idea of creating small and cohesive interfaces that are specific to the client’s needs². This way, the clients only need to know about the methods that are of interest to them¹.
-
-Here's an example of violating the ISP:
-
-```csharp
-public interface IVehicle 
-{
-    void Run();
-    void Fly();
-}
-
-public class Car: IVehicle 
-{
-    public void Run() => Console.Write("Running");
-    public void Fly() => throw new NotImplementedException();
-}
-```
-
-In this example, the `Car` class is forced to implement the `Fly` method, which it doesn't need. This violates the ISP². To adhere to the ISP, we could create separate interfaces for `IRunnable` and `IFlyable`, and have `Car` implement only `IRunnable`².
-
-Source: +
-(1) Interface Segregation Principle in C# - Dot Net Tutorials. https://dotnettutorials.net/lesson/interface-segregation-principle/. +
-(2) C# Interface Segregation Principle - C# Tutorial. https://www.csharptutorial.net/csharp-design-patterns/csharp-interface-segregation-principle/. +
-(3) SOLID Principles In C# - Interface Segregation Principle - C# Corner. https://www.c-sharpcorner.com/article/solid-principles-in-c-sharp-interface-segregation-principle/. +
+É o termo mais amplo.
+Agregação e composição são formas mais específicas de associação.
 ====
 
-.Can we create an instance of an Interface ?
+.O que é agregação?
 [%collapsible]
 ====
-*NO*
+Agregação representa relação todo-parte em que a parte pode existir independentemente.
+
+Exemplo: um departamento tem funcionários, mas funcionários existem fora daquele departamento.
+O ciclo de vida não é totalmente controlado pelo todo.
 ====
 
-.Can we do Multiple Inheritance with Abstract classes?
+.O que é composição em sentido estrito?
 [%collapsible]
 ====
-*NO*
+Composição representa relação todo-parte forte, em que a parte pertence ao todo.
+
+Exemplo: `Pedido` e seus `ItensDoPedido`.
+Remover o pedido geralmente remove seus itens.
 ====
 
-.Abstract classes vs Interfaces ?
+.Como escolher entre associação, agregação e composição?
 [%collapsible]
 ====
-TIP: To compare Abstract classes vs Interfaces is a comparison between different entities that serves different purposes. Just because they might have some similar behaviour they are not the same and are meant to fill different roles in OOP.
+Pergunte quem controla o ciclo de vida e as invariantes.
 
-NOTE: Interfaces are implemented, Abstract classes are inherited
-[]
-* Interfaces enables pure abstraction. It happens during design phase and you worry about implementation later. Classes implement the abstractions. When we start writing concrete classes, we don´t worry about abstractions anymore, we try to follow the abstractions that was already planned before.
-
-* Abstract class is a half defined class. Because some of the code you can define, you are already coding, therefore, you are not in the design phase anymore, you are in the execution phase (coding)... 
-
-
-There are, some logic that you can use for better programming:
-[]
-1. Define the interfaces in the Planning, Design Phase (Abstractions)
-2. After Design Phase finishes, extract the common logic to abstract classes
-3. Define the concrete classes
-
-
-WARNING: You can of course explore a technical loophole and create an abstract class with fully abstract methods and properties so that it now everything behaves as a contract. You can implement concrete classes from this abstract class, but you end up in a nasty situation up ahead if descendants does not need one the methods from the base abstract class. C# does not allow multiple inheritance and you end up being forced use an interface.
+Se só há colaboração, associação.
+Se há relação todo-parte com independência, agregação.
+Se a parte pertence ao todo e depende dele, composição.
 ====
 
-.Explain partial classes
+.Por que composição sobre herança é uma recomendação comum?
 [%collapsible]
 ====
-In C#, a partial class is a feature that allows you to split the definition of a class, struct, or interface over two or more source files¹². Each source file contains a section of the type or method definition, and all parts are combined when the application is compiled¹².
+Porque composição permite variar comportamento sem congelar uma hierarquia.
 
-Here's an example:
-
-```csharp
-public partial class Employee
-{
-    public void DoWork()
-    {
-    }
-}
-
-public partial class Employee
-{
-    public void GoToLunch()
-    {
-    }
-}
-```
-
-In this example, the `Employee` class is split into two files. One file contains the `DoWork` method, and the other file contains the `GoToLunch` method¹.
-
-Partial classes are useful in several situations:
-
-1. **Large Projects**: When working on large projects, spreading a class over separate files enables multiple programmers to work on it at the same time¹.
-2. **Automatically Generated Source**: Code can be added to the class without having to recreate the source file. Visual Studio uses this approach when it creates Windows Forms, Web service wrapper code, and so on¹.
-3. **Source Generators**: When using source generators to generate additional functionality in a class¹.
-
-Remember, all the parts of a partial class must use the `partial` keyword and must be available at compile time to form the final type¹. All the parts must have the same accessibility, such as public, private, and so on¹. If any part is declared abstract, then the whole type is considered abstract. If any part is declared sealed, then the whole type is considered sealed¹.
-
-Source: +
-(1) Partial Classes and Methods - C# Programming Guide - C#. https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods. +
-(2) Partial Classes in C# - GeeksforGeeks. https://www.geeksforgeeks.org/partial-classes-in-c-sharp/. +
-(3) Partial Class and Partial Methods in C# - Dot Net Tutorials. https://dotnettutorials.net/lesson/partial-classes-partial-methods-csharp/. +
+Ela facilita testes, substituição e reuso.
+Herança continua válida quando a relação "é um" é verdadeira e estável.
 ====
-.Explain Sealed Classes ?
+
+.O que é um objeto de valor?
 [%collapsible]
 ====
+Objeto de valor é definido por seus dados, não por identidade própria.
 
-In C#, a sealed class is a class that cannot be inherited by other classes¹²³⁵. Once a class is marked as sealed, it cannot be used as a base class for any other class¹²³⁵. Any attempt to derive a new class from a sealed class will result in a compile-time error¹²³⁵.
-
-Sealed classes are often used for security purposes to prevent the derived class from unwanted users⁴. They are also used to limit the extensibility of the classes⁴.
-
-Here's an example of a sealed class in C#:
-
-```csharp
-sealed class SealedClass
-{
-    public int x;
-    public int y;
-}
-
-class SealedTest2
-{
-    static void Main()
-    {
-        var sc = new SealedClass();
-        sc.x = 110;
-        sc.y = 150;
-        Console.WriteLine($"x = {sc.x}, y = {sc.y}");
-    }
-}
-```
-
-In this example, `SealedClass` is a sealed class. It can be instantiated, but no class can inherit from it¹²³⁵. If you try to inherit from the sealed class (e.g., `class MyDerivedC: SealedClass {}`), you will get a compile-time error².
-
-It's important to note that structs in C# are implicitly sealed, meaning they cannot be inherited².
-
-Source: +
-(1) C# | Sealed Class - GeeksforGeeks. https://www.geeksforgeeks.org/c-sharp-sealed-class/. +
-(2) sealed modifier - C# Reference - C# | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/sealed. +
-(3) C# Sealed Class: Everything you need to know - Josip Miskovic. https://josipmisko.com/posts/c-sharp-sealed-class. +
-(4) What is a Sealed Class? - Definition from Techopedia. https://www.techopedia.com/definition/25637/sealed-class-c. +
-(5) Sealed Class in C# | Sealed Methods in C# with Programming Codes - EDUCBA. https://www.educba.com/sealed-class-in-c-sharp/. +
-(6) github.com. https://github.com/DunyaELBASAN/.net_art/tree/f27054b4516d1e6e5ad00bc0ea518534c0028afe/snippets%2Fcsharp%2FVS_Snippets_VBCSharp%2FcsrefKeywordsModifiers%2FCS%2FcsrefKeywordsModifiers.cs. +
+Exemplos: `Email`, `Money`, `Endereco`.
+Em C#, records podem ser úteis para esse tipo de modelagem.
 ====
+
+.O que é uma entidade?
+[%collapsible]
+====
+Entidade tem identidade e ciclo de vida.
+
+Duas entidades podem ter os mesmos dados e ainda serem diferentes por identidade.
+Classes costumam ser uma escolha natural para entidades.
+====
+
+.Quando usar record, class ou struct?
+[%collapsible]
+====
+Use record para valores imutáveis ou mensagens.
+Use class para entidades, serviços e objetos com identidade.
+Use struct para valores pequenos, imutáveis e sensíveis a alocação.
+
+A escolha deve refletir semântica, não apenas sintaxe curta.
+====
+
+.O que são nested classes?
+[%collapsible]
+====
+São tipos declarados dentro de outro tipo.
+
+Use quando o tipo interno só faz sentido como detalhe do tipo externo.
+Evite quando a estrutura dificulta leitura ou testes.
+====
+
+.Nested classes acessam membros privados do tipo externo?
+[%collapsible]
+====
+Sim, nested classes podem acessar membros privados do tipo que as contém.
+
+Elas não recebem automaticamente uma instância do tipo externo.
+Para acessar membros de instância, precisam de uma referência a uma instância.
+====
+
+== Interfaces modernas e evolução
+
+.O que são default interface methods?
+[%collapsible]
+====
+São implementações padrão dentro de interfaces.
+
+Elas ajudam a evoluir contratos sem quebrar todas as implementações.
+Use com cuidado: muita lógica em interface pode esconder design ruim.
+====
+
+.Interfaces podem ter membros privados?
+[%collapsible]
+====
+Sim, quando usados para apoiar implementações padrão dentro da própria interface.
+
+Membros privados em interface não são acessíveis pela classe implementadora.
+Eles servem para reduzir duplicação interna da interface.
+====
+
+.O que são static abstract interface members?
+[%collapsible]
+====
+São membros estáticos exigidos por uma interface.
+
+Eles permitem abstrações sobre operadores e membros estáticos, como em matemática genérica.
+É um recurso moderno e deve ser usado quando há ganho real de tipo e performance.
+====
+
+.Como evoluir uma interface sem quebrar consumidores?
+[%collapsible]
+====
+Prefira adicionar uma nova interface menor, criar extensão, usar implementação padrão quando apropriado ou versionar o contrato.
+
+Adicionar membro abstrato a interface existente quebra implementações.
+Contrato público precisa de cuidado de compatibilidade.
+====
+
+.Quando uma interface é abstração demais?
+[%collapsible]
+====
+Quando existe uma única implementação, nenhum consumidor alternativo, nenhum boundary externo e nenhum ganho de teste.
+
+Interface criada só por hábito aumenta arquivos e indireção.
+Use abstração quando ela resolve uma variação real.
+====
+
+.O que é coesão em uma interface?
+[%collapsible]
+====
+É o quanto seus membros pertencem ao mesmo contrato.
+
+Interface coesa representa uma capacidade clara.
+Interface com métodos desconexos força implementadores e consumidores a dependerem de membros irrelevantes.
+====
+
+.O que é acoplamento temporal?
+[%collapsible]
+====
+É quando métodos precisam ser chamados em ordem específica para o objeto funcionar.
+
+Exemplo: criar objeto, chamar `Configurar`, depois `Inicializar`, depois `Executar`.
+Construtores, factories ou tipos de estado podem reduzir esse risco.
+====
+
+.Como construtores ajudam invariantes?
+[%collapsible]
+====
+Construtores podem exigir dados obrigatórios e impedir objeto inválido.
+
+Se um tipo não pode existir sem `Nome` e `Email`, esses valores devem ser obrigatórios na criação.
+Isso simplifica o restante do código.
+====
+
+.Qual é a diferença entre validação e invariante?
+[%collapsible]
+====
+Validação verifica entrada ou comando.
+Invariante é regra que deve permanecer verdadeira durante toda a vida do objeto.
+
+Domínio rico mantém invariantes perto do estado que elas protegem.
+====
+
+.Como reconhecer uma classe com responsabilidades demais?
+[%collapsible]
+====
+Ela muda por muitos motivos, tem muitos grupos de métodos, conhece detalhes de várias camadas e é difícil de testar.
+
+Nomes genéricos como `Manager`, `Helper` e `Service` podem ser sinal de baixa coesão, mas o diagnóstico vem das responsabilidades reais.
+====
+
+== Referências de apoio
+
+* https://learn.microsoft.com/dotnet/csharp/fundamentals/types/interfaces[Interfaces em C#]
+* https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/record[Records]
+* https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/nested-types[Nested types]
+* https://learn.microsoft.com/dotnet/csharp/advanced-topics/interface-implementation/[Implementação avançada de interfaces]

@@ -1,236 +1,305 @@
-=== Garbage Collectors
+= .NET e C# - Perguntas avançadas
+:toc:
+:toc-title: Sumário
+:toclevels: 2
 
-.Explain Garbage Collector
+== Objetivo do nível
+
+Este arquivo exige análise de trade-offs, diagnóstico e conhecimento profundo de runtime, performance, compatibilidade, AOT, concorrência e APIs modernas. Perguntas avançadas não pedem apenas definição; elas pedem decisão técnica com consequência.
+
+== Runtime, GC e memória
+
+.Como diagnosticar pressão excessiva de GC em uma aplicação .NET?
 [%collapsible]
 ====
-NOTE: It is a background process which runs undeterministically and it cleans unreferenced managed objects from the HEAP memory
+Procure evidências antes de alterar código.
 
-* When the objects goes out of scope, GC reclaims the memory and gives it back to operating system
-
-* We can analyze GC using performance counters in Perfmon or in Visual Studio, Debug Menu -> Performance Profiler
-
-
+* Observe alocação por segundo, `% Time in GC`, frequência de Gen 2, tamanho de heap e LOH.
+* Use ferramentas como `dotnet-counters`, `dotnet-trace`, dumps e perfis de alocação.
+* Depois conecte métricas ao código: buffers grandes, strings temporárias, materialização excessiva, closures e boxing.
 ====
-.What is the difference between Managed and UnManaged resource ?
+
+.Por que Gen 2 frequente costuma ser mais preocupante que Gen 0 frequente?
 [%collapsible]
 ====
+Gen 0 é esperada em aplicações que alocam objetos curtos.
+Gen 2 envolve objetos de vida longa e normalmente tem custo maior.
 
-* Managed resources are those which are pure .NET objects and these objects are controlled by .NET CLR
-* UnManaged resources are not controlled by .NET CLR: File handle, COM Objects, Connection objects, etc.
-
-NOTE: Garbage Collector *CAN ONLY CLEAN* Managed Objects
+Gen 2 frequente pode indicar retenção indevida, caches sem limite, objetos promovidos por finalização, LOH ou pressão de memória real.
 ====
-.Explain Generators and Why it is needed ?
+
+.Qual é o impacto do Large Object Heap?
 [%collapsible]
 ====
-. GC0: Short Lived Objects. Local Objects
-. GC1: Intermediate lived objects; buffers
-. GC2: Long lived objects; Static objects
+LOH armazena objetos grandes e é coletado com Gen 2.
 
-It is needed to improve GC performance; GC makes an assumption that if objects are needed longer then it should be visited less
-
-WARNING: If an object has a destructor, the 1st time GC visits the object, if it sees a destructor, it executes and the object will be promoted to upper generations to allow more time for the destructor code to finish, and ony during the upper generation check, it cleans the object from the memory; therefore, destructors will put more pressure on the memory because objects will live longer in the memory. SOLUTION: Inform GC that you will take care of cleaning unmanaged code by implementing IDispose pattern
-
-NOTE: Never use empty destructors
-
+Alocações grandes e frequentes podem causar fragmentação, pausas mais caras e pressão de memória.
+Mitigações incluem reutilização de buffers, streaming, `ArrayPool<T>` e evitar materializar payloads grandes sem necessidade.
 ====
 
-.Explain the Dispose Pattern using IDisposable?
+.O que é Pinned Object Heap e por que ele importa?
 [%collapsible]
 ====
+POH é uma área para objetos fixados que não podem ser movidos pelo GC.
 
-The Dispose Pattern in .NET C# is a design pattern used for releasing unmanaged resources¹². Here's a detailed explanation:
-
-**Why it is needed:**
-.NET applications often operate on system resources like memory, system handles, or database connections. While the .NET garbage collector (GC) automatically manages memory allocated using the C# `new` operator, it does not manage unmanaged resources². These unmanaged resources, such as file and pipe handles, registry handles, wait handles, or pointers to blocks of unmanaged memory, need to be released explicitly¹². If not properly released, these resources can lead to memory leaks and other performance issues².
-
-**What it is:**
-The Dispose Pattern is used for objects that implement the `IDisposable` interface¹. The `Dispose` method is primarily implemented to release unmanaged resources¹. When working with instance members that are `IDisposable` implementations, it's common to cascade `Dispose` calls¹. The pattern imposes order on the lifetime of an object¹.
-
-**How it works:**
-The class implementing the `IDisposable` interface encapsulates resources that need explicit clean-up³. The `Dispose(bool disposing)` method is the core of the disposal pattern. It is responsible for releasing both managed and unmanaged resources³. A `Dispose` method should be idempotent, meaning it's callable multiple times without throwing an exception¹.
-
-Here's a basic example of how to implement the Dispose pattern:
-
-```csharp
-public class Resource : IDisposable
-{
-     // To detect redundant calls
-    private bool _disposedValue;
-
-    public void Dispose()
-    {
-        Dispose(true);
-       //Tells GC: Do not execute the finalizer (Destructor), meaning, you already cleaned everything in the Dispose
-        GC.SuppressFinalize(this); 
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {               
-                // TODO: dispose managed state (managed objects) calling their dispose methods
-            }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-            // TODO: set large fields to null.
-
-            _disposedValue = true;
-        }
-        
-        //If a class is inherited and base classe has a dispose method
-        //base.Dispose(disposing);
-    }
-
-    // TODO: In case you forget to call Dispose, GC will execute this destructor
-    ~Resource()
-    {
-        // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        Dispose(false);
-    }
-}
-```
-This code ensures that resources are always cleaned up appropriately, whether by the developer calling `Dispose` or by the garbage collector calling the finalizer¹.
-
-Source:+
-(1) Implement a Dispose method - .NET | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose. +
-(2) Dispose Pattern - Framework Design Guidelines | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern. +
-(3) The Disposal Pattern in .NET: Managing Unmanaged Resources and .... https://dev.to/waelhabbal/the-disposal-pattern-in-net-managing-unmanaged-resources-and-implementing-clean-up-30ce. +
-(4) From Dispose Pattern to Auto-disposable Objects in .NET. https://codinghelmet.com/articles/from-dispose-pattern-to-auto-disposable-objects-in-net. +
-(5) The Dispose Pattern Step by Step - Vasil Kosturski. https://vkontech.com/the-dispose-pattern-step-by-step/. +
-(6) github.com. https://github.com/ZeusPlugins/ZplBackupPlugin/tree/cb650cb8ca568bfe3f8ec3f606d4016b5aeb299d/ZplBackupPlugin%2FZplBackupPluginCommand.cs. +
-(7) github.com. https://github.com/Hqtruong27/Knowledge/tree/ea0853df781ea949ce8c64cbcd849e308c90ae89/src%2FKnowledge.Data%2FUOW%2FUnitOfWork.cs. +
-(8) github.com. https://github.com/ngates87/WPF-Projection-Tool/tree/eab20753b5a1f4099b9972c0ed850df99224d8ea/ProjectionMapping%2FCommunication.cs. +
-(9) github.com. https://github.com/jessegranger/Shiv/tree/e934b7a11740d652526223de9e8c334ea1aa2a7f/Game%2FNativeMemory.cs. +
-
+Pinning excessivo atrapalha compactação e pode aumentar fragmentação.
+Em interoperabilidade e I/O de alto desempenho, entender pinning ajuda a evitar pausas e degradação de memória.
 ====
-.Explain GC.SuppressFinalize(this)
+
+.Quando `GC.Collect()` é aceitável?
 [%collapsible]
 ====
+Raramente.
 
-`GC.SuppressFinalize(this)` is a method call in C# that informs the .NET Garbage Collector (GC) that it doesn't need to call the finalizer (also known as the destructor) for the specified object¹².
-
-Here's a detailed explanation:
-
-- **Purpose**: The purpose of `GC.SuppressFinalize(this)` is to prevent the GC from calling the finalizer of an object that has already been cleaned up¹². This can improve the performance of your application by reducing the overhead of finalization³.
-
-- **When to use**: `GC.SuppressFinalize(this)` is typically called within the `Dispose` method of a class that implements the `IDisposable` interface¹². After the `Dispose` method has been called, it's safe to assume that all resources have been cleaned up properly. Therefore, there's no need for the GC to call the finalizer again, which is why `GC.SuppressFinalize(this)` is used¹².
-
-- **Effect on GC**: Normally, the CLR keeps tabs on objects with a finalizer when they are created, making them more expensive to create¹. `GC.SuppressFinalize(this)` tells the GC that the object was cleaned up properly and doesn't need to go onto the finalizer queue¹. This can be a significant optimization, as your objects can live a long time waiting on the finalizer queue¹.
-
-- **Caution**: It's important to note that `GC.SuppressFinalize(this)` should only be called on an object (`this`) that has a finalizer¹. Calling `GC.SuppressFinalize(this)` on an object that doesn't have a finalizer is equivalent to `GC.KeepAlive(this)`⁴. It will not only disable the class's own finalizer from running, but will ensure that the finalizers of any objects to which it holds references won't get scheduled for execution until disposal is complete⁴.
-
-Source: +
-(1) c# - When should I use GC.SuppressFinalize()? - Stack Overflow. https://stackoverflow.com/questions/151051/when-should-i-use-gc-suppressfinalize. +
-(2) GC.SuppressFinalize(Object) Method (System) | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/api/system.gc.suppressfinalize?view=net-8.0. +
-(3) When to use GC.SuppressFinalize() in C#? - iDiTect.com. https://www.iditect.com/faq/csharp/when-to-use-gcsuppressfinalize-in-c.html. +
-(4) c# - Why use GC.SuppressFinalize() when there is no Finalizer? - Stack .... https://stackoverflow.com/questions/19078536/why-use-gc-suppressfinalize-when-there-is-no-finalizer. +
+Pode fazer sentido após uma fase curta que alocou muito e terminou, em aplicações controladas, com medição mostrando benefício.
+Em servidores, chamar `GC.Collect()` por hábito geralmente piora latência e throughput.
 ====
-.What is the using statement in C# ?
+
+.Como finalizers afetam o ciclo de vida de objetos?
 [%collapsible]
 ====
-`*using*` define a scope and at the end of the scope Dispose() will be called automatically!
+Objetos com finalizer precisam entrar na fila de finalização antes de serem liberados.
+
+Isso prolonga a vida do objeto e pode promover memória para gerações superiores.
+Prefira `SafeHandle` e `IDisposable`; use finalizer apenas para proteger recurso não gerenciado direto.
 ====
 
-.Can you force GC to run ?
+.Quando usar `SafeHandle` no dispose pattern?
 [%collapsible]
 ====
-Yes, you can force the Garbage Collector (GC) to run in C# by using the `GC.Collect()` method¹⁴. This method forces the GC to spin through all unused objects and de-allocate them⁴. However, it's important to note that forcing a garbage collection is generally not recommended¹². The GC in .NET is designed to be self-tuning and to perform garbage collection automatically when needed².
+Use `SafeHandle` para encapsular handles nativos.
 
-Here's how you can force the GC to run:
-
-```csharp
-GC.Collect();
-```
-
-In addition, if you want to wait for all finalizers to run after forcing a collection, you can use `GC.WaitForPendingFinalizers()`¹:
-
-```csharp
-GC.Collect();
-GC.WaitForPendingFinalizers();
-```
-
-This code will block until all objects in the finalization queue have been finalized¹. If you want a chance for those objects to be collected then you need another call to `Collect` after calling `WaitForPendingFinalizers`¹.
-
-However, keep in mind that forcing a garbage collection can lead to performance issues². The GC is usually more efficient when it's allowed to run on its own schedule². Therefore, it's generally better to let the GC handle memory management, and only force a collection in specific, rare scenarios where it's necessary².
-
-Source: +
-(1) c# - How to force garbage collector to run? - Stack Overflow. https://stackoverflow.com/questions/4257372/how-to-force-garbage-collector-to-run. +
-(2) C# Tip: Forcing Garbage Collection in .NET | Developer.com. https://www.developer.com/microsoft/c-sharp/c-tip-forcing-garbage-collection-in-net/. +
-(3) Best Practice for Forcing Garbage Collection in C#. https://stackoverflow.com/questions/233596/best-practice-for-forcing-garbage-collection-in-c-sharp. +
-(4) c# - How to Force Disposal of Objects / GC - Stack Overflow. https://stackoverflow.com/questions/8783318/how-to-force-disposal-of-objects-gc. +
-(5) http://msdn.microsoft.com/en-us/library/66x5fx1b.aspx.+
+Ele reduz a necessidade de finalizers próprios e torna a liberação de recursos nativos mais confiável.
+Classes consumidoras podem delegar o descarte ao `SafeHandle`.
 ====
 
-.Explain WeakReference and StrongReference 
+.Como `Span<T>` muda decisões de performance?
 [%collapsible]
 ====
-**Strong References**: A strong reference is a typical object reference¹³⁴⁵. If an object is reachable (meaning there's a path of strong references from the roots to the object), it's considered "in use" and won't be collected by the garbage collector (GC)⁴⁵. This is the default type of reference for all .NET objects¹³⁴⁵.
+`Span<T>` permite trabalhar com regiões contíguas de memória sem copiar dados.
 
-**Weak References**: A weak reference, on the other hand, still references an object but allows that object to be reclaimed by garbage collection¹²⁴. It does not create a "countable" reference, thus you can keep a sort-of-reference to it, but still let it be eligible for garbage collection if your `WeakReference` is the only thing left looking at it¹. They are useful when you want to keep a reference to an object, but don't want that reference to prevent the GC from collecting the object¹²⁴. They can be useful for holding on to large objects that are expensive to initialize, but should be available for garbage collection if they are not actively in use².
-
-**Usage**: If your objects aren't being garbage collected when you want them to then you've made an error in your book keeping, something's still holding a reference that you forgot to remove¹. Using weak references can ease the pain of such book keeping, since you don't have to worry about them keeping an object "alive" and un-garbage-collected, but you don't have to use them¹. A good question to ask when considering use of a `WeakReference` is how one would feel if the weak reference were invalidated the instant no strong references existed to the object. If that would make the `WeakReference` less useful, then a `WeakReference` is probably not the best thing to use¹.
-
-``` csharp
-class Program
-{
-    static WeakReference weakRef = new WeakReference(null);
-
-    static void Main(string[] args)
-    {
-	    Fun1();
-	    Console.WriteLine("Waiting GC to run and clean the memory of my weakRef target");
-	    while (weakRef.IsAlive)
-	    {
-
-	    }
-	    Console.WriteLine($"Object is cleared from memory = {!weakRef.IsAlive}");
-    }
-
-    static void Fun1()
-    {
-        SomeClass t = new();
-        weakRef.Target = t;
-    } 
-    //t is out of scope here.
-    //t is marked to be Garbage Collected 
-    //between the time it is marked and actually Garbage Collected, we can use the weak reference to it
-}
-```
-In this example, as long as the strongReference exists, the Data object won’t be collected by the GC. However, once we remove the strongReference, the Data object is eligible for collection because the weakReference doesn’t prevent collection.
-
-Source: +
-(1) c# - When should weak references be used? - Stack Overflow. https://stackoverflow.com/questions/1640889/when-should-weak-references-be-used. +
-(2) Deciding When to Use Weak References in .NET | CodeGuru. https://www.codeguru.com/dotnet/deciding-when-to-use-weak-references-in-net/. +
-(3) WeakReference<T> Class (System) | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/api/system.weakreference-1?view=net-8.0. +
-(4) Weak Reference Lists (WeakLists) in C# - ChrisWirz.com. https://www.chriswirz.com/software/weak-reference-lists-in-c-sharp. +
-(5) c# - Weak reference benefits - Stack Overflow. https://stackoverflow.com/questions/310685/weak-reference-benefits. +
+Ele é `ref struct`, fica restrito ao stack e não pode ser capturado por async/lambda.
+É útil para parsing, buffers e caminhos críticos, mas não deve contaminar APIs sem necessidade.
 ====
-.When should we use WeakReferences?
+
+.Quando usar `Memory<T>` em vez de `Span<T>`?
 [%collapsible]
 ====
+Use `Memory<T>` quando a memória precisa sobreviver a chamadas assíncronas, ser armazenada ou atravessar fronteiras mais longas.
 
-Here are some guidelines for when to use weak references:
-
-1. **Large Objects**: Weak references are useful for objects that use a lot of memory but can be recreated easily if they are reclaimed by garbage collection². For example, if a tree view in a Windows Forms application displays a complex hierarchical choice of options to the user and the underlying data is large, keeping the tree in memory is inefficient when the user is involved with something else in the application².
-
-2. **Cache Management**: You can use the `WeakReference` class to create a weak reference to the tree and destroy all strong references when the user switches away to another part of the application². When the user switches back to the tree, the application attempts to obtain a strong reference to the tree and, if successful, avoids reconstructing the tree².
-
-3. **Breaking Reference Cycles**: Weak references can be used to break reference cycles in your application³.
-
-However, there are also some cautions to keep in mind when using weak references²⁴:
-
-- Use long weak references only when necessary as the state of the object is unpredictable after finalization²⁴.
-- Avoid using weak references to small objects because the pointer itself may be as large or larger²⁴.
-- Avoid using weak references as an automatic solution to memory management problems²⁴.
-
-Remember, the use of weak references should be carefully considered as they add complexity to your code²⁴. They should be used judiciously and not as a default solution to memory management issues²⁴.
-
-Source: +
-(1) Weak References - .NET | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/weak-references. +
-(2) c# - WeakReference understanding - Stack Overflow. https://stackoverflow.com/questions/10928329/weakreference-understanding. +
-(3) C# Language Tutorial => Weak References. https://riptutorial.com/csharp/example/19680/weak-references. +
-(4) WeakReference Class (System) | Microsoft Learn. https://learn.microsoft.com/en-us/dotnet/api/system.weakreference?view=net-8.0. +
+Use `Span<T>` para processamento síncrono e local.
+Ambos ajudam a reduzir cópias, mas têm restrições diferentes.
 ====
+
+.Quando `ArrayPool<T>` é uma boa escolha?
+[%collapsible]
+====
+Use quando buffers grandes ou frequentes causam pressão de alocação.
+
+O cuidado é sempre devolver o array, limpar dados sensíveis quando necessário e não manter referência após retorno ao pool.
+Para buffers pequenos e raros, a complexidade pode não compensar.
+====
+
+== Assincronismo, paralelismo e throughput
+
+.Quando `ValueTask` é melhor que `Task`?
+[%collapsible]
+====
+`ValueTask` pode reduzir alocação quando o resultado frequentemente já está disponível de forma síncrona.
+
+Ele aumenta complexidade: não deve ser aguardado múltiplas vezes sem cuidado e complica consumo.
+Use em caminhos críticos medidos; em APIs comuns, `Task` é mais simples.
+====
+
+.Como investigar thread pool starvation?
+[%collapsible]
+====
+Procure crescimento de filas, latência alta, muitas threads bloqueadas e uso de `.Result`, `.Wait()`, locks ou I/O síncrono.
+
+Use métricas de runtime, traces e dumps.
+A correção normalmente envolve remover bloqueios, tornar I/O realmente assíncrono e limitar fan-out.
+====
+
+.Por que fan-out assíncrono sem limite pode derrubar throughput?
+[%collapsible]
+====
+Iniciar milhares de tarefas pode saturar conexões, banco, CPU, memória ou serviço externo.
+
+`Task.WhenAll` é bom para conjuntos controlados.
+Para volume alto, use limites explícitos com `Parallel.ForEachAsync`, `SemaphoreSlim`, channels ou filas.
+====
+
+.Como tratar cancelamento em bibliotecas?
+[%collapsible]
+====
+Aceite `CancellationToken` nas APIs que fazem I/O ou trabalho longo.
+Propague o token para dependências e pare em pontos consistentes.
+
+Não engula `OperationCanceledException` como erro comum.
+Preserve a diferença entre falha e cancelamento.
+====
+
+.Quando usar `IAsyncEnumerable<T>`?
+[%collapsible]
+====
+Use para streaming assíncrono de dados quando os itens chegam ao longo do tempo.
+
+Ele evita materializar tudo de uma vez e combina bem com paginação, filas e leitura de dados.
+O consumidor precisa observar cancelamento e descarte assíncrono quando aplicável.
+====
+
+.Como escolher entre lock, `SemaphoreSlim` e channel?
+[%collapsible]
+====
+Use `lock` para proteger seção crítica síncrona e curta.
+Use `SemaphoreSlim` para limitar concorrência, inclusive em código assíncrono.
+Use channel para produzir/consumir trabalho com buffer, backpressure e pipeline.
+====
+
+== Compatibilidade, AOT e metaprogramação
+
+.Por que reflection pode quebrar em trimming ou Native AOT?
+[%collapsible]
+====
+Trimming remove código que parece não usado.
+Reflection acessa membros dinamicamente, então o trimmer pode não enxergar dependências.
+
+Em bibliotecas compatíveis com trimming/AOT, prefira source generators, contratos explícitos ou anotações adequadas.
+====
+
+.Quando usar source generators?
+[%collapsible]
+====
+Use quando código repetitivo pode ser gerado em tempo de compilação e precisa continuar seguro para trimming/AOT.
+
+Bons exemplos: serializers, mapeadores, validadores, registradores e metadados.
+Evite generator quando uma função simples ou reflection local resolve sem custo relevante.
+====
+
+.Como avaliar uma biblioteca para Native AOT?
+[%collapsible]
+====
+Verifique uso de reflection dinâmica, emissão de IL, carregamento dinâmico, serializers, interop e suporte declarado a trimming.
+
+Compile em modo AOT cedo.
+Warnings de trimming devem ser tratados como sinal de contrato incompleto, não como ruído.
+====
+
+.Qual é o risco de serialização baseada em reflection?
+[%collapsible]
+====
+Ela pode falhar com trimming/AOT, acessar membros inesperados e custar mais em runtime.
+
+Em aplicações modernas, serializers com source generation podem melhorar previsibilidade, performance e compatibilidade.
+====
+
+.Quando `dynamic` é aceitável em código avançado?
+[%collapsible]
+====
+Use em fronteiras realmente dinâmicas: COM, scripting, objetos expando ou interoperabilidade específica.
+
+Dentro do domínio, `dynamic` remove verificação de compilação e dificulta refatoração.
+Prefira tipos, generics ou pattern matching quando possível.
+====
+
+== Diagnóstico e design de APIs
+
+.Como diferenciar problema de CPU, I/O e alocação?
+[%collapsible]
+====
+Use evidências separadas.
+
+CPU alta aparece em perfis de execução.
+I/O aparece em latência externa, awaits e dependências.
+Alocação aparece em counters de GC, heap snapshots e traces.
+Sem essa separação, otimizações viram tentativa e erro.
+====
+
+.Como desenhar API pública resiliente a breaking changes?
+[%collapsible]
+====
+Prefira contratos pequenos, tipos explícitos e extensibilidade controlada.
+
+Adicionar membro costuma ser mais seguro que remover ou mudar semântica.
+Use overloads, opções tipadas e obsolescência gradual.
+Teste comportamento público, não detalhes internos.
+====
+
+.Quando retornar `IEnumerable<T>`, `IReadOnlyList<T>` ou `List<T>`?
+[%collapsible]
+====
+Retorne `IEnumerable<T>` para streaming ou enumeração simples.
+Retorne `IReadOnlyList<T>` quando o resultado é materializado e contável.
+Evite retornar `List<T>` quando o consumidor não deve modificar a coleção.
+====
+
+.Como analisar uma regressão de performance após troca de LINQ por loops?
+[%collapsible]
+====
+Meça antes e depois.
+
+Loops podem reduzir alocação e overhead, mas podem piorar legibilidade e introduzir bugs.
+Em caminhos críticos, use BenchmarkDotNet ou profiler; fora deles, prefira clareza.
+====
+
+.Como decidir entre exceções e resultado explícito?
+[%collapsible]
+====
+Use exceções para falhas inesperadas ou violações de contrato.
+Use resultado explícito para estados esperados do domínio, validação ou fluxo comum.
+
+Em APIs públicas, seja consistente: misturar padrões torna consumo difícil.
+====
+
+.Quando usar `IDisposable` e `IAsyncDisposable` juntos?
+[%collapsible]
+====
+Use quando o tipo possui recursos que podem precisar de liberação síncrona e assíncrona.
+
+Exemplos: buffers locais e conexões que fazem flush assíncrono.
+Implemente o padrão com cuidado para evitar descarte duplo ou bloqueio em dispose síncrono.
+====
+
+.Como avaliar se um cache em memória está correto?
+[%collapsible]
+====
+Verifique limite, política de expiração, invalidação, concorrência, tamanho dos valores e comportamento sob pressão.
+
+Cache sem limite pode virar vazamento.
+Cache correto precisa provar que reduz custo sem comprometer consistência.
+====
+
+.Como diagnosticar deadlock em código C#?
+[%collapsible]
+====
+Procure ciclos de espera: locks em ordem diferente, `.Result` em async, `SemaphoreSlim` não liberado, ou contexto de sincronização bloqueado.
+
+Dumps, traces e logs de entrada/saída de locks ajudam.
+A correção geralmente é remover bloqueio ou impor ordem e timeout.
+====
+
+.Quando otimizar com `ref struct`, `in`, `ref` e `readonly struct`?
+[%collapsible]
+====
+Use em código medido, sensível a cópia ou alocação.
+
+Esses recursos podem reduzir overhead, mas aumentam restrições e complexidade.
+Sem medição, podem deixar APIs piores por ganho inexistente.
+====
+
+.Como conduzir uma revisão avançada de código .NET?
+[%collapsible]
+====
+Procure contrato, alocação, concorrência, cancelamento, compatibilidade, observabilidade e tratamento de falhas.
+
+Uma revisão avançada não pergunta apenas "funciona?".
+Ela pergunta como o código falha, escala, é diagnosticado e evolui sem quebrar consumidores.
+====
+
+== Referências de apoio
+
+* https://learn.microsoft.com/dotnet/standard/garbage-collection/[Garbage collection]
+* https://learn.microsoft.com/dotnet/fundamentals/diagnostics/runtime-garbage-collection-events[Eventos de GC do runtime]
+* https://learn.microsoft.com/dotnet/standard/native-interop/pinvoke-source-generation[Source generation para P/Invoke]
+* https://learn.microsoft.com/dotnet/core/deploying/native-aot/[Native AOT]
+* https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/ref-struct[`ref struct` e `Span<T>`]
