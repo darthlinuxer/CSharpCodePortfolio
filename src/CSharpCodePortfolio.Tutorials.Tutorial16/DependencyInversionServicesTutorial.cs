@@ -34,20 +34,9 @@ public sealed class DependencyInversionServicesTutorial : ITutorial
             "Registra o contrato de cálculo e duas classes de folha de pagamento.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: o ponto de composição decide qual implementação atende o contrato.",
-            "Registro.cs",
-            """
-            services
-                .AddTransient<ISalaryCalculator, SalaryCalculator>()
-                .AddTransient<ConstructorInjectedPayroll>()
-                .AddScoped(provider =>
-                {
-                    var calculator = provider.GetRequiredService<ISalaryCalculator>();
-                    return new PropertyInjectedPayroll
-                    {
-                        SalaryCalculator = calculator
-                    };
-                });
-            """);
+            typeof(ServiceRegistration),
+            nameof(ServiceRegistration.Build),
+            new CodeExcerpt(5, 15, "Registros e factory"));
 
         TutorialConsole.WriteExperiment(
             2,
@@ -55,14 +44,7 @@ public sealed class DependencyInversionServicesTutorial : ITutorial
             "Resolve um serviço que recebe a dependência obrigatória pelo construtor.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: `ConstructorInjectedPayroll` não cria a calculadora; ele recebe `ISalaryCalculator`.",
-            "Construtor.cs",
-            """
-            internal sealed class ConstructorInjectedPayroll(ISalaryCalculator salaryCalculator)
-            {
-                public decimal Calculate(SalaryInput input) =>
-                    salaryCalculator.Calculate(input);
-            }
-            """);
+            typeof(ConstructorInjectedPayroll));
 
         TutorialConsole.WriteExperiment(
             3,
@@ -70,20 +52,7 @@ public sealed class DependencyInversionServicesTutorial : ITutorial
             "Resolve um serviço montado por uma função de criação, com a dependência atribuída por propriedade.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: a propriedade é preenchida no registro e validada antes do uso.",
-            "Propriedade.cs",
-            """
-            internal sealed class PropertyInjectedPayroll
-            {
-                public required ISalaryCalculator SalaryCalculator
-                {
-                    private get;
-                    init;
-                }
-
-                public decimal Calculate(SalaryInput input) =>
-                    SalaryCalculator.Calculate(input);
-            }
-            """);
+            typeof(PropertyInjectedPayroll));
 
         using var serviceProvider = ServiceRegistration.Build();
         using var scope = serviceProvider.CreateScope();

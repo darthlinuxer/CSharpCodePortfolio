@@ -486,9 +486,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 14`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial15
+## Ciclo Concluído: Helper No Tutorial15
 
 - [x] Refatorar `DependencyInjectionServicesTutorial` para ler ranges reais de `ServiceRegistration.Build` e `RunAsync`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 15`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial16
+
+- [x] Refatorar `DependencyInversionServicesTutorial` para ler range real de `ServiceRegistration.Build` e tipos reais de `ConstructorInjectedPayroll` e `PropertyInjectedPayroll`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 16`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
