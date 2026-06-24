@@ -34,18 +34,7 @@ public sealed class InMemoryRepositoryTutorial : ITutorial
             "Define operações de lista, busca por chave, inclusão, atualização e remoção.");
         TutorialConsole.WriteCodeSnippet(
             "O contrato não conhece EF, banco de dados nem infraestrutura externa.",
-            "IRepository.cs",
-            """
-            internal interface IRepository<T, TKey>
-                where TKey : notnull
-            {
-                IReadOnlyList<T> List();
-                T? GetById(TKey id);
-                void Add(T entity);
-                bool Update(T entity);
-                bool Delete(TKey id);
-            }
-            """);
+            "src/CSharpCodePortfolio.Tutorials.Tutorial11/IRepository.cs");
 
         TutorialConsole.WriteExperiment(
             2,
@@ -53,15 +42,13 @@ public sealed class InMemoryRepositoryTutorial : ITutorial
             "Usa o contrato para manipular clientes sem acoplar o fluxo de uso ao dicionário interno.");
         TutorialConsole.WriteCodeSnippet(
             "A chave é extraída por uma função, mantendo o repositório genérico.",
-            "InMemoryRepository.cs",
-            """
-            IRepository<Client, int> repository =
-                new InMemoryRepository<Client, int>(static client => client.Id);
-
-            var catalog = new ClientCatalog(repository);
-            catalog.Register(new Client(1, "Camilo", "camilo@example.com"));
-            catalog.Register(new Client(2, "Aline", "aline@example.com"));
-            """);
+            "src/CSharpCodePortfolio.Tutorials.Tutorial11/InMemoryRepository.cs");
+        TutorialConsole.WriteCodeSnippet(
+            "O catálogo usa o contrato e não conhece o dicionário interno.",
+            typeof(ClientCatalog),
+            nameof(ClientCatalog.Register),
+            nameof(ClientCatalog.ChangeEmail),
+            nameof(ClientCatalog.Remove));
 
         catalog.Register(new Client(1, "Camilo", "camilo@example.com"));
         catalog.Register(new Client(2, "Aline", "aline@example.com"));
