@@ -37,12 +37,9 @@ public sealed class EfCoreInMemoryDirectTutorial : ITutorial
             "Cria as opções do contexto com um banco em memória nomeado.");
         TutorialConsole.WriteCodeSnippet(
             "O nome do banco conecta as instâncias do contexto durante a execução do tutorial.",
-            "DbContextOptions.cs",
-            """
-            var options = new DbContextOptionsBuilder<SchoolDbContext>()
-                .UseInMemoryDatabase(databaseName: "dbSchool")
-                .Options;
-            """);
+            typeof(EfCoreInMemoryDirectTutorial),
+            nameof(RunAsync),
+            new CodeExcerpt(20, 23, "Configuração InMemory"));
 
         TutorialConsole.WriteExperiment(
             2,
@@ -50,18 +47,10 @@ public sealed class EfCoreInMemoryDirectTutorial : ITutorial
             "Grava entidades e consulta relacionamentos sem criar um repositório intermediário.");
         TutorialConsole.WriteCodeSnippet(
             "O fluxo usa `DbSet`, `SaveChangesAsync` e `Include` diretamente.",
-            "SchoolScenario.cs",
-            """
-            await context.Students.AddRangeAsync([camilo, aline], cancellationToken);
-            await context.Teachers.AddAsync(teacher, cancellationToken);
-            await context.Courses.AddAsync(course, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-
-            var savedCourse = await context.Courses
-                .Include(course => course.Teacher)
-                .Include(course => course.Students)
-                .SingleAsync(cancellationToken);
-            """);
+            typeof(SchoolScenario),
+            nameof(SchoolScenario.RunAsync),
+            new CodeExcerpt(14, 18, "Gravação com DbSet"),
+            new CodeExcerpt(33, 37, "Consulta com Include"));
 
         var report = await new SchoolScenario(options).RunAsync(cancellationToken);
         VerifyReport(report);
