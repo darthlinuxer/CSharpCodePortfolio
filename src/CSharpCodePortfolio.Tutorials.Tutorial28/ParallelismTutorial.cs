@@ -97,7 +97,11 @@ public sealed class ParallelismTutorial : ITutorial
             "Os testes validam limite de concorrência, fan-out, PLINQ, primos e cancelamento.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: os testes travam o contrato didático do paralelismo.",
-            "tests/CSharpCodePortfolio.Tutorials.Tutorial28.Tests/ParallelismScenarioTests.cs");
+            "tests/CSharpCodePortfolio.Tutorials.Tutorial28.Tests/ParallelismScenarioTests.cs",
+            new CodeExcerpt(13, 24, "Contrato completo do relatório"),
+            new CodeExcerpt(30, 36, "Limite de concorrência"),
+            new CodeExcerpt(42, 46, "Fan-out com Task.WhenAll"),
+            new CodeExcerpt(52, 54, "Grau de paralelismo inválido"));
 
         TutorialConsole.WriteObservation(
             "Paralelismo não é sinônimo de velocidade automática. O ganho aparece quando há trabalho independente suficiente e o limite de concorrência respeita o recurso usado.");

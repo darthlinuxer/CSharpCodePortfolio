@@ -570,9 +570,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 26`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial27
+## Ciclo Concluído: Helper No Tutorial27
 
 - [x] Refatorar `GmailSmtpEmailTutorial` para ler ranges reais de `GmailSmtpEmailScenarioTests.cs` pela helper.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 27`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial28
+
+- [x] Refatorar `ParallelismTutorial` para ler ranges reais de `ParallelismScenarioTests.cs` pela helper.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 28`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
