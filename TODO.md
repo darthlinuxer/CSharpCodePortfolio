@@ -500,9 +500,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 16`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial17
+## Ciclo Concluído: Helper No Tutorial17
 
 - [x] Refatorar `DotNetZipLibraryTutorial` para ler membros reais de `ZipLibraryScenario`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 17`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial18
+
+- [x] Refatorar `UnitTestsReflectionMoqTutorial` para ler membros reais de `ReflectionTestRunner` e range real de `CalculatorMachineTests.RunMockedCalculation`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 18`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

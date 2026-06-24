@@ -33,18 +33,9 @@ public sealed class UnitTestsReflectionMoqTutorial : ITutorial
             "Localiza métodos anotados e executa cada um com os argumentos do atributo.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: a descoberta fica explícita em `GetMethods` e `GetCustomAttribute`.",
-            "ReflectionTestRunner.cs",
-            """
-            var methods = typeof(CalculatorMachineTests)
-                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-                .Where(method => method.IsDefined(typeof(PortfolioTestAttribute), inherit: false));
-
-            foreach (var method in methods)
-            {
-                var test = method.GetCustomAttribute<PortfolioTestAttribute>()!;
-                method.Invoke(null, [test.First, test.Second]);
-            }
-            """);
+            typeof(ReflectionTestRunner),
+            nameof(ReflectionTestRunner.Run),
+            "InvokeTest");
 
         TutorialConsole.WriteExperiment(
             2,
@@ -52,19 +43,9 @@ public sealed class UnitTestsReflectionMoqTutorial : ITutorial
             "Configura o retorno da calculadora e verifica a chamada esperada.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: `Setup` define o comportamento e `Verify` valida a interação.",
-            "CalculatorMachineTests.cs",
-            """
-            var calculator = new Mock<ICalculator>(MockBehavior.Strict);
-            calculator
-                .Setup(calc => calc.Calculate(It.IsAny<Operation>(), first, second))
-                .Returns((Operation operation, double a, double b) => operation(a, b));
-
-            var result = action(new CalculatorMachine(calculator.Object));
-
-            calculator.Verify(
-                calc => calc.Calculate(It.IsAny<Operation>(), first, second),
-                Times.Once);
-            """);
+            typeof(CalculatorMachineTests),
+            "RunMockedCalculation",
+            new CodeExcerpt(9, 24, "Setup, execução e verificação"));
 
         var report = ReflectionTestRunner.Run();
         VerifyReport(report);
