@@ -479,9 +479,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 13`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial14
+## Ciclo Concluído: Helper No Tutorial14
 
 - [x] Refatorar `EfCoreInMemoryRepositoryTutorial` para ler arquivos reais de `IRepository` e `EfRepository`, além de range real de `RunScenarioAsync`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 14`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial15
+
+- [x] Refatorar `DependencyInjectionServicesTutorial` para ler ranges reais de `ServiceRegistration.Build` e `RunAsync`.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 15`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

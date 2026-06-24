@@ -31,19 +31,9 @@ public sealed class DependencyInjectionServicesTutorial : ITutorial
             "Configura ciclos de vida, serviço aninhado, instância pronta, genérico aberto e múltiplas implementações.");
         TutorialConsole.WriteCodeSnippet(
             "A coleção registra o contrato e o container resolve as dependências quando necessário.",
-            "ServiceRegistration.cs",
-            """
-            services
-                .AddSingleton<IDemoService, DemoService>()
-                .AddSingleton<ITestService, TestService>()
-                .AddSingleton(new DefinedValueService(10))
-                .AddTransient<TransientOperation>()
-                .AddScoped<ScopedOperation>()
-                .AddSingleton<SingletonOperation>()
-                .AddTransient(typeof(GenericRepository<>))
-                .AddSingleton<IMessageService, ServiceA>()
-                .AddSingleton<IMessageService, ServiceB>();
-            """);
+            typeof(ServiceRegistration),
+            nameof(ServiceRegistration.Build),
+            new CodeExcerpt(5, 14, "Registros da ServiceCollection"));
 
         TutorialConsole.WriteExperiment(
             2,
@@ -51,20 +41,9 @@ public sealed class DependencyInjectionServicesTutorial : ITutorial
             "Resolve os mesmos serviços em dois escopos para comparar reaproveitamento e criação de instâncias.");
         TutorialConsole.WriteCodeSnippet(
             "Scoped e transient são resolvidos pelo escopo; singleton pode ser resolvido em qualquer escopo.",
-            "ServiceScope.cs",
-            """
-            ServiceSnapshot first;
-            using (var firstScope = serviceProvider.CreateScope())
-            {
-                first = ServiceSnapshot.Capture(firstScope.ServiceProvider);
-            }
-
-            ServiceSnapshot second;
-            using (var secondScope = serviceProvider.CreateScope())
-            {
-                second = ServiceSnapshot.Capture(secondScope.ServiceProvider);
-            }
-            """);
+            typeof(DependencyInjectionServicesTutorial),
+            nameof(RunAsync),
+            new CodeExcerpt(39, 51, "Dois escopos independentes"));
 
         using var serviceProvider = ServiceRegistration.Build();
 
