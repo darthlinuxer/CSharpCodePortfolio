@@ -286,6 +286,45 @@ Uma boa classe tem responsabilidade clara e pequena o suficiente para ser entend
 Quando uma classe muda por muitos motivos diferentes, ela provavelmente precisa ser dividida.
 ====
 
+== Modelagem no código
+
+.O que é uma instância?
+[%collapsible]
+====
+Instância é um objeto criado a partir de uma classe.
+
+A classe descreve a forma; a instância possui valores concretos em tempo de execução.
+Várias instâncias da mesma classe podem ter estados diferentes.
+====
+
+.Para que serve `this`?
+[%collapsible]
+====
+`this` representa a instância atual dentro de uma classe.
+
+Ele é útil para acessar membros do próprio objeto e diferenciar campos de parâmetros com o mesmo nome.
+Use quando melhora a clareza; não é obrigatório em todo acesso.
+====
+
+.O que é object initializer?
+[%collapsible]
+====
+É uma sintaxe para criar um objeto e preencher propriedades públicas no mesmo bloco.
+
+Exemplo: `new Cliente { Nome = "Ana" }`.
+Ela é simples, mas não substitui construtores quando o objeto precisa validar invariantes.
+====
+
+.Qual é a diferença entre identidade e igualdade?
+[%collapsible]
+====
+Identidade pergunta se duas referências apontam para o mesmo objeto.
+Igualdade pergunta se dois valores devem ser considerados equivalentes.
+
+Em classes comuns, igualdade costuma ser por referência.
+Em records e value objects, igualdade por valor pode fazer mais sentido.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/oop[Programação orientada a objetos em C#]

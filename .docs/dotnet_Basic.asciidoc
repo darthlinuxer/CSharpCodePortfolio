@@ -297,6 +297,45 @@ Esse modelo é útil para I/O, rede, banco de dados e arquivos, sem bloquear a t
 Na maioria dos códigos modernos, use `Task` e APIs assíncronas em vez de gerenciar threads manualmente.
 ====
 
+== CLI e organização básica
+
+.O que é TFM em um projeto .NET?
+[%collapsible]
+====
+TFM significa Target Framework Moniker.
+
+Ele informa para qual versão/plataforma o projeto compila, por exemplo `net10.0`.
+Esse valor fica no `.csproj` e orienta APIs disponíveis, restore de pacotes e build.
+====
+
+.Para que servem `dotnet build`, `dotnet run` e `dotnet test`?
+[%collapsible]
+====
+`dotnet build` compila o projeto.
+`dotnet run` compila e executa uma aplicação.
+`dotnet test` compila e executa os testes automatizados.
+
+Esses comandos formam o fluxo mínimo para desenvolver e validar código .NET.
+====
+
+.O que é um namespace em C#?
+[%collapsible]
+====
+Namespace organiza tipos e evita conflitos de nomes.
+
+Exemplo: `System.Collections.Generic` agrupa tipos como `List<T>` e `Dictionary<TKey,TValue>`.
+Ele não substitui projeto ou assembly; é uma organização lógica do código.
+====
+
+.O que é instrução de nível superior?
+[%collapsible]
+====
+É a sintaxe, conhecida como top-level statement, que permite escrever o ponto de entrada de um programa sem declarar explicitamente uma classe `Program` e um método `Main`.
+
+Ela é comum em aplicações console e APIs mínimas.
+O compilador ainda gera a estrutura necessária por baixo.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/core/introduction[Introdução ao .NET]

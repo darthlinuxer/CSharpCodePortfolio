@@ -282,6 +282,45 @@ Baixo acoplamento não significa ausência de dependência.
 Significa dependências explícitas, estáveis e justificadas.
 ====
 
+== Consistência em sistemas reais
+
+.Como proteger invariantes em cenários concorrentes?
+[%collapsible]
+====
+Invariantes de objeto não bastam quando duas operações concorrentes leem o mesmo estado e gravam decisões conflitantes.
+
+Use transações, controle de concorrência, versionamento otimista ou comandos idempotentes conforme o caso.
+O modelo precisa ser consistente com a fronteira de persistência.
+====
+
+.Como decidir o limite transacional de um agregado?
+[%collapsible]
+====
+Coloque no mesmo agregado o que precisa mudar de forma atomicamente consistente.
+
+Não use relacionamento ou conveniência de navegação como critério principal.
+Agregados grandes reduzem inconsistência local, mas aumentam contenção e custo de carga.
+====
+
+.Como manter compatibilidade binária em uma biblioteca OOP?
+[%collapsible]
+====
+Evite remover membros públicos, mudar assinaturas, trocar tipos de retorno ou alterar comportamento documentado sem versionamento.
+
+Adicionar método abstrato em classe base pública também quebra consumidores.
+Design avançado de APIs considera consumidores que já compilaram contra versões anteriores.
+====
+
+.Como distinguir regra de domínio de regra de aplicação?
+[%collapsible]
+====
+Regra de domínio continua verdadeira independentemente de interface, banco ou caso de uso específico.
+Regra de aplicação coordena fluxo, autorização, transação, integração e decisão operacional.
+
+Misturar tudo no domínio cria acoplamento externo.
+Tirar tudo do domínio gera modelo anêmico.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/csharp/programming-guide/concepts/covariance-contravariance/[Covariance e contravariance]

@@ -306,6 +306,54 @@ Mudanças novas ficam mais localizadas, testes ficam mais simples e o fluxo cont
 Se a refatoração aumenta arquivos, indireção e setup sem reduzir risco, ela provavelmente passou do ponto.
 ====
 
+== Trade-offs avançados
+
+.Como detectar dependência cíclica entre serviços?
+[%collapsible]
+====
+Procure serviços que se chamam mutuamente ou que precisam conhecer detalhes internos um do outro para concluir uma operação.
+
+Isso costuma indicar fronteiras mal desenhadas, SRP fraco ou DIP aplicado como interface superficial.
+Quebrar o ciclo pode exigir evento de domínio, orquestração externa ou redistribuição de responsabilidade.
+====
+
+.Quando decorator ajuda SOLID?
+[%collapsible]
+====
+Decorator ajuda quando um comportamento transversal precisa envolver um contrato sem alterar a implementação principal.
+
+Exemplos: cache, retry, métrica, log ou autorização.
+Ele combina OCP e DIP quando o contrato é estável e o comportamento realmente é transversal.
+====
+
+.Como revisar lifetimes de DI sob a ótica de SOLID?
+[%collapsible]
+====
+Um singleton que depende de serviço scoped quebra a fronteira de ciclo de vida.
+
+Além do erro técnico, isso revela dependências mal posicionadas.
+Serviços de alto nível devem depender de contratos com ciclo de vida compatível com o caso de uso.
+====
+
+.Como equilibrar SOLID e performance?
+[%collapsible]
+====
+SOLID não autoriza indireção ilimitada em caminho crítico.
+
+Se abstrações, alocações ou chamadas virtuais aparecem em caminho crítico medido, simplifique ou isole o custo.
+Performance só deve vencer o design quando houver evidência, não palpite.
+====
+
+.Como aplicar SOLID em código assíncrono?
+[%collapsible]
+====
+SRP separa orquestração, I/O e regra.
+DIP evita acoplamento direto a clientes externos.
+LSP exige que implementações respeitem cancelamento, exceções e semântica assíncrona do contrato.
+
+Uma abstração assíncrona ruim propaga deadlocks, timeouts e tratamento de erro inconsistente.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures[Arquiteturas comuns em .NET]

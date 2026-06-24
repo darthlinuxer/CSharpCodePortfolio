@@ -294,6 +294,53 @@ O importante é validar configuração em fronteiras de inicialização.
 Use ciclo de vida scoped em aplicações web, não compartilhe contexto entre threads e evite consultas que carreguem mais dados que o necessário.
 ====
 
+== APIs modernas e operação
+
+.Quando usar `IHttpClientFactory`?
+[%collapsible]
+====
+Use `IHttpClientFactory` para configurar `HttpClient` por nome ou por tipo, centralizar headers, timeouts e handlers, e evitar problemas de ciclo de vida.
+
+Ele é útil quando a aplicação chama serviços externos de forma recorrente.
+Para uma chamada isolada em ferramenta simples, um `HttpClient` bem escopado pode bastar.
+====
+
+.Como usar `System.Text.Json` de forma segura?
+[%collapsible]
+====
+Declare contratos claros, trate propriedades opcionais e configure política de nomes apenas quando a API exigir.
+
+Evite depender de nomes implícitos quando o JSON é contrato público.
+Para cenários mais complexos, use atributos ou `JsonSerializerOptions` centralizadas.
+====
+
+.Quando implementar `IDisposable`?
+[%collapsible]
+====
+Implemente `IDisposable` quando o tipo é dono de recurso que precisa ser liberado, como stream, conexão, handle ou outro objeto descartável.
+
+Não implemente só por hábito.
+Se o tipo apenas recebe dependências descartáveis do container de DI, normalmente o container controla o descarte.
+====
+
+.O que é logging estruturado?
+[%collapsible]
+====
+É registrar eventos com template e propriedades nomeadas, não apenas texto concatenado.
+
+Exemplo: `logger.LogInformation("Pedido {PedidoId} criado", pedidoId)`.
+Isso facilita busca, filtros e correlação em ferramentas de observabilidade.
+====
+
+.Como validar options em uma aplicação .NET?
+[%collapsible]
+====
+Modele a configuração em uma classe, registre com Options Pattern e aplique validação na inicialização.
+
+Validação cedo evita descobrir configuração inválida durante uma requisição ou job.
+Em produção, falhar rápido costuma ser melhor que executar com estado inconsistente.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/csharp/programming-guide/delegates/[Delegates]

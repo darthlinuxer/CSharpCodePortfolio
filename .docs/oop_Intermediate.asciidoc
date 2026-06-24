@@ -281,6 +281,43 @@ Ela muda por muitos motivos, tem muitos grupos de métodos, conhece detalhes de 
 Nomes genéricos como `Manager`, `Helper` e `Service` podem ser sinal de baixa coesão, mas o diagnóstico vem das responsabilidades reais.
 ====
 
+== Encapsulamento aplicado
+
+.Como encapsular coleções em uma entidade?
+[%collapsible]
+====
+Evite expor uma lista mutável quando qualquer código externo pode alterar o estado sem regra.
+
+Uma alternativa comum é manter `List<T>` privada e expor `IReadOnlyCollection<T>`.
+As mudanças entram por métodos com nomes de domínio, como `AdicionarItem`.
+====
+
+.Quando usar métodos estáticos nomeados para criação?
+[%collapsible]
+====
+Use quando o construtor ficaria ambíguo ou quando há formas de criação com intenção diferente.
+
+Exemplo: `Pedido.CriarRascunho()` e `Pedido.CriarConfirmado()`.
+Isso ajuda leitura e concentra validação inicial.
+====
+
+.Como evitar acoplamento por DTO compartilhado?
+[%collapsible]
+====
+Não use o mesmo tipo para API, domínio, persistência e mensageria quando cada fronteira muda por motivos diferentes.
+
+Mapear tipos pode parecer repetição, mas reduz acoplamento entre contratos externos e modelo interno.
+====
+
+.Quando um método pertence à entidade e não ao serviço?
+[%collapsible]
+====
+Quando a operação muda o estado da entidade e depende diretamente de suas invariantes.
+
+Serviços devem coordenar dependências externas e casos de uso.
+Regras que protegem o próprio objeto ficam mais claras dentro do modelo.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/csharp/fundamentals/types/interfaces[Interfaces em C#]

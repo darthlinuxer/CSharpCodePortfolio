@@ -296,6 +296,56 @@ Uma revisão avançada não pergunta apenas "funciona?".
 Ela pergunta como o código falha, escala, é diagnosticado e evolui sem quebrar consumidores.
 ====
 
+== Produção, segurança e observabilidade
+
+.Como diagnosticar retenção de memória em produção?
+[%collapsible]
+====
+Compare métricas de GC com dumps de memória e caminhos de referência.
+
+Memória alta não prova vazamento.
+Pode ser cache, pool, LOH fragmentado, fila crescendo ou objetos presos por eventos estáticos.
+O diagnóstico precisa identificar quem mantém os objetos vivos.
+====
+
+.Como avaliar uma API quanto à observabilidade?
+[%collapsible]
+====
+Verifique se ela emite logs estruturados, métricas úteis e traces correlacionáveis sem expor dados sensíveis.
+
+O ponto avançado é equilibrar visibilidade e ruído.
+Logar tudo aumenta custo, reduz sinal e pode vazar informação.
+====
+
+.Como lidar com segredos em aplicações .NET?
+[%collapsible]
+====
+Segredos não devem ficar em código, repositório ou logs.
+
+Use configuração por ambiente, variáveis protegidas, repositórios de segredos ou cofres gerenciados.
+Também revise dumps, mensagens de exceção e telemetria, porque segredos podem vazar por caminhos indiretos.
+====
+
+.Quando usar criptografia simétrica, hash ou assinatura?
+[%collapsible]
+====
+Criptografia simétrica protege dados que precisam ser recuperados.
+Hash protege verificação sem recuperar o valor original.
+Assinatura comprova integridade e autoria.
+
+Escolher errado cria falsa sensação de segurança.
+Senha, token, documento assinado e payload confidencial são problemas diferentes.
+====
+
+.Como avaliar o impacto de compilação em camadas e PGO?
+[%collapsible]
+====
+Meça tempo de aquecimento, throughput estável e comportamento sob carga realista.
+
+Compilação em camadas e PGO podem melhorar caminhos frequentes, mas a medição precisa separar inicialização fria, estado estável e ruído de infraestrutura.
+Microbenchmark isolado não substitui validação no cenário da aplicação.
+====
+
 == Referências de apoio
 
 * https://learn.microsoft.com/dotnet/standard/garbage-collection/[Garbage collection]
