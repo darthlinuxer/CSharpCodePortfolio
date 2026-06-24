@@ -32,14 +32,8 @@ public sealed class DotNetZipLibraryTutorial : ITutorial
             "Compacta uma pasta de entrada com arquivos JSON.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: `ZipFile.CreateFromDirectory` recebe diretório de origem, destino e nível de compressão.",
-            "ZipLibraryScenario.cs",
-            """
-            ZipFile.CreateFromDirectory(
-                sourceDirectory,
-                archivePath,
-                CompressionLevel.Optimal,
-                includeBaseDirectory: false);
-            """);
+            typeof(ZipLibraryScenario),
+            nameof(ZipLibraryScenario.CreateArchive));
 
         TutorialConsole.WriteExperiment(
             2,
@@ -47,16 +41,8 @@ public sealed class DotNetZipLibraryTutorial : ITutorial
             "Lê nome, tamanho original, tamanho compactado e prévia do conteúdo.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: `ZipArchive` abre o ZIP em modo leitura e percorre `Entries`.",
-            "ZipLibraryScenario.cs",
-            """
-            using var archive = ZipFile.OpenRead(archivePath);
-
-            var entries = archive.Entries
-                .Where(static entry => !string.IsNullOrEmpty(entry.Name))
-                .Select(ReadSnapshot)
-                .OrderBy(static entry => entry.Name, StringComparer.Ordinal)
-                .ToArray();
-            """);
+            typeof(ZipLibraryScenario),
+            nameof(ZipLibraryScenario.InspectArchive));
 
         TutorialConsole.WriteExperiment(
             3,
@@ -64,18 +50,9 @@ public sealed class DotNetZipLibraryTutorial : ITutorial
             "Extrai cada entrada somente quando o destino permanece dentro da pasta permitida.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: cada caminho final é normalizado antes de `ExtractToFile`.",
-            "ZipLibraryScenario.cs",
-            """
-            var destinationPath = Path.GetFullPath(
-                Path.Combine(targetDirectory, entry.FullName));
-
-            if (!destinationPath.StartsWith(targetRoot, StringComparison.Ordinal))
-            {
-                throw new IOException("Entrada ZIP fora do destino permitido.");
-            }
-
-            entry.ExtractToFile(destinationPath, overwrite: true);
-            """);
+            typeof(ZipLibraryScenario),
+            nameof(ZipLibraryScenario.ExtractArchive),
+            new CodeExcerpt(9, 21, "Validação de destino"));
 
         var report = ZipLibraryScenario.Run();
         VerifyReport(report);
