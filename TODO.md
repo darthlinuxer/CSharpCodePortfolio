@@ -528,9 +528,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 20`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial21
+## Ciclo Concluído: Helper No Tutorial21
 
 - [x] Verificar `MassTransitInMemoryTutorial`: já lê ranges reais de `MassTransitInMemoryScenario.RunAsync` e `MassTransitInMemoryScenarioTests.cs` pela helper.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 21`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial22
+
+- [x] Verificar `AspNetCorePipelineTutorial`: já lê `AspNetCorePipelineScenario` e `AspNetCorePipelineScenarioTests.cs` pela helper.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 22`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
