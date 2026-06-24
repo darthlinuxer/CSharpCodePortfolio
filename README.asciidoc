@@ -1,35 +1,132 @@
-= The C# KB
+= CSharpCodePortfolio
 Camilo Chaves
 :toc: left
-:toc-title: Summary
-:toclevels: 4
+:toc-title: Sumário
+:toclevels: 3
 
-== Collection of C# Codes in https://dotnetfiddle.net/[Fiddle]
+CSharpCodePortfolio é um portfólio executável de tutoriais C# e .NET 10.
+O projeto organiza conceitos práticos em exemplos de console com menu interativo, explicações guiadas, evidências de execução e testes automatizados nos pontos mais relevantes.
 
-TIP: Some complex projects are not on Fiddle, but only in the repository... so, clone the repo. https://github.com/darthlinuxer
+== Proposta
 
-.EXAMPLES
-[%collapsible]
-====
-include::.docs/fiddleTable.asciidoc[Fiddle]
-====
+O repositório foi estruturado para servir como material de estudo, demonstração técnica e referência de implementação.
+Em vez de apenas listar trechos de código, cada tutorial pode ser executado pela CLI raiz e apresenta o conceito em uma interface de console baseada em Spectre.Console.
 
-== Interview Questions in .NET C#
+O catálogo principal inclui 28 tutoriais sobre assincronismo, sockets, pipes, reflexão, validadores, repository pattern, EF Core InMemory, dependency injection, testes, HTTP, MassTransit, ASP.NET Core, Razor Pages, RavenDB, Identity, OpenID, SMTP e paralelismo.
+O projeto também integra a área `EFCore10`, que possui menu próprio para exemplos dedicados de Entity Framework Core 10.
 
-include::.docs/dotnet_Basic.asciidoc[dotnetBasic]
+== Requisitos
 
-include::.docs/dotnet_Intermediate.asciidoc[dotnetIntermediate]
+* .NET SDK 10.0.109 ou superior compatível com `global.json`.
+* Terminal com suporte a ANSI para a melhor experiência visual.
+* Git, caso queira clonar e evoluir os tutoriais localmente.
 
-include::.docs/dotnet_Advanced.asciidoc[dotnetAdvanced]
+== Como executar
 
-== Interview Questions in OOP
+[source,bash]
+----
+git clone https://github.com/darthlinuxer/CSharpCodePortfolio.git
+cd CSharpCodePortfolio
+dotnet build CSharpCodePortfolio.slnx
+----
 
-include::.docs/oop_Basic.asciidoc[oopBasic]
+Abra o menu interativo:
 
-include::.docs/oop_Intermediate.asciidoc[oopIntermediate]
+[source,bash]
+----
+./run-menu.sh
+----
 
-include::.docs/oop_Advanced.asciidoc[oopAdvanced]
+No Windows:
 
-== Interview Questions in SOLID
+[source,bat]
+----
+run-menu.bat
+----
 
-include::.docs/solid.asciidoc[solid]
+Também é possível chamar a CLI diretamente:
+
+[source,bash]
+----
+dotnet run --project src/CSharpCodePortfolio.App -- menu
+dotnet run --project src/CSharpCodePortfolio.App -- list
+dotnet run --project src/CSharpCodePortfolio.App -- run parallelism
+dotnet run --project src/CSharpCodePortfolio.App -- run efcore10
+----
+
+== Comandos principais
+
+[cols="1,2", options="header"]
+|===
+|Comando |Descrição
+
+|`menu`
+|Abre o menu interativo inicial.
+
+|`list`
+|Lista todos os tutoriais executáveis descobertos pelo host raiz.
+
+|`run <id-or-slug>`
+|Executa um tutorial pelo identificador numérico ou pelo slug.
+
+|`run efcore10`
+|Abre o menu da área dedicada a Entity Framework Core 10 e retorna ao fluxo principal ao sair.
+|===
+
+== Catálogo resumido
+
+[cols="1,2", options="header"]
+|===
+|Área |Tutoriais
+
+|Fundamentos de runtime
+|Async/Await, paralelismo com `Task.WhenAll`, `Parallel.ForEachAsync`, PLINQ e processamento CPU bound.
+
+|Comunicação
+|Sockets cliente-servidor, named pipes e anonymous pipes.
+
+|Modelagem de decisões
+|Validadores com lambda, reflexão com atributos, objetos complexos e pipe builders.
+
+|Dados e arquitetura
+|Repository pattern em memória, EF Core InMemory, services, dependency injection e dependency inversion.
+
+|Testes e integrações
+|Moq, `InternalsVisibleTo`, `HttpClient` simulado, MassTransit, RavenDB e envio de e-mail SMTP.
+
+|Web e identidade
+|ASP.NET Core Minimal API, Razor Pages, ASP.NET Identity, JWT e servidor OpenID mínimo.
+
+|Entity Framework Core 10
+|Menu dedicado em `EFCore10` com tutoriais específicos de EF Core 10.
+|===
+
+O catálogo completo está em link:.docs/tutorial-catalog.asciidoc[.docs/tutorial-catalog.asciidoc].
+
+== Arquitetura
+
+O repositório usa uma solução raiz `CSharpCodePortfolio.slnx` e uma estrutura simples em `src/` e `tests/`.
+O host `CSharpCodePortfolio.App` descobre tutoriais por metadados, exibe o menu inicial e executa cada tutorial pelo id ou slug.
+Os projetos `CSharpCodePortfolio.Shared` e `CSharpCodePortfolio.Tutorials.Abstractions` concentram a UI compartilhada e o contrato mínimo de descoberta.
+
+Cada tutorial vive em seu próprio projeto `net10.0`, o que mantém os exemplos isolados e facilita a leitura.
+Quando o conceito precisa de verificação automatizada, há um projeto de teste correspondente em `tests/`.
+
+== Qualidade
+
+Use os comandos abaixo antes de abrir alterações:
+
+[source,bash]
+----
+dotnet build CSharpCodePortfolio.slnx
+dotnet test CSharpCodePortfolio.slnx
+dotnet run --project src/CSharpCodePortfolio.App -- list
+----
+
+O objetivo do projeto é manter exemplos pequenos, executáveis e claros.
+Novos tutoriais devem preservar a experiência do menu, apresentar explicações objetivas em português do Brasil e evitar dependências que não sejam necessárias para ensinar o conceito.
+
+== Documentação complementar
+
+A pasta link:.docs/[.docs] mantém materiais adicionais de estudo, incluindo catálogo de tutoriais, perguntas de entrevista, OOP, SOLID e uma tabela de exemplos externos.
+Esses documentos complementam o portfólio executável, mas o ponto de entrada recomendado é sempre o menu raiz.

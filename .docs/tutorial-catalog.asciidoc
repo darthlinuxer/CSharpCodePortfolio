@@ -1,0 +1,106 @@
+= Catálogo de tutoriais
+:toc: left
+:toc-title: Sumário
+:toclevels: 2
+
+Este catálogo resume os tutoriais executáveis pelo host raiz do CSharpCodePortfolio.
+Para ver a lista diretamente no terminal, execute:
+
+[source,bash]
+----
+dotnet run --project src/CSharpCodePortfolio.App -- list
+----
+
+== Fundamentos de runtime
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|01 |`async-await-task` |Async/Await e Tasks
+|28 |`parallelism` |Paralelismo com Tasks, PLINQ e Parallel
+|===
+
+== Comunicação entre processos e tarefas
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|02 |`client-server-socket` |Comunicação cliente-servidor com sockets
+|04 |`named-pipes` |Comunicação cliente-servidor com named pipes
+|05 |`anonymous-pipes` |Comunicação entre tarefas com anonymous pipes
+|===
+
+== Modelagem de decisões
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|03 |`string-pipe-builder` |Pipeline de strings com recursão reversa
+|06 |`lambda-validators` |Validadores com expressões lambda
+|07 |`reflection-attributes` |Reflexão e atributos no lugar de if/else
+|08 |`complex-object-reflection` |Reflexão em condições para objetos complexos
+|09 |`simple-pipe-builder` |Pipe Builder para decisões com tipos simples
+|10 |`complex-pipe-builder` |Pipe Builder para decisões com objetos complexos
+|===
+
+== Dados e arquitetura
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|11 |`in-memory-repository` |IRepository em memória sem Entity Framework
+|12 |`efcore-inmemory-direct` |EF Core InMemory sem IRepository
+|13 |`efcore-inmemory-services` |EF Core InMemory usando Services
+|14 |`efcore-inmemory-repository` |IRepository com EF Core InMemory
+|15 |`dependency-injection-services` |Dependency Injection com Services
+|16 |`dependency-inversion-services` |Inversão de Dependência com injeção por construtor e por propriedade
+|===
+
+== Testes, arquivos e integrações
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|17 |`dotnet-zip-library` |Arquivos ZIP com System.IO.Compression
+|18 |`unit-tests-reflection-moq` |Testes por reflexão com Moq
+|19 |`expose-internals-to-test` |InternalsVisibleTo para testes
+|20 |`mock-http-client` |HttpClient com handler simulado
+|21 |`masstransit-inmemory` |MassTransit com transporte em memória
+|24 |`raven-db-connection` |RavenDB com DocumentStore
+|27 |`gmail-smtp-email` |Envio de e-mail com Gmail SMTP
+|===
+
+== Web e identidade
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|22 |`aspnet-core-pipeline` |ASP.NET Core com pipeline Minimal API
+|23 |`razor-pages-layout` |Razor Pages com PageModel e layout
+|25 |`identity-framework` |ASP.NET Identity com claims e JWT
+|26 |`minimum-openid-server` |Servidor OpenID mínimo
+|===
+
+== Entity Framework Core 10
+
+[cols="1,2,2", options="header"]
+|===
+|Id |Slug |Tema
+
+|EF Core 10 |`efcore10` |Menu dedicado com exemplos de Entity Framework Core 10
+|===
+
+== Execução rápida
+
+[source,bash]
+----
+dotnet run --project src/CSharpCodePortfolio.App -- run async-await-task
+dotnet run --project src/CSharpCodePortfolio.App -- run parallelism
+dotnet run --project src/CSharpCodePortfolio.App -- run efcore10
+----

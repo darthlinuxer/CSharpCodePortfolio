@@ -1,0 +1,26 @@
+= Documentação complementar
+:toc: left
+:toc-title: Sumário
+:toclevels: 2
+
+Esta pasta reúne materiais de apoio para o CSharpCodePortfolio.
+O ponto de entrada principal do projeto é o link:../README.asciidoc[README raiz], que explica como executar o menu interativo e os tutoriais .NET 10.
+
+== Guias do projeto
+
+* link:tutorial-catalog.asciidoc[Catálogo de tutoriais]
+
+== Acervo de estudo
+
+* link:dotnet_Basic.asciidoc[.NET C# - perguntas básicas]
+* link:dotnet_Intermediate.asciidoc[.NET C# - perguntas intermediárias]
+* link:dotnet_Advanced.asciidoc[.NET C# - perguntas avançadas]
+* link:oop_Basic.asciidoc[OOP - perguntas básicas]
+* link:oop_Intermediate.asciidoc[OOP - perguntas intermediárias]
+* link:oop_Advanced.asciidoc[OOP - perguntas avançadas]
+* link:solid.asciidoc[SOLID]
+* link:fiddleTable.asciidoc[Tabela de exemplos externos]
+
+== Convenção editorial
+
+Os novos materiais do portfólio devem ser escritos em português do Brasil, com texto direto, revisado e orientado ao uso atual do projeto.
