@@ -535,9 +535,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 21`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial22
+## Ciclo Concluído: Helper No Tutorial22
 
 - [x] Verificar `AspNetCorePipelineTutorial`: já lê `AspNetCorePipelineScenario` e `AspNetCorePipelineScenarioTests.cs` pela helper.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 22`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial23
+
+- [x] Verificar `RazorPagesLayoutTutorial`: já lê `RazorPagesScenario`, `IndexModel.OnGet`, `Index.cshtml` e `RazorPagesScenarioTests.cs` pela helper.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 23`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
