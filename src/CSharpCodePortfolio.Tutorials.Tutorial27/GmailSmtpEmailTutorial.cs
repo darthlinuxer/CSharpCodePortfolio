@@ -89,7 +89,10 @@ public sealed class GmailSmtpEmailTutorial : ITutorial
             "Os testes validam configuração SMTP, endereços, mensagem e bloqueio de remetente divergente.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: os testes travam o contrato didático do envio.",
-            "tests/CSharpCodePortfolio.Tutorials.Tutorial27.Tests/GmailSmtpEmailScenarioTests.cs");
+            "tests/CSharpCodePortfolio.Tutorials.Tutorial27.Tests/GmailSmtpEmailScenarioTests.cs",
+            new CodeExcerpt(13, 23, "Configuração SMTP e proteções"),
+            new CodeExcerpt(29, 31, "E-mail inválido"),
+            new CodeExcerpt(37, 45, "Remetente divergente"));
 
         TutorialConsole.WriteObservation(
             "A execução prepara o envio sem tocar na rede. Em produção, o envio acontece somente depois de carregar o segredo por configuração segura e registrar falhas de SMTP sem imprimir credenciais.");
