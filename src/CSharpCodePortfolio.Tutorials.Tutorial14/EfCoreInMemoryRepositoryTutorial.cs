@@ -32,22 +32,7 @@ public sealed class EfCoreInMemoryRepositoryTutorial : ITutorial
             "Define o conjunto de operações que o fluxo de uso precisa para trabalhar com clientes.");
         TutorialConsole.WriteCodeSnippet(
             "O contrato aceita predicados para consultas e deixa o commit fora do repositório.",
-            "IRepository.cs",
-            """
-            internal interface IRepository<T, TKey>
-                where T : class
-                where TKey : notnull
-            {
-                Task<IReadOnlyList<T>> ListAsync(CancellationToken cancellationToken);
-                Task<IReadOnlyList<T>> FindAsync(
-                    Expression<Func<T, bool>> predicate,
-                    CancellationToken cancellationToken);
-                Task<T?> GetByIdAsync(TKey id, CancellationToken cancellationToken);
-                void Add(T entity);
-                void Update(T entity);
-                void Delete(T entity);
-            }
-            """);
+            "src/CSharpCodePortfolio.Tutorials.Tutorial14/IRepository.cs");
 
         TutorialConsole.WriteExperiment(
             2,
@@ -55,33 +40,7 @@ public sealed class EfCoreInMemoryRepositoryTutorial : ITutorial
             "Usa `DbSet<T>` para executar operações genéricas e mantém `SaveChangesAsync` na unidade de trabalho.");
         TutorialConsole.WriteCodeSnippet(
             "Leituras usam `AsNoTracking`; comandos ficam pendentes até o commit.",
-            "EfRepository.cs",
-            """
-            internal sealed class EfRepository<T, TKey>(DbContext context) : IRepository<T, TKey>
-                where T : class
-                where TKey : notnull
-            {
-                private readonly DbSet<T> dbSet = context.Set<T>();
-
-                public async Task<IReadOnlyList<T>> ListAsync(CancellationToken cancellationToken) =>
-                    await dbSet.AsNoTracking().ToListAsync(cancellationToken);
-
-                public async Task<IReadOnlyList<T>> FindAsync(
-                    Expression<Func<T, bool>> predicate,
-                    CancellationToken cancellationToken)
-                {
-                    var query = dbSet.AsNoTracking().Where(predicate);
-                    return await query.ToListAsync(cancellationToken);
-                }
-
-                public async Task<T?> GetByIdAsync(TKey id, CancellationToken cancellationToken) =>
-                    await dbSet.FindAsync([id], cancellationToken);
-
-                public void Add(T entity) => dbSet.Add(entity);
-                public void Update(T entity) => dbSet.Update(entity);
-                public void Delete(T entity) => dbSet.Remove(entity);
-            }
-            """);
+            "src/CSharpCodePortfolio.Tutorials.Tutorial14/EfRepository.cs");
 
         TutorialConsole.WriteExperiment(
             3,
@@ -89,14 +48,9 @@ public sealed class EfCoreInMemoryRepositoryTutorial : ITutorial
             "Executa inclusão, listagem, atualização, consulta por predicado e remoção.");
         TutorialConsole.WriteCodeSnippet(
             "A unidade de trabalho concentra o commit das alterações feitas pelo catálogo.",
-            "ClientCatalog.cs",
-            """
-            await catalog.RegisterAsync(new Client { Id = 100, Name = "John Rambo", Email = "rambo@example.com" }, cancellationToken);
-            await catalog.RegisterAsync(new Client { Id = 1, Name = "Camilo", Email = "camilo@example.com" }, cancellationToken);
-            await catalog.ChangeNameAsync(1, "Camilo Chaves", cancellationToken);
-            var namedClients = await catalog.FindClientsByNameAsync("Camilo", cancellationToken);
-            await catalog.RemoveAsync(100, cancellationToken);
-            """);
+            typeof(EfCoreInMemoryRepositoryTutorial),
+            nameof(RunScenarioAsync),
+            new CodeExcerpt(5, 19, "Fluxo CRUD pelo catálogo"));
 
         var databaseName = $"dbClients-repository-{Guid.NewGuid():N}";
         var options = new DbContextOptionsBuilder<ClientDbContext>()
