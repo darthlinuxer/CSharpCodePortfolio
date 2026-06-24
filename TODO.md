@@ -549,9 +549,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 23`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial24
+## Ciclo Concluído: Helper No Tutorial24
 
 - [x] Verificar `RavenDbConnectionTutorial`: já lê `RavenDocumentStoreFactory`, `RavenSessionFlow` e `RavenConnectionScenarioTests.cs` pela helper.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 24`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial25
+
+- [x] Refatorar `IdentityFrameworkTutorial` para ler ranges reais de `IdentityFrameworkScenarioTests.cs` pela helper.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 25`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

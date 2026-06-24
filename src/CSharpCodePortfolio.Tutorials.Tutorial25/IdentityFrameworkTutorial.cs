@@ -113,18 +113,9 @@ public sealed class IdentityFrameworkTutorial : ITutorial
             "Os testes validam hash, confirmação, policies, esquemas e contrato do token sem servidor HTTP.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: os testes verificam o contrato que o tutorial ensina.",
-            "IdentityFrameworkScenarioTests.cs",
-            """
-            Assert.IsFalse(report.CanSignInBeforeEmailConfirmation);
-            Assert.IsTrue(report.EmailConfirmationSucceeded);
-            Assert.IsTrue(report.Token.AuthenticationSchemes.Any(
-                step => step.Contains(
-                    IdentityConstants.ApplicationScheme,
-                    StringComparison.Ordinal)));
-            Assert.IsTrue(report.Token.ExternalProviderSteps.Any(
-                step => step.Contains("OpenID", StringComparison.Ordinal)));
-            Assert.HasCount(9, report.FlowSteps);
-            """);
+            "tests/CSharpCodePortfolio.Tutorials.Tutorial25.Tests/IdentityFrameworkScenarioTests.cs",
+            new CodeExcerpt(15, 21, "Registro, confirmação e senha"),
+            new CodeExcerpt(35, 38, "Esquemas, provedor externo e roteiro"));
 
         TutorialConsole.WriteObservation(
             "Em produção, use `UserManager`, `SignInManager`, stores do Identity e token providers do framework; aqui o console isola o comportamento que precisa ser entendido.");

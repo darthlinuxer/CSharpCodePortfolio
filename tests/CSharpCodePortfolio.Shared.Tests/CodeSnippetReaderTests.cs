@@ -15,6 +15,23 @@ public sealed class CodeSnippetReaderTests
     }
 
     [TestMethod]
+    public void ReadFileExcerpts_WithValidRange_ReturnsSelectedLinesAndCaption()
+    {
+        var snippets = CodeSnippetReader.ReadFileExcerpts(
+            "src/CSharpCodePortfolio.Shared/TutorialConclusionKind.cs",
+            new CodeExcerpt(6, 9, "Enum"));
+
+        Assert.HasCount(1, snippets);
+        var snippet = snippets[0];
+
+        Assert.AreEqual("Enum", snippet.Caption);
+        Assert.Contains("TutorialConclusionKind.cs | linhas 6-9", snippet.FileName);
+        Assert.Contains("public enum TutorialConclusionKind", snippet.Code);
+        Assert.Contains("Success", snippet.Code);
+        Assert.DoesNotContain("Failure", snippet.Code);
+    }
+
+    [TestMethod]
     public void ReadType_WithType_ReturnsWholeType()
     {
         var snippet = CodeSnippetReader.ReadType(typeof(SnippetSubject));
@@ -94,6 +111,18 @@ public sealed class CodeSnippetReaderTests
                 new CodeExcerpt(20, 21)));
 
         Assert.Contains("Describe", exception.Message);
+        Assert.Contains("20-21", exception.Message);
+    }
+
+    [TestMethod]
+    public void ReadFileExcerpts_WithRangePastFileEnd_ThrowsArgumentOutOfRange()
+    {
+        var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => CodeSnippetReader.ReadFileExcerpts(
+                "src/CSharpCodePortfolio.Shared/TutorialConclusionKind.cs",
+                new CodeExcerpt(20, 21)));
+
+        Assert.Contains("TutorialConclusionKind.cs", exception.Message);
         Assert.Contains("20-21", exception.Message);
     }
 

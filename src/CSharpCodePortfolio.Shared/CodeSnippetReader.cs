@@ -35,6 +35,47 @@ public static class CodeSnippetReader
     }
 
     /// <summary>
+    /// Reads selected line ranges from a file relative to the repository root.
+    /// </summary>
+    public static IReadOnlyList<CodeSnippet> ReadFileExcerpts(string relativePath, params CodeExcerpt[] excerpts)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
+        ArgumentNullException.ThrowIfNull(excerpts);
+
+        if (excerpts.Length == 0)
+        {
+            return [ReadFile(relativePath)];
+        }
+
+        var file = ReadFile(relativePath);
+        var lines = SplitLines(file.Code.Trim('\r', '\n'));
+        var snippets = new List<CodeSnippet>(excerpts.Length);
+
+        foreach (var excerpt in excerpts)
+        {
+            if (excerpt.EndLine > lines.Length)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(excerpts),
+                    excerpt.EndLine,
+                    $"Range {excerpt.StartLine}-{excerpt.EndLine} is outside file '{file.FileName}', which has {lines.Length} line(s).");
+            }
+
+            var selectedLines = lines
+                .Skip(excerpt.StartLine - 1)
+                .Take(excerpt.EndLine - excerpt.StartLine + 1);
+            var code = Reindent(selectedLines, 0);
+
+            snippets.Add(new CodeSnippet(
+                $"{file.FileName} | linhas {excerpt.StartLine}-{excerpt.EndLine}",
+                code,
+                excerpt.Caption));
+        }
+
+        return snippets;
+    }
+
+    /// <summary>
     /// Reads the whole source block for a type.
     /// </summary>
     public static CodeSnippet ReadType(Type type)

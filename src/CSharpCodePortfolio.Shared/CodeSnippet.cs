@@ -6,7 +6,7 @@ namespace CSharpCodePortfolio.Shared;
 public sealed record CodeSnippet(string FileName, string Code, string? Caption = null);
 
 /// <summary>
-/// A 1-based inclusive line range inside a source member.
+/// A 1-based inclusive line range inside a source snippet.
 /// </summary>
 public readonly record struct CodeExcerpt
 {

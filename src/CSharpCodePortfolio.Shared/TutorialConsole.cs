@@ -86,6 +86,22 @@ public static class TutorialConsole
     }
 
     /// <summary>
+    /// Writes selected source ranges from a file.
+    /// </summary>
+    public static void WriteCodeSnippet(string title, string relativePath, params CodeExcerpt[] excerpts)
+    {
+        var snippets = CodeSnippetReader.ReadFileExcerpts(relativePath, excerpts);
+
+        foreach (var snippet in snippets)
+        {
+            var snippetTitle = string.IsNullOrWhiteSpace(snippet.Caption)
+                ? title
+                : $"{title} | {snippet.Caption}";
+            WriteCodeSnippet(snippetTitle, snippet.FileName, snippet.Code);
+        }
+    }
+
+    /// <summary>
     /// Writes the source block for a type.
     /// </summary>
     public static void WriteCodeSnippet(string title, Type type)
