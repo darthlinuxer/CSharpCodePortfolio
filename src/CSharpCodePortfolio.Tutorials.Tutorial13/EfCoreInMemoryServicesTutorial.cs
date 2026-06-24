@@ -34,12 +34,9 @@ public sealed class EfCoreInMemoryServicesTutorial : ITutorial
             "Configura EF Core InMemory no container e registra o serviço de aplicação.");
         TutorialConsole.WriteCodeSnippet(
             "O DbContext é resolvido pelo container; o código de uso resolve `SchoolService`.",
-            "SchoolServiceRegistration.cs",
-            """
-            services.AddDbContext<SchoolDbContext>(options =>
-                options.UseInMemoryDatabase(databaseName));
-            services.AddScoped<SchoolService>();
-            """);
+            typeof(SchoolServiceRegistration),
+            nameof(SchoolServiceRegistration.Build),
+            new CodeExcerpt(5, 7, "Registro do DbContext e serviço"));
 
         TutorialConsole.WriteExperiment(
             2,
@@ -47,16 +44,9 @@ public sealed class EfCoreInMemoryServicesTutorial : ITutorial
             "Cria um escopo para gravação e outro para leitura, preservando o ciclo de vida scoped.");
         TutorialConsole.WriteCodeSnippet(
             "Cada escopo recebe uma instância própria do serviço e do contexto.",
-            "ServiceScope.cs",
-            """
-            using var writeScope = serviceProvider.CreateScope();
-            var writer = writeScope.ServiceProvider.GetRequiredService<SchoolService>();
-            await writer.CreateSchoolAsync(cancellationToken);
-
-            using var readScope = serviceProvider.CreateScope();
-            var reader = readScope.ServiceProvider.GetRequiredService<SchoolService>();
-            var report = await reader.BuildReportAsync(cancellationToken);
-            """);
+            typeof(EfCoreInMemoryServicesTutorial),
+            nameof(RunAsync),
+            new CodeExcerpt(42, 55, "Escopos de escrita e leitura"));
 
         using var serviceProvider = SchoolServiceRegistration.Build(databaseName);
 
