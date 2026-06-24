@@ -507,9 +507,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 17`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial18
+## Ciclo Concluído: Helper No Tutorial18
 
 - [x] Refatorar `UnitTestsReflectionMoqTutorial` para ler membros reais de `ReflectionTestRunner` e range real de `CalculatorMachineTests.RunMockedCalculation`.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 18`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial19
+
+- [x] Verificar `ExposeInternalsToTestTutorial`: já lê `AssemblyInfo.cs`, `CustomerDiscountPolicy` e `CustomerDiscountPolicyTests.cs` pela helper.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 19`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
