@@ -556,9 +556,16 @@
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 24`.
 - [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
 
-## Ciclo Atual: Helper No Tutorial25
+## Ciclo Concluído: Helper No Tutorial25
 
 - [x] Refatorar `IdentityFrameworkTutorial` para ler ranges reais de `IdentityFrameworkScenarioTests.cs` pela helper.
 - [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
 - [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 25`.
+- [x] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.
+
+## Ciclo Atual: Helper No Tutorial26
+
+- [x] Refatorar `MinimumOpenIdServerTutorial` para ler ranges reais de `MinimumOpenIdServerScenarioTests.cs` pela helper.
+- [x] Validar `dotnet test CSharpCodePortfolio.slnx --no-restore`.
+- [x] Validar `dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 26`.
 - [ ] Aguardar feedback do usuário antes de migrar o próximo tutorial para a helper.

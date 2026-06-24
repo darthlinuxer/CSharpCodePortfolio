@@ -101,7 +101,11 @@ public sealed class MinimumOpenIdServerTutorial : ITutorial
             "Os testes validam discovery, PKCE, uso único do code, assinatura HMAC e userinfo.");
         TutorialConsole.WriteCodeSnippet(
             "Código real: os testes travam o contrato principal do fluxo.",
-            "tests/CSharpCodePortfolio.Tutorials.Tutorial26.Tests/MinimumOpenIdServerScenarioTests.cs");
+            "tests/CSharpCodePortfolio.Tutorials.Tutorial26.Tests/MinimumOpenIdServerScenarioTests.cs",
+            new CodeExcerpt(13, 30, "Discovery, tokens e userinfo"),
+            new CodeExcerpt(46, 51, "PKCE incorreto"),
+            new CodeExcerpt(92, 97, "Reuso do authorization code"),
+            new CodeExcerpt(129, 135, "Access token adulterado"));
 
         TutorialConsole.WriteObservation(
             "Este tutorial ensina o contrato do fluxo. Um provedor real ainda precisa de HTTPS, armazenamento persistente, rotação de chaves, consentimento e proteção contra replay distribuído.");
