@@ -8,8 +8,14 @@ internal sealed record StaffRole
 
     public string Value { get; }
 
-    internal static StaffRole Create(string? value) =>
-        new(DomainText.Required(value, "Staff role", minLength: 3, MaxLength));
+    internal static Result<StaffRole> Create(string? value)
+    {
+        var text = DomainText.Required(value, "Staff role", minLength: 3, MaxLength);
 
-    internal static StaffRole FromStorage(string value) => Create(value);
+        return text.IsSuccess
+            ? Result<StaffRole>.Success(new StaffRole(text.RequireValue()))
+            : Result<StaffRole>.Failure(text.Errors);
+    }
+
+    internal static Result<StaffRole> FromStorage(string value) => Create(value);
 }

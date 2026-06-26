@@ -35,7 +35,8 @@ tabelas para entidades internas, joins e owned collections.
 
 O modelo protege seus dados: colecoes usam backing fields privados e expõem
 `IReadOnlyCollection<T>`. Mudancas passam por metodos de dominio, nao por
-`List<T>.Add(...)` externo.
+`List<T>.Add(...)` externo. Criacao tambem passa por factories; o dominio nao
+expoe construtores publicos.
 
 ## Services
 
@@ -59,8 +60,14 @@ tutorial, isso seria mais estrutura que valor.
 
 ## Errors
 
-`DomainException` carrega `Code` e `Message`. A mensagem ensina; o codigo e
-estavel para self-checks e possivel UI/API futura.
+Operacoes de dominio retornam `Result` ou `Result<T>`. `Result.Errors` carrega
+uma lista de `DomainError`, cada um com `Code` e `Message`. Um erro representa
+uma regra violada; varios erros permitem que o consumidor mostre tudo que
+precisa ser corrigido de uma vez.
+
+Excecoes ficam para falhas raras: bug de chamada, infraestrutura, materializacao
+EF com dado invalido ou self-check interno do tutorial. Regra de negocio violada
+nao e excecao.
 
 ## Value objects
 
@@ -72,13 +79,14 @@ APIs principais. Exemplos:
 - `CreditPoints`, `Semester`, `UtcDateTime`, `Grade`.
 
 Todos sao tipos fechados, com construtor privado. Entrada de dominio passa por
-`Create(...)`, novos IDs passam por `New()` e a materializacao EF passa por
-`FromStorage(...)`. Essa separacao evita o bypass que um positional
-`record struct` permitiria com `new CourseId(Guid.Empty)`.
+`Create(...)` e retorna `Result<T>`, novos IDs passam por `New()` e a
+materializacao EF passa por `FromStorage(...)`. Essa separacao evita o bypass
+que um positional `record struct` permitiria com `new CourseId(Guid.Empty)`.
 
 IDs baseados em `Guid` rejeitam `Guid.Empty`; `CampusId` rejeita valor nao
-positivo. Se o banco trouxer dado invalido, `FromStorage(...)` falha do mesmo
-jeito que a entrada de dominio falharia.
+positivo. Se o banco trouxer dado invalido, o converter usa
+`FromStorage(...).RequireValue()` e transforma isso em falha excepcional de
+persistencia, porque a entrada normal do dominio ja comunica erro por `Result`.
 
 O EF Core salva esses tipos como colunas escalares usando `HasConversion(...)`.
 

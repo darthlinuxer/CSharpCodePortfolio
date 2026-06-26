@@ -15,7 +15,7 @@ internal sealed class AdministrativeEmployeeConfiguration : IEntityTypeConfigura
         // Role only exists for the administrative branch, so it is nullable in
         // the physical table but still a value object in the domain model.
         administrativeEmployee.Property(value => value.Role)
-            .HasConversion(value => value.Value, value => StaffRole.FromStorage(value))
+            .HasConversion(value => value.Value, value => StaffRole.FromStorage(value).RequireValue())
             .HasMaxLength(StaffRole.MaxLength);
     }
 }

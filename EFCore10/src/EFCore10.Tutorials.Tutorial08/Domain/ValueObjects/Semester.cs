@@ -6,26 +6,30 @@ internal sealed record Semester
 
     public string Value { get; }
 
-    internal static Semester Create(int year, int term)
+    internal static Result<Semester> Create(int year, int term)
     {
-        if (year is < 2000 or > 2100)
-            throw new DomainException(DomainErrors.SemesterYearInvalid, "Semester year is outside the supported range.");
-        if (term is not (1 or 2))
-            throw new DomainException(DomainErrors.SemesterTermInvalid, "Semester term must be 1 or 2.");
+        var errors = new List<DomainError>();
 
-        return new Semester($"{year}-{term}");
+        if (year is < 2000 or > 2100)
+            errors.Add(DomainErrors.SemesterYearInvalid);
+        if (term is not (1 or 2))
+            errors.Add(DomainErrors.SemesterTermInvalid);
+
+        return errors is []
+            ? Result<Semester>.Success(new Semester($"{year}-{term}"))
+            : Result<Semester>.Failure(errors);
     }
 
-    internal static Semester FromStorage(string value)
+    internal static Result<Semester> FromStorage(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new DomainException(DomainErrors.SemesterRequired, "Semester is required.");
+            return Result<Semester>.Failure(DomainErrors.SemesterRequired);
 
         var parts = value.Split('-', StringSplitOptions.TrimEntries);
         if (parts.Length != 2 || !int.TryParse(parts[0], out var year))
-            throw new DomainException(DomainErrors.SemesterYearInvalid, "Semester year is invalid.");
+            return Result<Semester>.Failure(DomainErrors.SemesterYearInvalid);
         if (!int.TryParse(parts[1], out var term))
-            throw new DomainException(DomainErrors.SemesterTermInvalid, "Semester term is invalid.");
+            return Result<Semester>.Failure(DomainErrors.SemesterTermInvalid);
 
         return Create(year, term);
     }

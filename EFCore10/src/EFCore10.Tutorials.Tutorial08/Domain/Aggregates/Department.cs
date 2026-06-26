@@ -8,7 +8,7 @@ internal sealed class Department : DomainEntity<DepartmentId>
     {
     }
 
-    internal Department(DepartmentName name, University university)
+    private Department(DepartmentName name, University university)
         : base(DepartmentId.New())
     {
         ArgumentNullException.ThrowIfNull(university);
@@ -22,6 +22,8 @@ internal sealed class Department : DomainEntity<DepartmentId>
     public University University { get; private set; } = null!;
 
     public IReadOnlyCollection<Professor> Professors => _professors;
+
+    internal static Department Create(DepartmentName name, University university) => new(name, university);
 
     internal void AddProfessor(Professor professor)
     {

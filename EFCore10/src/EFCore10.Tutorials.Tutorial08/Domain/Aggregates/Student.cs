@@ -9,10 +9,7 @@ internal sealed class Student : DomainEntity<StudentId>
     {
     }
 
-    /// <summary>
-    /// Creates a student aggregate root.
-    /// </summary>
-    public Student(PersonName name, EmailAddress email)
+    private Student(PersonName name, EmailAddress email)
         : base(StudentId.New())
     {
         Name = name;
@@ -27,28 +24,55 @@ internal sealed class Student : DomainEntity<StudentId>
 
     public IReadOnlyCollection<Course> Courses => [.. _enrollments.Select(enrollment => enrollment.Course)];
 
-    /// <summary>
-    /// Registers the student in a course when the semester credit limit allows it.
-    /// </summary>
-    public Enrollment RegisterForCourse(Course course, Semester semester, UtcDateTime enrolledAtUtc)
+    public static Result<Student> Create(string? name, string? email)
+    {
+        var nameResult = PersonName.Create(name);
+        var emailResult = EmailAddress.Create(email);
+        var errors = new List<DomainError>();
+        errors.AddRange(nameResult.Errors);
+        errors.AddRange(emailResult.Errors);
+
+        return errors is []
+            ? Result<Student>.Success(new Student(nameResult.RequireValue(), emailResult.RequireValue()))
+            : Result<Student>.Failure(errors);
+    }
+
+    public Result<Enrollment> RegisterForCourse(Course course, int year, int term, DateTime enrolledAtUtc)
     {
         ArgumentNullException.ThrowIfNull(course);
 
-        if (_enrollments.Any(enrollment => enrollment.CourseId == course.Id && enrollment.Semester == semester))
-            throw new DomainException(DomainErrors.StudentAlreadyRegistered, "Student is already registered for this course in the semester.");
+        var semesterResult = Semester.Create(year, term);
+        var enrolledAtResult = UtcDateTime.Create(enrolledAtUtc);
+        var errors = new List<DomainError>();
+        errors.AddRange(semesterResult.Errors);
+        errors.AddRange(enrolledAtResult.Errors);
 
-        var currentPoints = _enrollments
-            .Where(enrollment => enrollment.Semester == semester)
-            .Sum(enrollment => enrollment.Course.CreditPoints.Value);
-        var nextTotal = currentPoints + course.CreditPoints.Value;
+        if (semesterResult.IsSuccess)
+        {
+            var semester = semesterResult.RequireValue();
+            if (_enrollments.Any(enrollment => enrollment.CourseId == course.Id && enrollment.Semester == semester))
+                errors.Add(DomainErrors.StudentAlreadyRegistered);
 
-        if (nextTotal > MaxCreditPointsPerSemester)
-            throw new DomainException(DomainErrors.StudentCreditLimitExceeded, "Student cannot register for more than 40 credit points in the same semester.");
+            var currentPoints = _enrollments
+                .Where(enrollment => enrollment.Semester == semester)
+                .Sum(enrollment => enrollment.Course.CreditPoints.Value);
+            var nextTotal = currentPoints + course.CreditPoints.Value;
 
-        var enrollment = new Enrollment(this, course, semester, enrolledAtUtc);
-        course.AddEnrollment(enrollment);
+            if (nextTotal > MaxCreditPointsPerSemester)
+                errors.Add(DomainErrors.StudentCreditLimitExceeded);
+        }
+
+        if (errors is not [])
+            return Result<Enrollment>.Failure(errors);
+
+        var enrollment = Enrollment.Create(this, course, semesterResult.RequireValue(), enrolledAtResult.RequireValue());
+        var addToCourse = course.AddEnrollment(enrollment);
+
+        if (addToCourse.IsFailure)
+            return Result<Enrollment>.Failure(addToCourse.Errors);
+
         _enrollments.Add(enrollment);
 
-        return enrollment;
+        return Result<Enrollment>.Success(enrollment);
     }
 }

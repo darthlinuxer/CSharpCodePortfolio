@@ -33,14 +33,28 @@ internal abstract class Employee : DomainEntity<EmployeeId>
     /// <summary>
     /// Marks the employee as dismissed.
     /// </summary>
-    public void Dismiss(UtcDateTime dismissedAtUtc)
+    internal IReadOnlyList<DomainError> GetDismissalErrors(UtcDateTime dismissedAtUtc)
     {
+        var errors = new List<DomainError>();
+
         if (Status == EmployeeStatus.Dismissed)
-            throw new DomainException(DomainErrors.EmployeeAlreadyDismissed, "Employee is already dismissed.");
+            errors.Add(DomainErrors.EmployeeAlreadyDismissed);
         if (dismissedAtUtc.Value < HiredAtUtc.Value)
-            throw new DomainException(DomainErrors.EmployeeDismissalDateInvalid, "Dismissal date cannot be earlier than hiring date.");
+            errors.Add(DomainErrors.EmployeeDismissalDateInvalid);
+
+        return errors;
+    }
+
+    internal Result Dismiss(UtcDateTime dismissedAtUtc)
+    {
+        var errors = GetDismissalErrors(dismissedAtUtc);
+
+        if (errors is not [])
+            return Result.Failure(errors);
 
         DismissedAtUtc = dismissedAtUtc;
         Status = EmployeeStatus.Dismissed;
+
+        return Result.Success();
     }
 }

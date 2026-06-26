@@ -6,10 +6,7 @@ internal sealed class Syllabus
     {
     }
 
-    /// <summary>
-    /// Creates a syllabus owned by a course.
-    /// </summary>
-    public Syllabus(SyllabusSummary summary, SyllabusOutcomes outcomes)
+    private Syllabus(SyllabusSummary summary, SyllabusOutcomes outcomes)
     {
         Summary = summary;
         Outcomes = outcomes;
@@ -18,4 +15,17 @@ internal sealed class Syllabus
     public SyllabusSummary Summary { get; private set; } = null!;
 
     public SyllabusOutcomes Outcomes { get; private set; } = null!;
+
+    public static Result<Syllabus> Create(string? summary, string? outcomes)
+    {
+        var summaryResult = SyllabusSummary.Create(summary);
+        var outcomesResult = SyllabusOutcomes.Create(outcomes);
+        var errors = new List<DomainError>();
+        errors.AddRange(summaryResult.Errors);
+        errors.AddRange(outcomesResult.Errors);
+
+        return errors is []
+            ? Result<Syllabus>.Success(new Syllabus(summaryResult.RequireValue(), outcomesResult.RequireValue()))
+            : Result<Syllabus>.Failure(errors);
+    }
 }

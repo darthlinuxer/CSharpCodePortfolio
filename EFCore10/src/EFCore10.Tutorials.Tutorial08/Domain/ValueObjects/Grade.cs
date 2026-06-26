@@ -6,10 +6,10 @@ internal sealed record Grade
 
     public decimal Value { get; }
 
-    internal static Grade Create(decimal value) =>
+    internal static Result<Grade> Create(decimal value) =>
         value is >= 0m and <= 10m
-            ? new Grade(value)
-            : throw new DomainException(DomainErrors.GradeInvalid, "Final grade must be between 0 and 10.");
+            ? Result<Grade>.Success(new Grade(value))
+            : Result<Grade>.Failure(DomainErrors.GradeInvalid);
 
-    internal static Grade FromStorage(decimal value) => Create(value);
+    internal static Result<Grade> FromStorage(decimal value) => Create(value);
 }

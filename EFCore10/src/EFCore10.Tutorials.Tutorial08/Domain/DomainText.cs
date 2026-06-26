@@ -5,15 +5,15 @@ internal static class DomainText
     /// <summary>
     /// Normalizes required text and enforces length limits.
     /// </summary>
-    public static string Required(string? value, string label, int minLength = 1, int maxLength = 200)
+    public static Result<string> Required(string? value, string label, int minLength = 1, int maxLength = 200)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new DomainException(DomainErrors.RequiredText, $"{label} is required.");
+            return Result<string>.Failure(DomainErrors.RequiredText(label));
 
         var normalized = string.Join(' ', value.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
         return normalized.Length >= minLength && normalized.Length <= maxLength
-            ? normalized
-            : throw new DomainException(DomainErrors.TextLength, $"{label} must have between {minLength} and {maxLength} characters.");
+            ? Result<string>.Success(normalized)
+            : Result<string>.Failure(DomainErrors.TextLength(label, minLength, maxLength));
     }
 }

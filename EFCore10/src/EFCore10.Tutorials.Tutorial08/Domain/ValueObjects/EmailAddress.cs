@@ -10,23 +10,19 @@ internal sealed record EmailAddress
 
     public string Value { get; }
 
-    internal static EmailAddress Create(string? value)
+    internal static Result<EmailAddress> Create(string? value)
     {
-        var normalized = DomainText.Required(value, "Email", minLength: 3, MaxLength).ToLowerInvariant();
+        var text = DomainText.Required(value, "Email", minLength: 3, MaxLength);
 
-        try
-        {
-            var address = new MailAddress(normalized);
+        if (text.IsFailure)
+            return Result<EmailAddress>.Failure(text.Errors);
 
-            return address.Address == normalized
-                ? new EmailAddress(normalized)
-                : throw new DomainException(DomainErrors.EmailInvalid, "Email is invalid.");
-        }
-        catch (FormatException exception)
-        {
-            throw new DomainException(DomainErrors.EmailInvalid, "Email is invalid.") { Source = exception.Source };
-        }
+        var normalized = text.RequireValue().ToLowerInvariant();
+
+        return MailAddress.TryCreate(normalized, out var address) && address.Address == normalized
+            ? Result<EmailAddress>.Success(new EmailAddress(normalized))
+            : Result<EmailAddress>.Failure(DomainErrors.EmailInvalid);
     }
 
-    internal static EmailAddress FromStorage(string value) => Create(value);
+    internal static Result<EmailAddress> FromStorage(string value) => Create(value);
 }

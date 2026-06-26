@@ -6,11 +6,11 @@ internal sealed record UtcDateTime
 
     public DateTime Value { get; }
 
-    internal static UtcDateTime Create(DateTime value) =>
+    internal static Result<UtcDateTime> Create(DateTime value) =>
         value.Kind == DateTimeKind.Utc
-            ? new UtcDateTime(value)
-            : throw new DomainException(DomainErrors.UtcRequired, "Domain timestamps must be UTC.");
+            ? Result<UtcDateTime>.Success(new UtcDateTime(value))
+            : Result<UtcDateTime>.Failure(DomainErrors.UtcRequired);
 
-    internal static UtcDateTime FromStorage(DateTime value) =>
+    internal static Result<UtcDateTime> FromStorage(DateTime value) =>
         Create(DateTime.SpecifyKind(value, DateTimeKind.Utc));
 }

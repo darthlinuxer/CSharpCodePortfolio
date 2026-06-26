@@ -8,8 +8,14 @@ internal sealed record PersonName
 
     public string Value { get; }
 
-    internal static PersonName Create(string? value) =>
-        new(DomainText.Required(value, "Person name", minLength: 3, MaxLength));
+    internal static Result<PersonName> Create(string? value)
+    {
+        var text = DomainText.Required(value, "Person name", minLength: 3, MaxLength);
 
-    internal static PersonName FromStorage(string value) => Create(value);
+        return text.IsSuccess
+            ? Result<PersonName>.Success(new PersonName(text.RequireValue()))
+            : Result<PersonName>.Failure(text.Errors);
+    }
+
+    internal static Result<PersonName> FromStorage(string value) => Create(value);
 }

@@ -8,8 +8,14 @@ internal sealed record CityName
 
     public string Value { get; }
 
-    internal static CityName Create(string? value) =>
-        new(DomainText.Required(value, "Campus city", minLength: 3, MaxLength));
+    internal static Result<CityName> Create(string? value)
+    {
+        var text = DomainText.Required(value, "Campus city", minLength: 3, MaxLength);
 
-    internal static CityName FromStorage(string value) => Create(value);
+        return text.IsSuccess
+            ? Result<CityName>.Success(new CityName(text.RequireValue()))
+            : Result<CityName>.Failure(text.Errors);
+    }
+
+    internal static Result<CityName> FromStorage(string value) => Create(value);
 }

@@ -26,10 +26,10 @@ internal sealed class UniversityConfiguration : IEntityTypeConfiguration<Univers
         // values in the database.
         university.HasKey(value => value.Id);
         university.Property(value => value.Id)
-            .HasConversion(value => value.Value, value => UniversityId.FromStorage(value))
+            .HasConversion(value => value.Value, value => UniversityId.FromStorage(value).RequireValue())
             .ValueGeneratedNever();
         university.Property(value => value.Name)
-            .HasConversion(value => value.Value, value => UniversityName.FromStorage(value))
+            .HasConversion(value => value.Value, value => UniversityName.FromStorage(value).RequireValue())
             .HasMaxLength(UniversityName.MaxLength)
             .IsRequired();
 
@@ -46,17 +46,17 @@ internal sealed class UniversityConfiguration : IEntityTypeConfiguration<Univers
             // Shadow owner FK: Campus should not expose UniversityId in the
             // domain because it cannot exist outside University anyway.
             campus.Property<UniversityId>(Columns.UniversityId)
-                .HasConversion(value => value.Value, value => UniversityId.FromStorage(value));
+                .HasConversion(value => value.Value, value => UniversityId.FromStorage(value).RequireValue());
             campus.Property(value => value.Id)
-                .HasConversion(value => value.Value, value => CampusId.FromStorage(value))
+                .HasConversion(value => value.Value, value => CampusId.FromStorage(value).RequireValue())
                 .ValueGeneratedNever();
             campus.HasKey(Columns.UniversityId, nameof(UniversityCampus.Id));
             campus.Property(value => value.Name)
-                .HasConversion(value => value.Value, value => CampusName.FromStorage(value))
+                .HasConversion(value => value.Value, value => CampusName.FromStorage(value).RequireValue())
                 .HasMaxLength(CampusName.MaxLength)
                 .IsRequired();
             campus.Property(value => value.City)
-                .HasConversion(value => value.Value, value => CityName.FromStorage(value))
+                .HasConversion(value => value.Value, value => CityName.FromStorage(value).RequireValue())
                 .HasMaxLength(CityName.MaxLength)
                 .IsRequired();
         });

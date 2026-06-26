@@ -6,12 +6,12 @@ internal sealed record EmployeeId
 
     public Guid Value { get; }
 
-    internal static EmployeeId New() => FromStorage(Guid.CreateVersion7());
+    internal static EmployeeId New() => new(Guid.CreateVersion7());
 
-    internal static EmployeeId Create(Guid value) => FromStorage(value);
+    internal static Result<EmployeeId> Create(Guid value) => FromStorage(value);
 
-    internal static EmployeeId FromStorage(Guid value) =>
+    internal static Result<EmployeeId> FromStorage(Guid value) =>
         value == Guid.Empty
-            ? throw new DomainException(DomainErrors.EmployeeIdInvalid, "Employee ID cannot be empty.")
-            : new EmployeeId(value);
+            ? Result<EmployeeId>.Failure(DomainErrors.EmployeeIdInvalid)
+            : Result<EmployeeId>.Success(new EmployeeId(value));
 }

@@ -34,7 +34,7 @@ public sealed class RelationshipMappingTutorial : ITutorial
             "Como um dominio universitario rico fica persistido quando aggregate root nao e sinonimo de uma unica tabela?");
         TutorialConsole.WriteHypothesis(
             "Aggregates definem consistencia; o banco ainda pode ter tabelas para entidades internas e joins.",
-            "Value objects fechados deixam o dominio sem primitive obsession e sao salvos por converters que materializam via FromStorage.",
+            "Value objects fechados deixam o dominio sem primitive obsession; factories retornam Result.Errors quando regras sao violadas.",
             "Course.Department e Enrollment.RecordFinalGrade colocam regra no objeto que realmente conhece o ciclo de vida.",
             "OwnsOne/OwnsMany aparecem quando o objeto nao vive sem o owner; HasOne/HasMany fica para identidade propria.");
         TutorialConsole.WritePreparation(
@@ -52,7 +52,8 @@ public sealed class RelationshipMappingTutorial : ITutorial
             ("Limite academico", "Student bloqueia mais de 40 pontos no mesmo semestre"),
             ("Matricula", "Student e Course compartilham a mesma Enrollment"),
             ("Nota final", "Enrollment bloqueia segunda nota final"),
-            ("Demissao", "University bloqueia professor ainda atribuido a curso ativo"));
+            ("Demissao", "University bloqueia professor ainda atribuido a curso ativo"),
+            ("Erros", "Violacoes de dominio retornam Result.Errors; excecoes ficam para falhas raras"));
 
         var options = new DbContextOptionsBuilder<UniversityContext>()
             .UseSqlite(connectionString)
@@ -62,7 +63,7 @@ public sealed class RelationshipMappingTutorial : ITutorial
         var applicationService = new UniversityApplicationService(context);
         await applicationService.RecreateSampleAsync(cancellationToken).ConfigureAwait(false);
 
-        var semester = Semester.Create(2026, 1);
+        var semester = Semester.Create(2026, 1).RequireValue();
         var dashboardReadService = new UniversityDashboardReadService(context);
         var courseAnalyticsReadService = new CourseAnalyticsReadService(context);
         var studentProgressReadService = new StudentProgressReadService(context);
@@ -167,86 +168,89 @@ public sealed class RelationshipMappingTutorial : ITutorial
 
     private static int ValidateDomainRules()
     {
-        var checks = new (string Scenario, string ExpectedCode, Action Action)[]
+        var checks = new (string Scenario, string[] ExpectedCodes, Func<IReadOnlyCollection<DomainError>> Errors)[]
         {
-            ("nome nulo", DomainErrors.RequiredText, static () => _ = new University(UniversityName.Create(null))),
-            ("email invalido", DomainErrors.EmailInvalid, static () => _ = new Student(PersonName.Create("Ana Valida"), EmailAddress.Create("not email"))),
-            ("id vazio materializado", DomainErrors.CourseIdInvalid, static () => _ = CourseId.FromStorage(Guid.Empty)),
-            ("campus id materializado invalido", DomainErrors.CampusIdInvalid, static () => _ = CampusId.FromStorage(0)),
-            ("data local", DomainErrors.UtcRequired, static () => _ = UtcDateTime.Create(DateTime.Now)),
-            ("nota fora da faixa", DomainErrors.GradeInvalid, static () => _ = Grade.Create(11m)),
-            ("campus duplicado", DomainErrors.CampusNameDuplicated, static () =>
+            ("nome nulo", [DomainErrors.RequiredTextCode], static () => University.Create(null).Errors),
+            ("email invalido", [DomainErrors.EmailInvalid.Code], static () => Student.Create("Ana Valida", "not email").Errors),
+            ("id vazio materializado", [DomainErrors.CourseIdInvalid.Code], static () => CourseId.FromStorage(Guid.Empty).Errors),
+            ("campus id materializado invalido", [DomainErrors.CampusIdInvalid.Code], static () => CampusId.FromStorage(0).Errors),
+            ("data local", [DomainErrors.UtcRequired.Code], static () => UtcDateTime.Create(DateTime.Now).Errors),
+            ("nota fora da faixa", [DomainErrors.GradeInvalid.Code], static () => Grade.Create(11m).Errors),
+            ("aluno com nome e email invalidos", [DomainErrors.RequiredTextCode, DomainErrors.EmailInvalid.Code], static () => Student.Create(null, "not email").Errors),
+            ("campus duplicado", [DomainErrors.CampusNameDuplicated.Code], static () =>
             {
-                var university = new University(UniversityName.Create("Universidade Valida"));
-                university.AddCampus(CampusName.Create("Main"), CityName.Create("Sao Paulo"));
-                university.AddCampus(CampusName.Create("Main"), CityName.Create("Campinas"));
-            }),
-            ("departamento de outra universidade", DomainErrors.ProfessorDepartmentMismatch, static () =>
-            {
-                var first = new University(UniversityName.Create("Primeira Universidade"));
-                var second = new University(UniversityName.Create("Segunda Universidade"));
-                var department = first.OpenDepartment(DepartmentName.Create("Computer Science"));
+                var university = University.Create("Universidade Valida").RequireValue();
+                university.AddCampus("Main", "Sao Paulo").RequireSuccess();
 
-                second.HireProfessor(
-                    PersonName.Create("Professora Valida"),
-                    EmailAddress.Create("professora.valida@contoso.edu"),
-                    department,
-                    UtcDateTime.Create(DateTime.UtcNow));
+                return university.AddCampus("Main", "Campinas").Errors;
             }),
-            ("professor de outro departamento", DomainErrors.CourseDepartmentMismatch, static () =>
+            ("departamento de outra universidade", [DomainErrors.ProfessorDepartmentMismatch.Code], static () =>
             {
-                var university = new University(UniversityName.Create("Universidade Valida"));
-                var computerScience = university.OpenDepartment(DepartmentName.Create("Computer Science"));
-                var dataScience = university.OpenDepartment(DepartmentName.Create("Data Science"));
+                var first = University.Create("Primeira Universidade").RequireValue();
+                var second = University.Create("Segunda Universidade").RequireValue();
+                var department = first.OpenDepartment("Computer Science").RequireValue();
+
+                return second.HireProfessor(
+                    "Professora Valida",
+                    "professora.valida@contoso.edu",
+                    department,
+                    DateTime.UtcNow).Errors;
+            }),
+            ("professor de outro departamento", [DomainErrors.CourseDepartmentMismatch.Code], static () =>
+            {
+                var university = University.Create("Universidade Valida").RequireValue();
+                var computerScience = university.OpenDepartment("Computer Science").RequireValue();
+                var dataScience = university.OpenDepartment("Data Science").RequireValue();
                 var professor = university.HireProfessor(
-                    PersonName.Create("Professora Valida"),
-                    EmailAddress.Create("professora.valida@contoso.edu"),
+                    "Professora Valida",
+                    "professora.valida@contoso.edu",
                     dataScience,
-                    UtcDateTime.Create(DateTime.UtcNow));
+                    DateTime.UtcNow).RequireValue();
                 var course = CreateValidCourse("Curso Valido", "CS-201", 10, computerScience);
 
-                course.AssignProfessor(professor);
+                return course.AssignProfessor(professor).Errors;
             }),
-            ("limite de pontos no semestre", DomainErrors.StudentCreditLimitExceeded, static () =>
+            ("limite de pontos no semestre", [DomainErrors.StudentCreditLimitExceeded.Code], static () =>
             {
                 var department = CreateValidDepartment();
-                var student = new Student(PersonName.Create("Aluno Valido"), EmailAddress.Create("aluno.valido@contoso.edu"));
-                var semester = Semester.Create(2026, 1);
-                var enrolledAtUtc = UtcDateTime.Create(DateTime.UtcNow);
+                var student = Student.Create("Aluno Valido", "aluno.valido@contoso.edu").RequireValue();
+                var enrolledAtUtc = DateTime.UtcNow;
 
-                student.RegisterForCourse(CreateValidCourse("Curso Valido A", "CS-301", 25, department), semester, enrolledAtUtc);
-                student.RegisterForCourse(CreateValidCourse("Curso Valido B", "CS-302", 20, department), semester, enrolledAtUtc);
+                student.RegisterForCourse(CreateValidCourse("Curso Valido A", "CS-301", 25, department), 2026, 1, enrolledAtUtc).RequireValue();
+
+                return student.RegisterForCourse(CreateValidCourse("Curso Valido B", "CS-302", 20, department), 2026, 1, enrolledAtUtc).Errors;
             }),
-            ("nota final duplicada", DomainErrors.EnrollmentFinalGradeAlreadyRecorded, static () =>
+            ("nota final duplicada", [DomainErrors.EnrollmentFinalGradeAlreadyRecorded.Code], static () =>
             {
                 var department = CreateValidDepartment();
-                var student = new Student(PersonName.Create("Aluno Valido"), EmailAddress.Create("aluno.valido@contoso.edu"));
+                var student = Student.Create("Aluno Valido", "aluno.valido@contoso.edu").RequireValue();
                 var course = CreateValidCourse("Curso Valido", "CS-303", 10, department);
-                var enrollment = student.RegisterForCourse(course, Semester.Create(2026, 1), UtcDateTime.Create(DateTime.UtcNow));
+                var enrollment = student.RegisterForCourse(course, 2026, 1, DateTime.UtcNow).RequireValue();
 
-                enrollment.RecordFinalGrade(Grade.Create(8.5m));
-                enrollment.RecordFinalGrade(Grade.Create(9.0m));
+                enrollment.RecordFinalGrade(8.5m).RequireSuccess();
+
+                return enrollment.RecordFinalGrade(9.0m).Errors;
             }),
-            ("professor com curso ativo nao pode ser demitido", DomainErrors.EmployeeDismissalBlocked, static () =>
+            ("professor com curso ativo nao pode ser demitido", [DomainErrors.EmployeeDismissalBlocked.Code], static () =>
             {
-                var university = new University(UniversityName.Create("Universidade Valida"));
-                var department = university.OpenDepartment(DepartmentName.Create("Computer Science"));
-                var hiredAtUtc = UtcDateTime.Create(DateTime.UtcNow);
+                var university = University.Create("Universidade Valida").RequireValue();
+                var department = university.OpenDepartment("Computer Science").RequireValue();
+                var hiredAtUtc = DateTime.UtcNow;
                 var professor = university.HireProfessor(
-                    PersonName.Create("Professora Valida"),
-                    EmailAddress.Create("professora.valida@contoso.edu"),
+                    "Professora Valida",
+                    "professora.valida@contoso.edu",
                     department,
-                    hiredAtUtc);
+                    hiredAtUtc).RequireValue();
                 var course = CreateValidCourse("Curso Valido", "CS-401", 10, department);
-                course.AssignProfessor(professor);
+                course.AssignProfessor(professor).RequireSuccess();
 
-                university.DismissEmployee(professor, UtcDateTime.Create(hiredAtUtc.Value.AddDays(1)), [course]);
+                return university.DismissEmployee(professor, hiredAtUtc.AddDays(1), [course]).Errors;
             })
         };
 
-        foreach (var (scenario, expectedCode, action) in checks)
+        foreach (var (scenario, expectedCodes, errors) in checks)
         {
-            ExpectDomainException(action, scenario, expectedCode);
+            ExpectDomainErrors(errors(), scenario, expectedCodes);
         }
 
         ValidateBidirectionalEnrollment();
@@ -296,28 +300,27 @@ public sealed class RelationshipMappingTutorial : ITutorial
         grade is not null ? grade.Value.ToString("0.00", CultureInfo.InvariantCulture) : "sem nota";
 
     private static Course CreateValidCourse(string title, string code, int points, Department department) =>
-        new(
+        Course.Create(
             department,
-            CourseTitle.Create(title),
-            CourseCode.Create(code),
-            CreditPoints.Create(points),
-            new Syllabus(
-                SyllabusSummary.Create("Resumo valido para o curso."),
-                SyllabusOutcomes.Create("Resultados validos para o curso.")));
+            title,
+            code,
+            points,
+            "Resumo valido para o curso.",
+            "Resultados validos para o curso.").RequireValue();
 
     private static Department CreateValidDepartment()
     {
-        var university = new University(UniversityName.Create("Universidade Valida"));
+        var university = University.Create("Universidade Valida").RequireValue();
 
-        return university.OpenDepartment(DepartmentName.Create("Computer Science"));
+        return university.OpenDepartment("Computer Science").RequireValue();
     }
 
     private static void ValidateBidirectionalEnrollment()
     {
         var department = CreateValidDepartment();
-        var student = new Student(PersonName.Create("Aluno Valido"), EmailAddress.Create("aluno.valido@contoso.edu"));
+        var student = Student.Create("Aluno Valido", "aluno.valido@contoso.edu").RequireValue();
         var course = CreateValidCourse("Curso Valido", "CS-304", 10, department);
-        var enrollment = student.RegisterForCourse(course, Semester.Create(2026, 1), UtcDateTime.Create(DateTime.UtcNow));
+        var enrollment = student.RegisterForCourse(course, 2026, 1, DateTime.UtcNow).RequireValue();
 
         if (!student.Enrollments.Contains(enrollment)
             || !course.Enrollments.Contains(enrollment)
@@ -328,30 +331,23 @@ public sealed class RelationshipMappingTutorial : ITutorial
         }
     }
 
-    private static void ExpectDomainException(Action action, string scenario, string expectedCode)
+    private static void ExpectDomainErrors(
+        IReadOnlyCollection<DomainError> errors,
+        string scenario,
+        IReadOnlyCollection<string> expectedCodes)
     {
-        try
-        {
-            action();
-        }
-        catch (DomainException exception) when (string.Equals(exception.Code, expectedCode, StringComparison.Ordinal))
-        {
-            return;
-        }
-        catch (DomainException exception)
-        {
-            throw new InvalidOperationException(
-                $"{scenario} raised DomainException code {exception.Code} instead of {expectedCode}.",
-                exception);
-        }
-        catch (Exception exception)
-        {
-            throw new InvalidOperationException(
-                $"{scenario} raised {exception.GetType().Name} instead of DomainException.",
-                exception);
-        }
+        if (errors.Count == 0)
+            throw new InvalidOperationException($"{scenario} returned success instead of domain errors.");
 
-        throw new InvalidOperationException($"{scenario} did not raise DomainException.");
+        var actualCodes = errors.Select(static error => error.Code).ToArray();
+        var missingCodes = expectedCodes.Except(actualCodes, StringComparer.Ordinal).ToArray();
+        var unexpectedCodes = actualCodes.Except(expectedCodes, StringComparer.Ordinal).ToArray();
+
+        if (missingCodes is [] && unexpectedCodes is [])
+            return;
+
+        throw new InvalidOperationException(
+            $"{scenario} returned unexpected domain errors. Expected: {string.Join(", ", expectedCodes)}. Actual: {string.Join(", ", actualCodes)}.");
     }
 
     private static void WriteMappingMetadata(UniversityContext context)

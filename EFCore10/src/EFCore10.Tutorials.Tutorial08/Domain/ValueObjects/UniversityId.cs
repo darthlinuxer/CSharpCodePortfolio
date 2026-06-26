@@ -6,12 +6,12 @@ internal sealed record UniversityId
 
     public Guid Value { get; }
 
-    internal static UniversityId New() => FromStorage(Guid.CreateVersion7());
+    internal static UniversityId New() => new(Guid.CreateVersion7());
 
-    internal static UniversityId Create(Guid value) => FromStorage(value);
+    internal static Result<UniversityId> Create(Guid value) => FromStorage(value);
 
-    internal static UniversityId FromStorage(Guid value) =>
+    internal static Result<UniversityId> FromStorage(Guid value) =>
         value == Guid.Empty
-            ? throw new DomainException(DomainErrors.UniversityIdInvalid, "University ID cannot be empty.")
-            : new UniversityId(value);
+            ? Result<UniversityId>.Failure(DomainErrors.UniversityIdInvalid)
+            : Result<UniversityId>.Success(new UniversityId(value));
 }

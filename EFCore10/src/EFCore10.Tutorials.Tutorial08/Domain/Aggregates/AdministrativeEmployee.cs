@@ -6,7 +6,7 @@ internal sealed class AdministrativeEmployee : Employee
     {
     }
 
-    internal AdministrativeEmployee(
+    private AdministrativeEmployee(
         PersonName name,
         EmailAddress email,
         University university,
@@ -18,4 +18,12 @@ internal sealed class AdministrativeEmployee : Employee
     }
 
     public StaffRole Role { get; private set; } = null!;
+
+    internal static AdministrativeEmployee Create(
+        PersonName name,
+        EmailAddress email,
+        University university,
+        StaffRole role,
+        UtcDateTime hiredAtUtc) =>
+        new(name, email, university, role, hiredAtUtc);
 }

@@ -6,10 +6,10 @@ internal sealed record CreditPoints
 
     public int Value { get; }
 
-    internal static CreditPoints Create(int value) =>
+    internal static Result<CreditPoints> Create(int value) =>
         value is >= 1 and <= 40
-            ? new CreditPoints(value)
-            : throw new DomainException(DomainErrors.CreditPointsInvalid, "Course credit points must be between 1 and 40.");
+            ? Result<CreditPoints>.Success(new CreditPoints(value))
+            : Result<CreditPoints>.Failure(DomainErrors.CreditPointsInvalid);
 
-    internal static CreditPoints FromStorage(int value) => Create(value);
+    internal static Result<CreditPoints> FromStorage(int value) => Create(value);
 }

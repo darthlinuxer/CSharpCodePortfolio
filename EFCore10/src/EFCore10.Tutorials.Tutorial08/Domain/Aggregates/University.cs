@@ -10,10 +10,7 @@ internal sealed class University : DomainEntity<UniversityId>
     {
     }
 
-    /// <summary>
-    /// Creates a university aggregate root.
-    /// </summary>
-    public University(UniversityName name)
+    private University(UniversityName name)
         : base(UniversityId.New())
     {
         Name = name;
@@ -27,77 +24,143 @@ internal sealed class University : DomainEntity<UniversityId>
 
     public IReadOnlyCollection<Employee> Employees => _employees;
 
-    /// <summary>
-    /// Adds a campus owned by the university.
-    /// </summary>
-    public void AddCampus(CampusName name, CityName city)
+    public static Result<University> Create(string? name)
     {
-        if (_campuses.Any(campus => string.Equals(campus.Name.Value, name.Value, StringComparison.OrdinalIgnoreCase)))
-            throw new DomainException(DomainErrors.CampusNameDuplicated, "University campus names must be unique.");
+        var nameResult = UniversityName.Create(name);
 
-        _campuses.Add(new UniversityCampus(CampusId.Create(_campuses.Count + 1), name, city));
+        return nameResult.IsSuccess
+            ? Result<University>.Success(new University(nameResult.RequireValue()))
+            : Result<University>.Failure(nameResult.Errors);
     }
 
-    /// <summary>
-    /// Creates a department that belongs to this university.
-    /// </summary>
-    public Department OpenDepartment(DepartmentName name)
+    public Result AddCampus(string? name, string? city)
     {
-        if (_departments.Any(department => string.Equals(department.Name.Value, name.Value, StringComparison.OrdinalIgnoreCase)))
-            throw new DomainException(DomainErrors.DepartmentNameDuplicated, "Department names must be unique inside the university.");
+        var nameResult = CampusName.Create(name);
+        var cityResult = CityName.Create(city);
+        var errors = new List<DomainError>();
+        errors.AddRange(nameResult.Errors);
+        errors.AddRange(cityResult.Errors);
 
-        var department = new Department(name, this);
+        if (nameResult.IsSuccess
+            && _campuses.Any(campus => string.Equals(campus.Name.Value, nameResult.RequireValue().Value, StringComparison.OrdinalIgnoreCase)))
+        {
+            errors.Add(DomainErrors.CampusNameDuplicated);
+        }
+
+        if (errors is not [])
+            return Result.Failure(errors);
+
+        _campuses.Add(UniversityCampus.Create(
+            CampusId.Create(_campuses.Count + 1).RequireValue(),
+            nameResult.RequireValue(),
+            cityResult.RequireValue()));
+
+        return Result.Success();
+    }
+
+    public Result<Department> OpenDepartment(string? name)
+    {
+        var nameResult = DepartmentName.Create(name);
+        var errors = new List<DomainError>(nameResult.Errors);
+
+        if (nameResult.IsSuccess
+            && _departments.Any(department => string.Equals(department.Name.Value, nameResult.RequireValue().Value, StringComparison.OrdinalIgnoreCase)))
+        {
+            errors.Add(DomainErrors.DepartmentNameDuplicated);
+        }
+
+        if (errors is not [])
+            return Result<Department>.Failure(errors);
+
+        var department = Department.Create(nameResult.RequireValue(), this);
         _departments.Add(department);
 
-        return department;
+        return Result<Department>.Success(department);
     }
 
-    /// <summary>
-    /// Hires a professor for a department without assigning a course.
-    /// </summary>
-    public Professor HireProfessor(
-        PersonName name,
-        EmailAddress email,
+    public Result<Professor> HireProfessor(
+        string? name,
+        string? email,
         Department department,
-        UtcDateTime hiredAtUtc)
+        DateTime hiredAtUtc)
     {
         ArgumentNullException.ThrowIfNull(department);
 
-        if (department.University.Id != Id)
-            throw new DomainException(DomainErrors.ProfessorDepartmentMismatch, "Professor department must belong to the same university.");
+        var nameResult = PersonName.Create(name);
+        var emailResult = EmailAddress.Create(email);
+        var hiredAtResult = UtcDateTime.Create(hiredAtUtc);
+        var errors = new List<DomainError>();
+        errors.AddRange(nameResult.Errors);
+        errors.AddRange(emailResult.Errors);
+        errors.AddRange(hiredAtResult.Errors);
 
-        var professor = new Professor(name, email, this, department, hiredAtUtc);
+        if (department.University.Id != Id)
+            errors.Add(DomainErrors.ProfessorDepartmentMismatch);
+
+        if (errors is not [])
+            return Result<Professor>.Failure(errors);
+
+        var professor = Professor.Create(
+            nameResult.RequireValue(),
+            emailResult.RequireValue(),
+            this,
+            department,
+            hiredAtResult.RequireValue());
         _employees.Add(professor);
         department.AddProfessor(professor);
 
-        return professor;
+        return Result<Professor>.Success(professor);
     }
 
-    /// <summary>
-    /// Hires a non-teaching employee for the university.
-    /// </summary>
-    public AdministrativeEmployee HireAdministrativeEmployee(
-        PersonName name,
-        EmailAddress email,
-        StaffRole role,
-        UtcDateTime hiredAtUtc)
+    public Result<AdministrativeEmployee> HireAdministrativeEmployee(
+        string? name,
+        string? email,
+        string? role,
+        DateTime hiredAtUtc)
     {
-        var employee = new AdministrativeEmployee(name, email, this, role, hiredAtUtc);
+        var nameResult = PersonName.Create(name);
+        var emailResult = EmailAddress.Create(email);
+        var roleResult = StaffRole.Create(role);
+        var hiredAtResult = UtcDateTime.Create(hiredAtUtc);
+        var errors = new List<DomainError>();
+        errors.AddRange(nameResult.Errors);
+        errors.AddRange(emailResult.Errors);
+        errors.AddRange(roleResult.Errors);
+        errors.AddRange(hiredAtResult.Errors);
+
+        if (errors is not [])
+            return Result<AdministrativeEmployee>.Failure(errors);
+
+        var employee = AdministrativeEmployee.Create(
+            nameResult.RequireValue(),
+            emailResult.RequireValue(),
+            this,
+            roleResult.RequireValue(),
+            hiredAtResult.RequireValue());
         _employees.Add(employee);
 
-        return employee;
+        return Result<AdministrativeEmployee>.Success(employee);
     }
 
-    /// <summary>
-    /// Dismisses an employee unless a professor still owns an active course assignment.
-    /// </summary>
-    public void DismissEmployee(Employee employee, UtcDateTime dismissedAtUtc, IReadOnlyCollection<Course> activeCourses)
+    public Result DismissEmployee(Employee employee, DateTime dismissedAtUtc, IReadOnlyCollection<Course> activeCourses)
     {
         ArgumentNullException.ThrowIfNull(employee);
         ArgumentNullException.ThrowIfNull(activeCourses);
 
-        ProfessorDismissalPolicy.EnsureCanDismiss(this, employee, activeCourses);
+        var dismissedAtResult = UtcDateTime.Create(dismissedAtUtc);
+        var policyResult = ProfessorDismissalPolicy.EnsureCanDismiss(this, employee, activeCourses);
+        var errors = new List<DomainError>();
+        errors.AddRange(dismissedAtResult.Errors);
+        errors.AddRange(policyResult.Errors);
 
-        employee.Dismiss(dismissedAtUtc);
+        if (dismissedAtResult.IsSuccess)
+            errors.AddRange(employee.GetDismissalErrors(dismissedAtResult.RequireValue()));
+
+        if (errors is not [])
+            return Result.Failure(errors);
+
+        employee.Dismiss(dismissedAtResult.RequireValue()).RequireSuccess();
+
+        return Result.Success();
     }
 }

@@ -22,13 +22,13 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
         // duplicate enrollment depends on CourseId plus Semester, so exposing
         // them here is useful and not just ORM bookkeeping.
         enrollment.Property(value => value.StudentId)
-            .HasConversion(value => value.Value, value => StudentId.FromStorage(value))
+            .HasConversion(value => value.Value, value => StudentId.FromStorage(value).RequireValue())
             .IsRequired();
         enrollment.Property(value => value.CourseId)
-            .HasConversion(value => value.Value, value => CourseId.FromStorage(value))
+            .HasConversion(value => value.Value, value => CourseId.FromStorage(value).RequireValue())
             .IsRequired();
         enrollment.Property(value => value.Semester)
-            .HasConversion(value => value.Value, value => Semester.FromStorage(value))
+            .HasConversion(value => value.Value, value => Semester.FromStorage(value).RequireValue())
             .HasMaxLength(8)
             .IsRequired();
         enrollment.HasIndex(value => new { value.Semester, value.CourseId })
@@ -36,12 +36,12 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
 
         // Payload columns belong to the enrollment itself.
         enrollment.Property(value => value.EnrolledAtUtc)
-            .HasConversion(value => value.Value, value => UtcDateTime.FromStorage(value))
+            .HasConversion(value => value.Value, value => UtcDateTime.FromStorage(value).RequireValue())
             .IsRequired();
         enrollment.Property(value => value.FinalGrade)
             .HasConversion(
                 value => value == null ? (decimal?)null : value.Value,
-                value => value.HasValue ? Grade.FromStorage(value.Value) : null)
+                value => value.HasValue ? Grade.FromStorage(value.Value).RequireValue() : null)
             .HasPrecision(4, 2);
 
         // Cascade is acceptable here: enrollment rows do not make sense without

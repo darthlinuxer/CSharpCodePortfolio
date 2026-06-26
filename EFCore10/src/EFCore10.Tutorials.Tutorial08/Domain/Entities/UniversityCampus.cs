@@ -6,7 +6,7 @@ internal sealed class UniversityCampus
     {
     }
 
-    internal UniversityCampus(CampusId id, CampusName name, CityName city)
+    private UniversityCampus(CampusId id, CampusName name, CityName city)
     {
         Id = id;
         Name = name;
@@ -18,4 +18,6 @@ internal sealed class UniversityCampus
     public CampusName Name { get; private set; } = null!;
 
     public CityName City { get; private set; } = null!;
+
+    internal static UniversityCampus Create(CampusId id, CampusName name, CityName city) => new(id, name, city);
 }

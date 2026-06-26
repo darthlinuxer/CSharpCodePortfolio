@@ -8,8 +8,14 @@ internal sealed record SyllabusOutcomes
 
     public string Value { get; }
 
-    internal static SyllabusOutcomes Create(string? value) =>
-        new(DomainText.Required(value, "Syllabus outcomes", minLength: 10, MaxLength));
+    internal static Result<SyllabusOutcomes> Create(string? value)
+    {
+        var text = DomainText.Required(value, "Syllabus outcomes", minLength: 10, MaxLength);
 
-    internal static SyllabusOutcomes FromStorage(string value) => Create(value);
+        return text.IsSuccess
+            ? Result<SyllabusOutcomes>.Success(new SyllabusOutcomes(text.RequireValue()))
+            : Result<SyllabusOutcomes>.Failure(text.Errors);
+    }
+
+    internal static Result<SyllabusOutcomes> FromStorage(string value) => Create(value);
 }

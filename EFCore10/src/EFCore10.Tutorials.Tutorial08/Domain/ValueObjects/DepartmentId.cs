@@ -6,12 +6,12 @@ internal sealed record DepartmentId
 
     public Guid Value { get; }
 
-    internal static DepartmentId New() => FromStorage(Guid.CreateVersion7());
+    internal static DepartmentId New() => new(Guid.CreateVersion7());
 
-    internal static DepartmentId Create(Guid value) => FromStorage(value);
+    internal static Result<DepartmentId> Create(Guid value) => FromStorage(value);
 
-    internal static DepartmentId FromStorage(Guid value) =>
+    internal static Result<DepartmentId> FromStorage(Guid value) =>
         value == Guid.Empty
-            ? throw new DomainException(DomainErrors.DepartmentIdInvalid, "Department ID cannot be empty.")
-            : new DepartmentId(value);
+            ? Result<DepartmentId>.Failure(DomainErrors.DepartmentIdInvalid)
+            : Result<DepartmentId>.Success(new DepartmentId(value));
 }

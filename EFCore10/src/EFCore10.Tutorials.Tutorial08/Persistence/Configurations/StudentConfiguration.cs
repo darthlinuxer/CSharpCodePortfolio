@@ -26,14 +26,14 @@ internal sealed class StudentConfiguration : IEntityTypeConfiguration<Student>
         // schema as ordinary scalar columns.
         student.HasKey(value => value.Id);
         student.Property(value => value.Id)
-            .HasConversion(value => value.Value, value => StudentId.FromStorage(value))
+            .HasConversion(value => value.Value, value => StudentId.FromStorage(value).RequireValue())
             .ValueGeneratedNever();
         student.Property(value => value.Name)
-            .HasConversion(value => value.Value, value => PersonName.FromStorage(value))
+            .HasConversion(value => value.Value, value => PersonName.FromStorage(value).RequireValue())
             .HasMaxLength(PersonName.MaxLength)
             .IsRequired();
         student.Property(value => value.Email)
-            .HasConversion(value => value.Value, value => EmailAddress.FromStorage(value))
+            .HasConversion(value => value.Value, value => EmailAddress.FromStorage(value).RequireValue())
             .HasMaxLength(EmailAddress.MaxLength)
             .IsRequired();
         // Same reasoning as employees: EmailAddress validates one value, the

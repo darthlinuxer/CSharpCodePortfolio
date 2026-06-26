@@ -8,8 +8,14 @@ internal sealed record SyllabusSummary
 
     public string Value { get; }
 
-    internal static SyllabusSummary Create(string? value) =>
-        new(DomainText.Required(value, "Syllabus summary", minLength: 10, MaxLength));
+    internal static Result<SyllabusSummary> Create(string? value)
+    {
+        var text = DomainText.Required(value, "Syllabus summary", minLength: 10, MaxLength);
 
-    internal static SyllabusSummary FromStorage(string value) => Create(value);
+        return text.IsSuccess
+            ? Result<SyllabusSummary>.Success(new SyllabusSummary(text.RequireValue()))
+            : Result<SyllabusSummary>.Failure(text.Errors);
+    }
+
+    internal static Result<SyllabusSummary> FromStorage(string value) => Create(value);
 }

@@ -10,10 +10,10 @@ internal sealed record EmployeeStatus
 
     internal static EmployeeStatus Dismissed => new("Dismissed");
 
-    internal static EmployeeStatus Create(string value) => FromStorage(value);
+    internal static Result<EmployeeStatus> Create(string value) => FromStorage(value);
 
-    internal static EmployeeStatus FromStorage(string value) =>
+    internal static Result<EmployeeStatus> FromStorage(string value) =>
         value is "Active" or "Dismissed"
-            ? new EmployeeStatus(value)
-            : throw new DomainException(DomainErrors.EmployeeStatusInvalid, "Employee status is invalid.");
+            ? Result<EmployeeStatus>.Success(new EmployeeStatus(value))
+            : Result<EmployeeStatus>.Failure(DomainErrors.EmployeeStatusInvalid);
 }

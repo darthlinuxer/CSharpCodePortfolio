@@ -25,81 +25,76 @@ internal sealed class UniversityApplicationService(UniversityContext context)
 
     private static UniversitySample CreateUniversitySample()
     {
-        var hiredAtUtc = UtcDateTime.Create(DateTime.SpecifyKind(new DateTime(2026, 6, 25, 14, 0, 0), DateTimeKind.Utc));
-        var enrolledAtUtc = UtcDateTime.Create(hiredAtUtc.Value.AddHours(2));
-        var semester = Semester.Create(2026, 1);
+        var hiredAtUtc = DateTime.SpecifyKind(new DateTime(2026, 6, 25, 14, 0, 0), DateTimeKind.Utc);
+        var enrolledAtUtc = hiredAtUtc.AddHours(2);
 
-        var university = new University(UniversityName.Create("Contoso University"));
-        university.AddCampus(CampusName.Create("Main Campus"), CityName.Create("Sao Paulo"));
-        university.AddCampus(CampusName.Create("Research Campus"), CityName.Create("Campinas"));
+        var university = University.Create("Contoso University").RequireValue();
+        university.AddCampus("Main Campus", "Sao Paulo").RequireSuccess();
+        university.AddCampus("Research Campus", "Campinas").RequireSuccess();
 
-        var computerScience = university.OpenDepartment(DepartmentName.Create("Computer Science"));
-        var dataScience = university.OpenDepartment(DepartmentName.Create("Data Science"));
+        var computerScience = university.OpenDepartment("Computer Science").RequireValue();
+        var dataScience = university.OpenDepartment("Data Science").RequireValue();
         var grace = university.HireProfessor(
-            PersonName.Create("Grace Hopper"),
-            EmailAddress.Create("grace.hopper@contoso.edu"),
+            "Grace Hopper",
+            "grace.hopper@contoso.edu",
             computerScience,
-            hiredAtUtc);
+            hiredAtUtc).RequireValue();
         var katherine = university.HireProfessor(
-            PersonName.Create("Katherine Johnson"),
-            EmailAddress.Create("katherine.johnson@contoso.edu"),
+            "Katherine Johnson",
+            "katherine.johnson@contoso.edu",
             dataScience,
-            hiredAtUtc);
+            hiredAtUtc).RequireValue();
         university.HireAdministrativeEmployee(
-            PersonName.Create("Alan Turing"),
-            EmailAddress.Create("alan.turing@contoso.edu"),
-            StaffRole.Create("Registrar"),
-            hiredAtUtc);
+            "Alan Turing",
+            "alan.turing@contoso.edu",
+            "Registrar",
+            hiredAtUtc).RequireValue();
 
-        var relationshipMapping = new Course(
+        var relationshipMapping = Course.Create(
             computerScience,
-            CourseTitle.Create("EF Core Relationship Mapping"),
-            CourseCode.Create("CS-EF-101"),
-            CreditPoints.Create(20),
-            new Syllabus(
-                SyllabusSummary.Create("Modelar relacoes universitarias com EF Core."),
-                SyllabusOutcomes.Create("Distinguir aggregate root, entidade interna, OwnsOne, OwnsMany, HasOne e HasMany.")));
-        relationshipMapping.AssignProfessor(grace);
+            "EF Core Relationship Mapping",
+            "CS-EF-101",
+            20,
+            "Modelar relacoes universitarias com EF Core.",
+            "Distinguir aggregate root, entidade interna, OwnsOne, OwnsMany, HasOne e HasMany.").RequireValue();
+        relationshipMapping.AssignProfessor(grace).RequireSuccess();
 
-        var domainModeling = new Course(
+        var domainModeling = Course.Create(
             computerScience,
-            CourseTitle.Create("DDD Tactical Modeling"),
-            CourseCode.Create("CS-DDD-201"),
-            CreditPoints.Create(15),
-            new Syllabus(
-                SyllabusSummary.Create("Modelar invariantes e boundaries de aggregates."),
-                SyllabusOutcomes.Create("Aplicar value objects, entidades internas e regras no dominio.")));
-        domainModeling.AssignProfessor(grace);
+            "DDD Tactical Modeling",
+            "CS-DDD-201",
+            15,
+            "Modelar invariantes e boundaries de aggregates.",
+            "Aplicar value objects, entidades internas e regras no dominio.").RequireValue();
+        domainModeling.AssignProfessor(grace).RequireSuccess();
 
-        var queryOptimization = new Course(
+        var queryOptimization = Course.Create(
             dataScience,
-            CourseTitle.Create("EF Core Query Optimization"),
-            CourseCode.Create("CS-EF-202"),
-            CreditPoints.Create(10),
-            new Syllabus(
-                SyllabusSummary.Create("Projetar read models eficientes para relatorios academicos."),
-                SyllabusOutcomes.Create("Aplicar Select, AsNoTracking, agregacoes e indices em consultas EF Core.")));
-        queryOptimization.AssignProfessor(katherine);
+            "EF Core Query Optimization",
+            "CS-EF-202",
+            10,
+            "Projetar read models eficientes para relatorios academicos.",
+            "Aplicar Select, AsNoTracking, agregacoes e indices em consultas EF Core.").RequireValue();
+        queryOptimization.AssignProfessor(katherine).RequireSuccess();
 
-        var reporting = new Course(
+        var reporting = Course.Create(
             dataScience,
-            CourseTitle.Create("Campus Operations Reporting"),
-            CourseCode.Create("CS-OPS-105"),
-            CreditPoints.Create(5),
-            new Syllabus(
-                SyllabusSummary.Create("Transformar relacoes academicas em indicadores operacionais."),
-                SyllabusOutcomes.Create("Ler dados relacionais sem expor entidades de dominio como contrato.")));
+            "Campus Operations Reporting",
+            "CS-OPS-105",
+            5,
+            "Transformar relacoes academicas em indicadores operacionais.",
+            "Ler dados relacionais sem expor entidades de dominio como contrato.").RequireValue();
 
-        var ana = new Student(PersonName.Create("Ana Pereira"), EmailAddress.Create("ana.pereira@contoso.edu"));
-        var bia = new Student(PersonName.Create("Bia Santos"), EmailAddress.Create("bia.santos@contoso.edu"));
-        var caio = new Student(PersonName.Create("Caio Lima"), EmailAddress.Create("caio.lima@contoso.edu"));
-        ana.RegisterForCourse(relationshipMapping, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(9.5m));
-        ana.RegisterForCourse(domainModeling, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(8.8m));
-        bia.RegisterForCourse(relationshipMapping, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(8.0m));
-        bia.RegisterForCourse(queryOptimization, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(9.2m));
-        bia.RegisterForCourse(reporting, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(8.5m));
-        caio.RegisterForCourse(domainModeling, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(7.6m));
-        caio.RegisterForCourse(queryOptimization, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(9.0m));
+        var ana = Student.Create("Ana Pereira", "ana.pereira@contoso.edu").RequireValue();
+        var bia = Student.Create("Bia Santos", "bia.santos@contoso.edu").RequireValue();
+        var caio = Student.Create("Caio Lima", "caio.lima@contoso.edu").RequireValue();
+        ana.RegisterForCourse(relationshipMapping, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(9.5m).RequireSuccess();
+        ana.RegisterForCourse(domainModeling, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(8.8m).RequireSuccess();
+        bia.RegisterForCourse(relationshipMapping, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(8.0m).RequireSuccess();
+        bia.RegisterForCourse(queryOptimization, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(9.2m).RequireSuccess();
+        bia.RegisterForCourse(reporting, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(8.5m).RequireSuccess();
+        caio.RegisterForCourse(domainModeling, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(7.6m).RequireSuccess();
+        caio.RegisterForCourse(queryOptimization, 2026, 1, enrolledAtUtc).RequireValue().RecordFinalGrade(9.0m).RequireSuccess();
 
         return new UniversitySample(
             university,

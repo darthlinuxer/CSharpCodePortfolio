@@ -6,7 +6,7 @@ internal sealed class Professor : Employee
     {
     }
 
-    internal Professor(
+    private Professor(
         PersonName name,
         EmailAddress email,
         University university,
@@ -20,4 +20,12 @@ internal sealed class Professor : Employee
     }
 
     public Department Department { get; private set; } = null!;
+
+    internal static Professor Create(
+        PersonName name,
+        EmailAddress email,
+        University university,
+        Department department,
+        UtcDateTime hiredAtUtc) =>
+        new(name, email, university, department, hiredAtUtc);
 }

@@ -6,7 +6,7 @@ internal sealed class Enrollment
     {
     }
 
-    internal Enrollment(Student student, Course course, Semester semester, UtcDateTime enrolledAtUtc)
+    private Enrollment(Student student, Course course, Semester semester, UtcDateTime enrolledAtUtc)
     {
         ArgumentNullException.ThrowIfNull(student);
         ArgumentNullException.ThrowIfNull(course);
@@ -33,13 +33,22 @@ internal sealed class Enrollment
 
     public Grade? FinalGrade { get; private set; }
 
-    public void RecordFinalGrade(Grade grade)
+    internal static Enrollment Create(Student student, Course course, Semester semester, UtcDateTime enrolledAtUtc) =>
+        new(student, course, semester, enrolledAtUtc);
+
+    public Result RecordFinalGrade(decimal grade)
     {
-        ArgumentNullException.ThrowIfNull(grade);
+        var gradeResult = Grade.Create(grade);
+        var errors = new List<DomainError>(gradeResult.Errors);
 
         if (FinalGrade is not null)
-            throw new DomainException(DomainErrors.EnrollmentFinalGradeAlreadyRecorded, "Final grade is already recorded.");
+            errors.Add(DomainErrors.EnrollmentFinalGradeAlreadyRecorded);
 
-        FinalGrade = grade;
+        if (errors is not [])
+            return Result.Failure(errors);
+
+        FinalGrade = gradeResult.RequireValue();
+
+        return Result.Success();
     }
 }

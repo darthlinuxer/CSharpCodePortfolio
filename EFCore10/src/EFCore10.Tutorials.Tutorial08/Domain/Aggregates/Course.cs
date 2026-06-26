@@ -8,10 +8,7 @@ internal sealed class Course : DomainEntity<CourseId>
     {
     }
 
-    /// <summary>
-    /// Creates a course with an owned syllabus.
-    /// </summary>
-    public Course(Department department, CourseTitle title, CourseCode code, CreditPoints creditPoints, Syllabus syllabus)
+    private Course(Department department, CourseTitle title, CourseCode code, CreditPoints creditPoints, Syllabus syllabus)
         : base(CourseId.New())
     {
         ArgumentNullException.ThrowIfNull(department);
@@ -39,32 +36,73 @@ internal sealed class Course : DomainEntity<CourseId>
 
     public IReadOnlyCollection<Student> Students => [.. _enrollments.Select(enrollment => enrollment.Student)];
 
-    /// <summary>
-    /// Assigns an active professor to the course.
-    /// </summary>
-    public void AssignProfessor(Professor professor)
+    public static Result<Course> Create(
+        Department department,
+        string? title,
+        string? code,
+        int creditPoints,
+        string? syllabusSummary,
+        string? syllabusOutcomes)
+    {
+        ArgumentNullException.ThrowIfNull(department);
+
+        var titleResult = CourseTitle.Create(title);
+        var codeResult = CourseCode.Create(code);
+        var creditPointsResult = CreditPoints.Create(creditPoints);
+        var syllabusResult = Syllabus.Create(syllabusSummary, syllabusOutcomes);
+        var errors = new List<DomainError>();
+        errors.AddRange(titleResult.Errors);
+        errors.AddRange(codeResult.Errors);
+        errors.AddRange(creditPointsResult.Errors);
+        errors.AddRange(syllabusResult.Errors);
+
+        return errors is []
+            ? Result<Course>.Success(new Course(
+                department,
+                titleResult.RequireValue(),
+                codeResult.RequireValue(),
+                creditPointsResult.RequireValue(),
+                syllabusResult.RequireValue()))
+            : Result<Course>.Failure(errors);
+    }
+
+    public Result AssignProfessor(Professor professor)
     {
         ArgumentNullException.ThrowIfNull(professor);
 
+        var errors = new List<DomainError>();
+
         if (professor.Status == EmployeeStatus.Dismissed)
-            throw new DomainException(DomainErrors.ProfessorDismissed, "Dismissed professors cannot be assigned to courses.");
+            errors.Add(DomainErrors.ProfessorDismissed);
         if (professor.Department.Id != Department.Id)
-            throw new DomainException(DomainErrors.CourseDepartmentMismatch, "Course professor must belong to the course department.");
+            errors.Add(DomainErrors.CourseDepartmentMismatch);
         if (Professor is not null && Professor.Id != professor.Id)
-            throw new DomainException(DomainErrors.CourseProfessorAlreadyAssigned, "Course already has a professor.");
+            errors.Add(DomainErrors.CourseProfessorAlreadyAssigned);
+
+        if (errors is not [])
+            return Result.Failure(errors);
 
         Professor = professor;
+
+        return Result.Success();
     }
 
-    internal void AddEnrollment(Enrollment enrollment)
+    internal Result AddEnrollment(Enrollment enrollment)
     {
         ArgumentNullException.ThrowIfNull(enrollment);
 
+        var errors = new List<DomainError>();
+
         if (enrollment.CourseId != Id)
-            throw new DomainException(DomainErrors.EnrollmentCourseMismatch, "Enrollment must belong to this course.");
+            errors.Add(DomainErrors.EnrollmentCourseMismatch);
         if (_enrollments.Any(value => value.StudentId == enrollment.StudentId && value.Semester == enrollment.Semester))
-            throw new DomainException(DomainErrors.EnrollmentAlreadyAddedToCourse, "Course already has this enrollment.");
+            errors.Add(DomainErrors.EnrollmentAlreadyAddedToCourse);
+
+        if (errors is not [])
+            return Result.Failure(errors);
 
         _enrollments.Add(enrollment);
+
+        return Result.Success();
     }
 }
