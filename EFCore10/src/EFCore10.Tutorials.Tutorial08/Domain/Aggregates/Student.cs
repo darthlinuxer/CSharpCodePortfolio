@@ -19,9 +19,9 @@ internal sealed class Student : DomainEntity<StudentId>
         Email = email;
     }
 
-    public PersonName Name { get; private set; }
+    public PersonName Name { get; private set; } = null!;
 
-    public EmailAddress Email { get; private set; }
+    public EmailAddress Email { get; private set; } = null!;
 
     public IReadOnlyCollection<Enrollment> Enrollments => _enrollments;
 
@@ -30,7 +30,7 @@ internal sealed class Student : DomainEntity<StudentId>
     /// <summary>
     /// Registers the student in a course when the semester credit limit allows it.
     /// </summary>
-    public void RegisterForCourse(Course course, Semester semester, UtcDateTime enrolledAtUtc, Grade? finalGrade = null)
+    public Enrollment RegisterForCourse(Course course, Semester semester, UtcDateTime enrolledAtUtc)
     {
         ArgumentNullException.ThrowIfNull(course);
 
@@ -45,6 +45,10 @@ internal sealed class Student : DomainEntity<StudentId>
         if (nextTotal > MaxCreditPointsPerSemester)
             throw new DomainException(DomainErrors.StudentCreditLimitExceeded, "Student cannot register for more than 40 credit points in the same semester.");
 
-        _enrollments.Add(new Enrollment(this, course, semester, enrolledAtUtc, finalGrade));
+        var enrollment = new Enrollment(this, course, semester, enrolledAtUtc);
+        course.AddEnrollment(enrollment);
+        _enrollments.Add(enrollment);
+
+        return enrollment;
     }
 }

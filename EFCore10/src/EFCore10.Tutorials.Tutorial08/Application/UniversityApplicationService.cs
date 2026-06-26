@@ -52,6 +52,7 @@ internal sealed class UniversityApplicationService(UniversityContext context)
             hiredAtUtc);
 
         var relationshipMapping = new Course(
+            computerScience,
             CourseTitle.Create("EF Core Relationship Mapping"),
             CourseCode.Create("CS-EF-101"),
             CreditPoints.Create(20),
@@ -61,6 +62,7 @@ internal sealed class UniversityApplicationService(UniversityContext context)
         relationshipMapping.AssignProfessor(grace);
 
         var domainModeling = new Course(
+            computerScience,
             CourseTitle.Create("DDD Tactical Modeling"),
             CourseCode.Create("CS-DDD-201"),
             CreditPoints.Create(15),
@@ -70,6 +72,7 @@ internal sealed class UniversityApplicationService(UniversityContext context)
         domainModeling.AssignProfessor(grace);
 
         var queryOptimization = new Course(
+            dataScience,
             CourseTitle.Create("EF Core Query Optimization"),
             CourseCode.Create("CS-EF-202"),
             CreditPoints.Create(10),
@@ -79,6 +82,7 @@ internal sealed class UniversityApplicationService(UniversityContext context)
         queryOptimization.AssignProfessor(katherine);
 
         var reporting = new Course(
+            dataScience,
             CourseTitle.Create("Campus Operations Reporting"),
             CourseCode.Create("CS-OPS-105"),
             CreditPoints.Create(5),
@@ -89,13 +93,13 @@ internal sealed class UniversityApplicationService(UniversityContext context)
         var ana = new Student(PersonName.Create("Ana Pereira"), EmailAddress.Create("ana.pereira@contoso.edu"));
         var bia = new Student(PersonName.Create("Bia Santos"), EmailAddress.Create("bia.santos@contoso.edu"));
         var caio = new Student(PersonName.Create("Caio Lima"), EmailAddress.Create("caio.lima@contoso.edu"));
-        ana.RegisterForCourse(relationshipMapping, semester, enrolledAtUtc, Grade.Create(9.5m));
-        ana.RegisterForCourse(domainModeling, semester, enrolledAtUtc, Grade.Create(8.8m));
-        bia.RegisterForCourse(relationshipMapping, semester, enrolledAtUtc, Grade.Create(8.0m));
-        bia.RegisterForCourse(queryOptimization, semester, enrolledAtUtc, Grade.Create(9.2m));
-        bia.RegisterForCourse(reporting, semester, enrolledAtUtc, Grade.Create(8.5m));
-        caio.RegisterForCourse(domainModeling, semester, enrolledAtUtc, Grade.Create(7.6m));
-        caio.RegisterForCourse(queryOptimization, semester, enrolledAtUtc, Grade.Create(9.0m));
+        ana.RegisterForCourse(relationshipMapping, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(9.5m));
+        ana.RegisterForCourse(domainModeling, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(8.8m));
+        bia.RegisterForCourse(relationshipMapping, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(8.0m));
+        bia.RegisterForCourse(queryOptimization, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(9.2m));
+        bia.RegisterForCourse(reporting, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(8.5m));
+        caio.RegisterForCourse(domainModeling, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(7.6m));
+        caio.RegisterForCourse(queryOptimization, semester, enrolledAtUtc).RecordFinalGrade(Grade.Create(9.0m));
 
         return new UniversitySample(
             university,

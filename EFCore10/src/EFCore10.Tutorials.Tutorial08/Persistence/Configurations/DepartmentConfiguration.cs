@@ -21,10 +21,10 @@ internal sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departm
         // DepartmentId and DepartmentName stay in the domain as value objects.
         department.HasKey(value => value.Id);
         department.Property(value => value.Id)
-            .HasConversion(value => value.Value, value => new DepartmentId(value))
+            .HasConversion(value => value.Value, value => DepartmentId.FromStorage(value))
             .ValueGeneratedNever();
         department.Property(value => value.Name)
-            .HasConversion(value => value.Value, value => DepartmentName.Create(value))
+            .HasConversion(value => value.Value, value => DepartmentName.FromStorage(value))
             .HasMaxLength(DepartmentName.MaxLength)
             .IsRequired();
 
@@ -32,7 +32,7 @@ internal sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departm
         // University navigation. Keeping both in the domain would duplicate the
         // same association and make invariants easier to desynchronize.
         department.Property<UniversityId>(Columns.UniversityId)
-            .HasConversion(value => value.Value, value => new UniversityId(value))
+            .HasConversion(value => value.Value, value => UniversityId.FromStorage(value))
             .IsRequired();
         department.HasIndex(Columns.UniversityId, nameof(Department.Name))
             .IsUnique()

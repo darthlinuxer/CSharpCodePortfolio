@@ -61,8 +61,8 @@ internal sealed class StudentProgressReadService(UniversityContext context)
     private static decimal? AverageFinalGrade(IReadOnlyCollection<StudentProgressRow> rows)
     {
         var grades = rows
-            .Where(row => row.FinalGrade.HasValue)
-            .Select(row => row.FinalGrade!.Value.Value)
+            .Where(row => row.FinalGrade is not null)
+            .Select(row => row.FinalGrade!.Value)
             .ToArray();
 
         return grades is [] ? null : Math.Round(grades.Average(), 2);

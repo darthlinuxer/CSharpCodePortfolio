@@ -13,9 +13,9 @@ internal sealed class UniversityCampus
         City = city;
     }
 
-    public CampusId Id { get; private set; }
+    public CampusId Id { get; private set; } = null!;
 
-    public CampusName Name { get; private set; }
+    public CampusName Name { get; private set; } = null!;
 
-    public CityName City { get; private set; }
+    public CityName City { get; private set; } = null!;
 }

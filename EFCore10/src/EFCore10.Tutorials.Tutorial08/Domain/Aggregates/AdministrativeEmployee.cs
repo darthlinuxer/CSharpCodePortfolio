@@ -17,5 +17,5 @@ internal sealed class AdministrativeEmployee : Employee
         Role = role;
     }
 
-    public StaffRole Role { get; private set; }
+    public StaffRole Role { get; private set; } = null!;
 }

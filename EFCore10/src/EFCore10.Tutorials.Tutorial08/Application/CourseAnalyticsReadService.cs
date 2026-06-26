@@ -21,7 +21,7 @@ internal sealed class CourseAnalyticsReadService(UniversityContext context)
             .ConfigureAwait(false);
         var grades = await context.Enrollments
             .AsNoTracking()
-            .Where(enrollment => enrollment.FinalGrade.HasValue)
+            .Where(enrollment => enrollment.FinalGrade != null)
             .Select(enrollment => new CourseGradeRow(enrollment.Course.Code, enrollment.FinalGrade))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -58,15 +58,15 @@ internal sealed class CourseAnalyticsReadService(UniversityContext context)
                 course.CreditPoints,
                 course.Syllabus.Summary,
                 course.Professor == null ? null : course.Professor.Name,
-                course.Professor == null ? null : course.Professor.Department.Name,
+                course.Department.Name,
                 course.Enrollments.Count,
-                course.Enrollments.Count(enrollment => enrollment.FinalGrade.HasValue)));
+                course.Enrollments.Count(enrollment => enrollment.FinalGrade != null)));
 
     private static decimal? AverageFinalGrade(IReadOnlyCollection<CourseGradeRow> rows)
     {
         var grades = rows
-            .Where(row => row.FinalGrade.HasValue)
-            .Select(row => row.FinalGrade!.Value.Value)
+            .Where(row => row.FinalGrade is not null)
+            .Select(row => row.FinalGrade!.Value)
             .ToArray();
 
         return grades is [] ? null : Math.Round(grades.Average(), 2);

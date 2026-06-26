@@ -14,7 +14,7 @@ internal sealed class ProfessorConfiguration : IEntityTypeConfiguration<Professo
         // DepartmentId is a shadow FK. Professor behavior uses the Department
         // navigation; the FK column exists for the relational model only.
         professor.Property<DepartmentId>(Columns.DepartmentId)
-            .HasConversion(value => value.Value, value => new DepartmentId(value))
+            .HasConversion(value => value.Value, value => DepartmentId.FromStorage(value))
             .IsRequired();
         professor.HasIndex(Columns.DepartmentId)
             .HasDatabaseName("IX_Employees_DepartmentId");

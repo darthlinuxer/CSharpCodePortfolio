@@ -17,7 +17,7 @@ internal sealed class Department : DomainEntity<DepartmentId>
         University = university;
     }
 
-    public DepartmentName Name { get; private set; }
+    public DepartmentName Name { get; private set; } = null!;
 
     public University University { get; private set; } = null!;
 

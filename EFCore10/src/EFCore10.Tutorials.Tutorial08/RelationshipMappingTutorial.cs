@@ -34,7 +34,8 @@ public sealed class RelationshipMappingTutorial : ITutorial
             "Como um dominio universitario rico fica persistido quando aggregate root nao e sinonimo de uma unica tabela?");
         TutorialConsole.WriteHypothesis(
             "Aggregates definem consistencia; o banco ainda pode ter tabelas para entidades internas e joins.",
-            "Value objects deixam o dominio sem primitive obsession e sao salvos por converters.",
+            "Value objects fechados deixam o dominio sem primitive obsession e sao salvos por converters que materializam via FromStorage.",
+            "Course.Department e Enrollment.RecordFinalGrade colocam regra no objeto que realmente conhece o ciclo de vida.",
             "OwnsOne/OwnsMany aparecem quando o objeto nao vive sem o owner; HasOne/HasMany fica para identidade propria.");
         TutorialConsole.WritePreparation(
             "Leia cada configuracao como uma pergunta de modelagem: quem tem identidade, quem tem ciclo de vida proprio, qual FK pertence ao banco e qual regra pertence ao dominio?",
@@ -47,8 +48,10 @@ public sealed class RelationshipMappingTutorial : ITutorial
         var domainRuleCount = ValidateDomainRules();
         TutorialConsole.WriteEvidence(
             "Self-checks de dominio",
-            ("Regras exercitadas", $"{domainRuleCount} entradas invalidas rejeitadas com DomainException"),
+            ("Regras exercitadas", $"{domainRuleCount} cenarios de invariantes verificados"),
             ("Limite academico", "Student bloqueia mais de 40 pontos no mesmo semestre"),
+            ("Matricula", "Student e Course compartilham a mesma Enrollment"),
+            ("Nota final", "Enrollment bloqueia segunda nota final"),
             ("Demissao", "University bloqueia professor ainda atribuido a curso ativo"));
 
         var options = new DbContextOptionsBuilder<UniversityContext>()
@@ -134,7 +137,8 @@ public sealed class RelationshipMappingTutorial : ITutorial
         3. O dominio precisa enxergar o ID/FK, ou isso e so detalhe relacional?
         4. A colecao deve passar pelo backing field para preservar invariantes?
         5. A exclusao deve cascatear ou ser bloqueada para proteger consistencia?
-        6. Qual consulta do tutorial justifica cada indice?
+        6. Qual invariante tambem precisa de apoio no banco?
+        7. Qual consulta do tutorial justifica cada indice?
 
         ## Comandos e razoes
 
@@ -145,10 +149,12 @@ public sealed class RelationshipMappingTutorial : ITutorial
         - Ignore: impede que propriedades de conveniencia, como Courses ou Students, virem outro relacionamento duplicado.
         - HasKey: declara a identidade relacional que corresponde a identidade do dominio, ou a chave composta da join entity.
         - Property: mostra explicitamente cada coluna que sai de value object, shadow FK ou payload.
-        - HasConversion: transforma value object em escalar persistivel e reconstrui o tipo validado ao materializar.
+        - HasConversion: transforma value object em escalar persistivel e reconstrui por FromStorage, evitando bypass de invariantes na materializacao.
         - ValueGeneratedNever: diz que o dominio cria o ID; o banco nao substitui a identidade do aggregate.
         - HasMaxLength e IsRequired: levam invariantes simples para o schema sem retirar a validacao do dominio.
+        - HasCheckConstraint: fecha lacunas especificas de TPH que nullable columns deixam abertas no schema.
         - Property<T>(Columns.*): cria shadow FK quando o banco precisa da coluna, mas o dominio ja navega por objeto.
+        - Property<DepartmentId> em Courses: curso pertence a departamento antes de ter professor; professor opcional nao pode ser a fonte dessa informacao.
         - HasColumnName: nomeia colunas owned para mostrar que Syllabus vive em Courses.
         - OwnsOne: Syllabus nao tem identidade fora de Course, entao vira colunas do owner.
         - OwnsMany, WithOwner e HasForeignKey: Campus pertence a University; a colecao precisa de tabela, mas nao de repository proprio.
@@ -156,7 +162,7 @@ public sealed class RelationshipMappingTutorial : ITutorial
         - OnDelete(Cascade): remove dependentes que nao fazem sentido sem o owner, como Campus ou Enrollment.
         - OnDelete(Restrict): bloqueia exclusoes que poderiam quebrar referencias importantes, como Employee, Department e Professor.
         - HasIndex, IsUnique e HasDatabaseName: deixam visiveis os acessos usados pelas read queries e documentam unicidade esperada pelo dominio.
-        - HasPrecision: preserva a forma numerica de Grade sem espalhar decimal cru no dominio.
+        - HasPrecision: preserva a forma numerica de Grade; a gravacao unica da nota continua em Enrollment.RecordFinalGrade.
         """;
 
     private static int ValidateDomainRules()
@@ -165,6 +171,8 @@ public sealed class RelationshipMappingTutorial : ITutorial
         {
             ("nome nulo", DomainErrors.RequiredText, static () => _ = new University(UniversityName.Create(null))),
             ("email invalido", DomainErrors.EmailInvalid, static () => _ = new Student(PersonName.Create("Ana Valida"), EmailAddress.Create("not email"))),
+            ("id vazio materializado", DomainErrors.CourseIdInvalid, static () => _ = CourseId.FromStorage(Guid.Empty)),
+            ("campus id materializado invalido", DomainErrors.CampusIdInvalid, static () => _ = CampusId.FromStorage(0)),
             ("data local", DomainErrors.UtcRequired, static () => _ = UtcDateTime.Create(DateTime.Now)),
             ("nota fora da faixa", DomainErrors.GradeInvalid, static () => _ = Grade.Create(11m)),
             ("campus duplicado", DomainErrors.CampusNameDuplicated, static () =>
@@ -185,14 +193,39 @@ public sealed class RelationshipMappingTutorial : ITutorial
                     department,
                     UtcDateTime.Create(DateTime.UtcNow));
             }),
+            ("professor de outro departamento", DomainErrors.CourseDepartmentMismatch, static () =>
+            {
+                var university = new University(UniversityName.Create("Universidade Valida"));
+                var computerScience = university.OpenDepartment(DepartmentName.Create("Computer Science"));
+                var dataScience = university.OpenDepartment(DepartmentName.Create("Data Science"));
+                var professor = university.HireProfessor(
+                    PersonName.Create("Professora Valida"),
+                    EmailAddress.Create("professora.valida@contoso.edu"),
+                    dataScience,
+                    UtcDateTime.Create(DateTime.UtcNow));
+                var course = CreateValidCourse("Curso Valido", "CS-201", 10, computerScience);
+
+                course.AssignProfessor(professor);
+            }),
             ("limite de pontos no semestre", DomainErrors.StudentCreditLimitExceeded, static () =>
             {
+                var department = CreateValidDepartment();
                 var student = new Student(PersonName.Create("Aluno Valido"), EmailAddress.Create("aluno.valido@contoso.edu"));
                 var semester = Semester.Create(2026, 1);
                 var enrolledAtUtc = UtcDateTime.Create(DateTime.UtcNow);
 
-                student.RegisterForCourse(CreateValidCourse("Curso Valido A", "CS-301", 25), semester, enrolledAtUtc);
-                student.RegisterForCourse(CreateValidCourse("Curso Valido B", "CS-302", 20), semester, enrolledAtUtc);
+                student.RegisterForCourse(CreateValidCourse("Curso Valido A", "CS-301", 25, department), semester, enrolledAtUtc);
+                student.RegisterForCourse(CreateValidCourse("Curso Valido B", "CS-302", 20, department), semester, enrolledAtUtc);
+            }),
+            ("nota final duplicada", DomainErrors.EnrollmentFinalGradeAlreadyRecorded, static () =>
+            {
+                var department = CreateValidDepartment();
+                var student = new Student(PersonName.Create("Aluno Valido"), EmailAddress.Create("aluno.valido@contoso.edu"));
+                var course = CreateValidCourse("Curso Valido", "CS-303", 10, department);
+                var enrollment = student.RegisterForCourse(course, Semester.Create(2026, 1), UtcDateTime.Create(DateTime.UtcNow));
+
+                enrollment.RecordFinalGrade(Grade.Create(8.5m));
+                enrollment.RecordFinalGrade(Grade.Create(9.0m));
             }),
             ("professor com curso ativo nao pode ser demitido", DomainErrors.EmployeeDismissalBlocked, static () =>
             {
@@ -204,7 +237,7 @@ public sealed class RelationshipMappingTutorial : ITutorial
                     EmailAddress.Create("professora.valida@contoso.edu"),
                     department,
                     hiredAtUtc);
-                var course = CreateValidCourse("Curso Valido", "CS-401", 10);
+                var course = CreateValidCourse("Curso Valido", "CS-401", 10, department);
                 course.AssignProfessor(professor);
 
                 university.DismissEmployee(professor, UtcDateTime.Create(hiredAtUtc.Value.AddDays(1)), [course]);
@@ -216,7 +249,9 @@ public sealed class RelationshipMappingTutorial : ITutorial
             ExpectDomainException(action, scenario, expectedCode);
         }
 
-        return checks.Length;
+        ValidateBidirectionalEnrollment();
+
+        return checks.Length + 1;
     }
 
     private static void ValidateReadModels(
@@ -258,16 +293,40 @@ public sealed class RelationshipMappingTutorial : ITutorial
     }
 
     private static string FormatNullableGrade(decimal? grade) =>
-        grade.HasValue ? grade.Value.ToString("0.00", CultureInfo.InvariantCulture) : "sem nota";
+        grade is not null ? grade.Value.ToString("0.00", CultureInfo.InvariantCulture) : "sem nota";
 
-    private static Course CreateValidCourse(string title, string code, int points) =>
+    private static Course CreateValidCourse(string title, string code, int points, Department department) =>
         new(
+            department,
             CourseTitle.Create(title),
             CourseCode.Create(code),
             CreditPoints.Create(points),
             new Syllabus(
                 SyllabusSummary.Create("Resumo valido para o curso."),
                 SyllabusOutcomes.Create("Resultados validos para o curso.")));
+
+    private static Department CreateValidDepartment()
+    {
+        var university = new University(UniversityName.Create("Universidade Valida"));
+
+        return university.OpenDepartment(DepartmentName.Create("Computer Science"));
+    }
+
+    private static void ValidateBidirectionalEnrollment()
+    {
+        var department = CreateValidDepartment();
+        var student = new Student(PersonName.Create("Aluno Valido"), EmailAddress.Create("aluno.valido@contoso.edu"));
+        var course = CreateValidCourse("Curso Valido", "CS-304", 10, department);
+        var enrollment = student.RegisterForCourse(course, Semester.Create(2026, 1), UtcDateTime.Create(DateTime.UtcNow));
+
+        if (!student.Enrollments.Contains(enrollment)
+            || !course.Enrollments.Contains(enrollment)
+            || enrollment.Student != student
+            || enrollment.Course != course)
+        {
+            throw new InvalidOperationException("Enrollment was not shared by Student and Course.");
+        }
+    }
 
     private static void ExpectDomainException(Action action, string scenario, string expectedCode)
     {
@@ -416,14 +475,23 @@ public sealed class RelationshipMappingTutorial : ITutorial
             required: [Tables.Universities, Tables.UniversityCampuses, Tables.Departments, Tables.Employees, Tables.Courses, Tables.Students, Tables.Enrollments],
             forbidden: ["People", "Users", "Teachers", "StaffEmployees"]);
         EnsureNoLegacyTables(tables);
+        EnsureColumns(columns, Tables.Universities, ["Id", "Name"]);
         EnsureColumns(columns, Tables.Employees, ["Id", "EmployeeType", "Name", "Email", Columns.UniversityId, Columns.DepartmentId, "Role", "Status", "HiredAtUtc", "DismissedAtUtc"]);
-        EnsureColumns(columns, Tables.Courses, ["Id", "Title", "Code", "CreditPoints", Columns.ProfessorId, "SyllabusSummary", "SyllabusOutcomes"]);
+        EnsureColumns(columns, Tables.Courses, ["Id", "Title", "Code", "CreditPoints", Columns.DepartmentId, Columns.ProfessorId, "SyllabusSummary", "SyllabusOutcomes"]);
         EnsureColumns(columns, Tables.UniversityCampuses, [Columns.UniversityId, "Id", "Name", "City"]);
         EnsureColumns(columns, Tables.Enrollments, [Columns.StudentId, Columns.CourseId, "Semester", "EnrolledAtUtc", "FinalGrade"]);
-        EnsureColumns(columns, Tables.Departments, [Columns.UniversityId, "Name"]);
+        EnsureColumns(columns, Tables.Departments, ["Id", Columns.UniversityId, "Name"]);
         EnsureColumns(columns, Tables.Students, ["Id", "Name", "Email"]);
+        EnsureSchemaObject(schema, "index", "IX_Courses_Code");
+        EnsureSchemaObject(schema, "index", "IX_Courses_DepartmentId");
+        EnsureSchemaObject(schema, "index", "IX_Courses_ProfessorId");
+        EnsureSchemaObject(schema, "index", "IX_Employees_Email");
+        EnsureSchemaObject(schema, "index", "IX_Students_Email");
+        EnsureSchemaObject(schema, "index", "IX_Enrollments_Semester_CourseId");
+        EnsureSchemaSqlContains(schema, "table", Tables.Employees, "CK_Employees_Professor_DepartmentId");
+        EnsureSchemaSqlContains(schema, "table", Tables.Employees, "CK_Employees_Administrative_Role");
 
-        return "schema reflete aggregate roots, entidade interna, TPH, OwnsOne, OwnsMany e join entity";
+        return "schema reflete aggregate roots, entidade interna, TPH com constraints, OwnsOne, OwnsMany, join entity e indices de leitura";
     }
 
     private static IReadOnlySet<string> GetTableNames(IEnumerable<SqliteSchemaObject> schema) =>
@@ -486,6 +554,39 @@ public sealed class RelationshipMappingTutorial : ITutorial
 
         throw new InvalidOperationException(
             $"{tableName} is missing columns: {string.Join(", ", missingColumns)}.");
+    }
+
+    private static void EnsureSchemaObject(
+        IReadOnlyCollection<SqliteSchemaObject> schema,
+        string type,
+        string name)
+    {
+        if (schema.Any(item =>
+                string.Equals(item.Type, type, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        throw new InvalidOperationException($"Schema object {type} {name} was not created.");
+    }
+
+    private static void EnsureSchemaSqlContains(
+        IReadOnlyCollection<SqliteSchemaObject> schema,
+        string type,
+        string name,
+        string expectedFragment)
+    {
+        var item = schema.SingleOrDefault(value =>
+            string.Equals(value.Type, type, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(value.Name, name, StringComparison.OrdinalIgnoreCase));
+
+        if (item is null)
+            throw new InvalidOperationException($"Schema object {type} {name} was not created.");
+        if (item.Sql.Contains(expectedFragment, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        throw new InvalidOperationException($"{name} does not contain schema fragment {expectedFragment}.");
     }
 
     private static string FormatSchema(IEnumerable<SqliteSchemaObject> schema) =>

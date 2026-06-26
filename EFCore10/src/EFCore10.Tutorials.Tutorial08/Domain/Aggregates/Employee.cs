@@ -18,17 +18,17 @@ internal abstract class Employee : DomainEntity<EmployeeId>
         Status = EmployeeStatus.Active;
     }
 
-    public PersonName Name { get; private set; }
+    public PersonName Name { get; private set; } = null!;
 
-    public EmailAddress Email { get; private set; }
+    public EmailAddress Email { get; private set; } = null!;
 
     public University University { get; private set; } = null!;
 
-    public UtcDateTime HiredAtUtc { get; private set; }
+    public UtcDateTime HiredAtUtc { get; private set; } = null!;
 
     public UtcDateTime? DismissedAtUtc { get; private set; }
 
-    public EmployeeStatus Status { get; private set; }
+    public EmployeeStatus Status { get; private set; } = null!;
 
     /// <summary>
     /// Marks the employee as dismissed.

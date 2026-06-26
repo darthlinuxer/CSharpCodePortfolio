@@ -15,7 +15,7 @@ internal sealed class Syllabus
         Outcomes = outcomes;
     }
 
-    public SyllabusSummary Summary { get; private set; }
+    public SyllabusSummary Summary { get; private set; } = null!;
 
-    public SyllabusOutcomes Outcomes { get; private set; }
+    public SyllabusOutcomes Outcomes { get; private set; } = null!;
 }

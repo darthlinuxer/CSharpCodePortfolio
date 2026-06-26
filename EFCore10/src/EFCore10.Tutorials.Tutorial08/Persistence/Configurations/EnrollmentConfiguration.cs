@@ -22,10 +22,10 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
         // duplicate enrollment depends on CourseId plus Semester, so exposing
         // them here is useful and not just ORM bookkeeping.
         enrollment.Property(value => value.StudentId)
-            .HasConversion(value => value.Value, value => new StudentId(value))
+            .HasConversion(value => value.Value, value => StudentId.FromStorage(value))
             .IsRequired();
         enrollment.Property(value => value.CourseId)
-            .HasConversion(value => value.Value, value => new CourseId(value))
+            .HasConversion(value => value.Value, value => CourseId.FromStorage(value))
             .IsRequired();
         enrollment.Property(value => value.Semester)
             .HasConversion(value => value.Value, value => Semester.FromStorage(value))
@@ -36,12 +36,12 @@ internal sealed class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollm
 
         // Payload columns belong to the enrollment itself.
         enrollment.Property(value => value.EnrolledAtUtc)
-            .HasConversion(value => value.Value, value => UtcDateTime.Create(DateTime.SpecifyKind(value, DateTimeKind.Utc)))
+            .HasConversion(value => value.Value, value => UtcDateTime.FromStorage(value))
             .IsRequired();
         enrollment.Property(value => value.FinalGrade)
             .HasConversion(
-                value => value.HasValue ? value.Value.Value : (decimal?)null,
-                value => value.HasValue ? Grade.Create(value.Value) : null)
+                value => value == null ? (decimal?)null : value.Value,
+                value => value.HasValue ? Grade.FromStorage(value.Value) : null)
             .HasPrecision(4, 2);
 
         // Cascade is acceptable here: enrollment rows do not make sense without

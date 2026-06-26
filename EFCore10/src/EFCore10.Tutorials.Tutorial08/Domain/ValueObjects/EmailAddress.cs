@@ -2,9 +2,13 @@ using System.Net.Mail;
 
 namespace EFCore10.Tutorials.Tutorial08.Domain;
 
-internal readonly record struct EmailAddress(string Value)
+internal sealed record EmailAddress
 {
+    private EmailAddress(string value) => Value = value;
+
     public const int MaxLength = 180;
+
+    public string Value { get; }
 
     internal static EmailAddress Create(string? value)
     {
@@ -23,4 +27,6 @@ internal readonly record struct EmailAddress(string Value)
             throw new DomainException(DomainErrors.EmailInvalid, "Email is invalid.") { Source = exception.Source };
         }
     }
+
+    internal static EmailAddress FromStorage(string value) => Create(value);
 }

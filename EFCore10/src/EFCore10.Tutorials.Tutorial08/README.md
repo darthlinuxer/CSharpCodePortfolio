@@ -15,12 +15,13 @@ um tutorial de heranca.
   possui campi e demite funcionarios.
 - `Department` e entidade interna da universidade: tem identidade e professores,
   mas nao deve virar ponto de entrada/repository separado no tutorial.
-- `Course` e aggregate root: tem pontos academicos, plano de ensino e professor
-  opcional.
+- `Course` e aggregate root: pertence a um departamento, tem pontos academicos,
+  plano de ensino e professor opcional do mesmo departamento.
 - `Student` e aggregate root: registra matriculas e impede mais de 40 pontos no
   mesmo semestre.
 - `Enrollment` e join entity com payload: semestre, data UTC e nota final
-  opcional.
+  opcional. A nota e registrada depois da matricula e so pode ser gravada uma
+  vez.
 
 Aggregate root nao significa "uma tabela so". DDD define fronteiras de
 consistencia e acesso ao dominio. O banco relacional ainda pode precisar de
@@ -70,6 +71,15 @@ APIs principais. Exemplos:
 - `PersonName`, `EmailAddress`, `CourseCode`, `CourseTitle`;
 - `CreditPoints`, `Semester`, `UtcDateTime`, `Grade`.
 
+Todos sao tipos fechados, com construtor privado. Entrada de dominio passa por
+`Create(...)`, novos IDs passam por `New()` e a materializacao EF passa por
+`FromStorage(...)`. Essa separacao evita o bypass que um positional
+`record struct` permitiria com `new CourseId(Guid.Empty)`.
+
+IDs baseados em `Guid` rejeitam `Guid.Empty`; `CampusId` rejeita valor nao
+positivo. Se o banco trouxer dado invalido, `FromStorage(...)` falha do mesmo
+jeito que a entrada de dominio falharia.
+
 O EF Core salva esses tipos como colunas escalares usando `HasConversion(...)`.
 
 ## OwnsOne, OwnsMany, HasOne e HasMany
@@ -79,7 +89,8 @@ O EF Core salva esses tipos como colunas escalares usando `HasConversion(...)`.
 - `University -> Campuses` usa `OwnsMany`: campus pertence somente a uma
   universidade, mas a colecao precisa de linhas em `UniversityCampuses`.
 - `University -> Departments`, `University -> Employees`, `Department ->
-  Professors`, `Course -> Professor` e `Student/Course -> Enrollment` usam
+  Professors`, `Course -> Department`, `Course -> Professor` e
+  `Student/Course -> Enrollment` usam
   `HasOne`/`HasMany`, porque esses objetos tem identidade propria ou payload de
   relacionamento. Um professor pode estar associado a varios cursos.
 - `Professor` nao e owned type: professor e funcionario, tem identidade,
@@ -92,12 +103,13 @@ Algumas FKs aparecem no banco, mas nao aparecem no modelo de dominio:
 - `Department -> University` usa shadow `UniversityId`;
 - `Employee -> University` usa shadow `UniversityId`;
 - `Professor -> Department` usa shadow `DepartmentId`;
+- `Course -> Department` usa shadow `DepartmentId`;
 - `Course -> Professor` usa shadow `ProfessorId`.
 
 Essas propriedades sao indicadas aqui porque o dominio ja navega por objetos:
 `Department.University`, `Employee.University`, `Professor.Department` e
-`Course.Professor`. Expor tambem o ID duplicaria a mesma associacao e abriria
-espaco para estado inconsistente.
+`Course.Department`/`Course.Professor`. Expor tambem o ID duplicaria a mesma
+associacao e abriria espaco para estado inconsistente.
 
 `Enrollment` e a excecao proposital: `StudentId`, `CourseId` e `Semester`
 formam a chave da matricula e participam das regras de duplicidade, entao fazem
@@ -126,11 +138,14 @@ type.
 O mapeamento tambem declara indices pequenos para as consultas ensinadas:
 
 - `Courses.Code`;
+- `Courses.DepartmentId`;
 - `Courses.ProfessorId`;
 - `Departments.UniversityId + Name`;
+- `Employees.Email`;
 - `Employees.UniversityId`;
 - `Employees.EmployeeType + Status`;
 - `Employees.DepartmentId`;
+- `Students.Email`;
 - `Enrollments.Semester + CourseId`.
 
 ## Como estudar `Persistence/Configurations`
@@ -146,6 +161,8 @@ Perguntas socraticas para qualquer configuracao:
 - A coluna pertence ao modelo de dominio ou e apenas infraestrutura relacional?
 - O EF deve acessar a colecao pelo backing field para nao furar invariantes?
 - A delecao deve remover dependentes ou bloquear a operacao?
+- O TPH deixou alguma coluna nullable que precisa de `CHECK` para nao aceitar
+  estado impossivel?
 - Qual consulta real justifica este indice?
 
 ### `UniversityConfiguration`
@@ -159,7 +176,8 @@ Perguntas socraticas para qualquer configuracao:
   `List<T>`.
 - `HasKey(Id)` fixa a identidade relacional do aggregate.
 - `Property(Id).HasConversion(...).ValueGeneratedNever()` preserva `UniversityId`
-  como value object e deixa o dominio gerar o identificador.
+  como value object, reconstrui por `FromStorage(...)` e deixa o dominio gerar o
+  identificador.
 - `Property(Name).HasConversion(...).HasMaxLength(...).IsRequired()` persiste
   `UniversityName` como texto limitado, sem aceitar valor ausente.
 - `OwnsMany(Campuses)` responde: campus existe sem universidade? Nao. A colecao
@@ -202,7 +220,10 @@ Perguntas socraticas para qualquer configuracao:
 - `HasKey(Id)` e `Property(Id).HasConversion(...).ValueGeneratedNever()`
   preservam `EmployeeId`.
 - `Property(Name/Email/HiredAtUtc/DismissedAtUtc/Status).HasConversion(...)`
-  guarda value objects como escalares e reconstrui tipos validados ao ler.
+  guarda value objects como escalares e reconstrui tipos validados ao ler por
+  `FromStorage(...)`.
+- `HasIndex(Email).IsUnique()` impede dois funcionarios com o mesmo email no
+  banco, alem da normalizacao feita pelo value object.
 - `Property<UniversityId>(UniversityId)` e `Property<DepartmentId>(DepartmentId)`
   sao shadow FKs: o banco precisa das colunas; o dominio trabalha com
   `University` e `Department`.
@@ -215,6 +236,10 @@ Perguntas socraticas para qualquer configuracao:
   departamento ainda usado por professor.
 - `AdministrativeEmployee.Role` fica nullable na tabela TPH porque so existe
   nessa ramificacao, mas continua `StaffRole` no dominio.
+- `HasCheckConstraint(CK_Employees_Professor_DepartmentId)` fecha a lacuna do
+  TPH: linha de professor precisa de `DepartmentId`.
+- `HasCheckConstraint(CK_Employees_Administrative_Role)` fecha a outra lacuna:
+  linha administrativa precisa de `Role`.
 
 ### `CourseConfiguration`
 
@@ -226,15 +251,21 @@ Perguntas socraticas para qualquer configuracao:
 - `HasKey(Id)` e `Property(Id).HasConversion(...).ValueGeneratedNever()` mantem
   `CourseId` no dominio.
 - `Property(Title/Code/CreditPoints).HasConversion(...).IsRequired()` salva value
-  objects como colunas simples.
+  objects como colunas simples e reconstrui por `FromStorage(...)`.
 - `HasIndex(Code).IsUnique()` torna visivel a unicidade natural do codigo do
   curso.
+- `Property<DepartmentId>(DepartmentId).IsRequired()` cria a FK obrigatoria para
+  o departamento academico do curso.
+- `HasIndex(DepartmentId)` atende leituras por departamento e torna a relacao
+  visivel no schema.
 - `Property<EmployeeId?>(ProfessorId)` cria shadow FK opcional: curso pode existir
   antes de receber professor.
 - `OwnsOne(Syllabus)` responde: plano de ensino tem identidade propria? Nao.
   Entao suas colunas ficam em `Courses`.
 - `HasColumnName("SyllabusSummary")` e `HasColumnName("SyllabusOutcomes")`
   explicam no DDL onde o owned type foi armazenado.
+- `HasOne(Department).WithMany().HasForeignKey(DepartmentId).IsRequired()` liga o
+  curso ao departamento que tambem limita qual professor pode ser atribuido.
 - `HasOne(Professor).WithMany().HasForeignKey(ProfessorId)` permite varios cursos
   por professor.
 - `OnDelete(Restrict)` protege cursos de ficarem com professor removido
@@ -245,6 +276,7 @@ Perguntas socraticas para qualquer configuracao:
 - `Student.ToTable(Tables.Students)` mapeia outro aggregate root.
 - `Student.Ignore(Courses)` evita duplicar o relacionamento ja representado por
   `Enrollment`.
+- `Student.HasIndex(Email).IsUnique()` reforca email unico no banco.
 - `Enrollment.ToTable(Tables.Enrollments)` torna a relacao aluno-curso uma join
   entity com payload.
 - `HasKey(StudentId, CourseId, Semester)` responde: o que torna uma matricula
@@ -254,7 +286,8 @@ Perguntas socraticas para qualquer configuracao:
 - `HasIndex(Semester, CourseId)` atende a consulta de progresso por semestre e
   demanda por curso.
 - `Property(EnrolledAtUtc)` e `Property(FinalGrade).HasPrecision(4, 2)` salvam o
-  payload da matricula.
+  payload da matricula. `FinalGrade` e nullable porque `Enrollment.RecordFinalGrade(...)`
+  acontece depois da inscricao.
 - `HasOne(Student).WithMany(Enrollments).OnDelete(Cascade)` e
   `HasOne(Course).WithMany(Enrollments).OnDelete(Cascade)` removem matriculas
   quando um dos lados some, porque a linha nao faz sentido sozinha.

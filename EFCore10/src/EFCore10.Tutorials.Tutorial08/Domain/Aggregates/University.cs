@@ -19,7 +19,7 @@ internal sealed class University : DomainEntity<UniversityId>
         Name = name;
     }
 
-    public UniversityName Name { get; private set; }
+    public UniversityName Name { get; private set; } = null!;
 
     public IReadOnlyCollection<UniversityCampus> Campuses => _campuses;
 
@@ -35,7 +35,7 @@ internal sealed class University : DomainEntity<UniversityId>
         if (_campuses.Any(campus => string.Equals(campus.Name.Value, name.Value, StringComparison.OrdinalIgnoreCase)))
             throw new DomainException(DomainErrors.CampusNameDuplicated, "University campus names must be unique.");
 
-        _campuses.Add(new UniversityCampus(CampusId.From(_campuses.Count + 1), name, city));
+        _campuses.Add(new UniversityCampus(CampusId.Create(_campuses.Count + 1), name, city));
     }
 
     /// <summary>

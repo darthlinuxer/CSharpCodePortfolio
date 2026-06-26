@@ -26,15 +26,20 @@ internal sealed class StudentConfiguration : IEntityTypeConfiguration<Student>
         // schema as ordinary scalar columns.
         student.HasKey(value => value.Id);
         student.Property(value => value.Id)
-            .HasConversion(value => value.Value, value => new StudentId(value))
+            .HasConversion(value => value.Value, value => StudentId.FromStorage(value))
             .ValueGeneratedNever();
         student.Property(value => value.Name)
-            .HasConversion(value => value.Value, value => PersonName.Create(value))
+            .HasConversion(value => value.Value, value => PersonName.FromStorage(value))
             .HasMaxLength(PersonName.MaxLength)
             .IsRequired();
         student.Property(value => value.Email)
-            .HasConversion(value => value.Value, value => EmailAddress.Create(value))
+            .HasConversion(value => value.Value, value => EmailAddress.FromStorage(value))
             .HasMaxLength(EmailAddress.MaxLength)
             .IsRequired();
+        // Same reasoning as employees: EmailAddress validates one value, the
+        // unique index validates the collection persisted by the database.
+        student.HasIndex(value => value.Email)
+            .IsUnique()
+            .HasDatabaseName("IX_Students_Email");
     }
 }
