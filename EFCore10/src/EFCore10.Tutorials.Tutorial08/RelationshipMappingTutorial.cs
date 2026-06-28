@@ -1,9 +1,11 @@
 using System.Globalization;
 using EFCore10.Shared;
 using EFCore10.Tutorials.Abstractions;
-using EFCore10.Tutorials.Tutorial08.Application;
+using EFCore10.Tutorials.Tutorial08.Application.Commands;
+using EFCore10.Tutorials.Tutorial08.Application.ReadModels;
 using EFCore10.Tutorials.Tutorial08.Domain;
-using EFCore10.Tutorials.Tutorial08.Persistence;
+using EFCore10.Tutorials.Tutorial08.Infrastructure.Persistence;
+using EFCore10.Tutorials.Tutorial08.Infrastructure.ReadModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCore10.Tutorials.Tutorial08;
@@ -35,13 +37,13 @@ public sealed class RelationshipMappingTutorial : ITutorial
         TutorialConsole.WriteHypothesis(
             "Aggregates definem consistencia; o banco ainda pode ter tabelas para entidades internas e joins.",
             "Value objects fechados deixam o dominio sem primitive obsession; factories retornam Result.Errors quando regras sao violadas.",
-            "Course.Department e Enrollment.RecordFinalGrade colocam regra no objeto que realmente conhece o ciclo de vida.",
+            "Bounded contexts conversam por IDs e snapshots; entidades de outro contexto nao entram no aggregate.",
             "OwnsOne/OwnsMany aparecem quando o objeto nao vive sem o owner; HasOne/HasMany fica para identidade propria.");
         TutorialConsole.WritePreparation(
             "Leia cada configuracao como uma pergunta de modelagem: quem tem identidade, quem tem ciclo de vida proprio, qual FK pertence ao banco e qual regra pertence ao dominio?",
             "O metodo socratico usado aqui evita decorar Fluent API: cada comando responde uma duvida sobre identidade, conversao, relacionamento, delecao ou consulta.");
         TutorialConsole.WriteCodeSnippet(
-            "Roteiro socratico para ler as classes em Persistence/Configurations.",
+            "Roteiro socratico para ler as classes em Infrastructure/Persistence/Configurations.",
             "Configurations.socratic.md",
             MappingSocraticGuide);
 
@@ -50,9 +52,9 @@ public sealed class RelationshipMappingTutorial : ITutorial
             "Self-checks de dominio",
             ("Regras exercitadas", $"{domainRuleCount} cenarios de invariantes verificados"),
             ("Limite academico", "Student bloqueia mais de 40 pontos no mesmo semestre"),
-            ("Matricula", "Student e Course compartilham a mesma Enrollment"),
+            ("Matricula", "Enrollment grava StudentId/CourseId e nao segura Course ou Student"),
             ("Nota final", "Enrollment bloqueia segunda nota final"),
-            ("Demissao", "University bloqueia professor ainda atribuido a curso ativo"),
+            ("Demissao", "University bloqueia professor ainda atribuido via AssignedCourseSnapshot"),
             ("Erros", "Violacoes de dominio retornam Result.Errors; excecoes ficam para falhas raras"));
 
         var options = new DbContextOptionsBuilder<UniversityContext>()
@@ -60,10 +62,13 @@ public sealed class RelationshipMappingTutorial : ITutorial
             .Options;
 
         await using var context = new UniversityContext(options);
-        var applicationService = new UniversityApplicationService(context);
-        await applicationService.RecreateSampleAsync(cancellationToken).ConfigureAwait(false);
+        var recreateSampleHandler = new RecreateUniversitySampleHandler(new UniversitySampleStore(context));
+        var sampleResult = await recreateSampleHandler
+            .HandleAsync(new RecreateUniversitySampleCommand(), cancellationToken)
+            .ConfigureAwait(false);
+        sampleResult.RequireValue();
 
-        var semester = Semester.Create(2026, 1).RequireValue();
+        var studentProgressQuery = new StudentProgressQuery(2026, 1);
         var dashboardReadService = new UniversityDashboardReadService(context);
         var courseAnalyticsReadService = new CourseAnalyticsReadService(context);
         var studentProgressReadService = new StudentProgressReadService(context);
@@ -71,12 +76,12 @@ public sealed class RelationshipMappingTutorial : ITutorial
 
         var dashboardSql = dashboardReadService.GetUniversityDashboardSql();
         var courseAnalyticsSql = courseAnalyticsReadService.GetCourseAnalyticsSql();
-        var studentProgressSql = studentProgressReadService.GetStudentProgressSql(semester);
+        var studentProgressSql = studentProgressReadService.GetStudentProgressSql(studentProgressQuery);
         var facultyWorkloadSql = facultyWorkloadReadService.GetFacultyWorkloadSql();
         var dashboard = await dashboardReadService.GetUniversityDashboardAsync(cancellationToken).ConfigureAwait(false);
         var courseAnalytics = await courseAnalyticsReadService.GetCourseAnalyticsAsync(cancellationToken).ConfigureAwait(false);
         var studentProgress = await studentProgressReadService
-            .GetStudentProgressAsync(semester, cancellationToken)
+            .GetStudentProgressAsync(studentProgressQuery, cancellationToken)
             .ConfigureAwait(false);
         var facultyWorkloads = await facultyWorkloadReadService.GetFacultyWorkloadAsync(cancellationToken).ConfigureAwait(false);
         ValidateReadModels(dashboard, courseAnalytics, studentProgress, facultyWorkloads);
@@ -147,19 +152,18 @@ public sealed class RelationshipMappingTutorial : ITutorial
         - HasTableMapping: anotacao didatica do tutorial; nao muda o EF, mas permite explicar TPH, concrete table, internal entity, OwnsOne, OwnsMany e join entity na saida.
         - UseTphMappingStrategy, HasDiscriminator e HasValue: guardam Professor e AdministrativeEmployee em Employees com EmployeeType, porque Tutorial08 so precisa de uma hierarquia curta.
         - Navigation(...).UsePropertyAccessMode(Field): faz o EF preencher backing fields privados sem abrir List<T> mutavel no dominio.
-        - Ignore: impede que propriedades de conveniencia, como Courses ou Students, virem outro relacionamento duplicado.
         - HasKey: declara a identidade relacional que corresponde a identidade do dominio, ou a chave composta da join entity.
-        - Property: mostra explicitamente cada coluna que sai de value object, shadow FK ou payload.
+        - Property: mostra explicitamente cada coluna que sai de value object, FK real do aggregate ou payload.
         - HasConversion: transforma value object em escalar persistivel e reconstrui por FromStorage, evitando bypass de invariantes na materializacao.
         - ValueGeneratedNever: diz que o dominio cria o ID; o banco nao substitui a identidade do aggregate.
         - HasMaxLength e IsRequired: levam invariantes simples para o schema sem retirar a validacao do dominio.
         - HasCheckConstraint: fecha lacunas especificas de TPH que nullable columns deixam abertas no schema.
         - Property<T>(Columns.*): cria shadow FK quando o banco precisa da coluna, mas o dominio ja navega por objeto.
-        - Property<DepartmentId> em Courses: curso pertence a departamento antes de ter professor; professor opcional nao pode ser a fonte dessa informacao.
+        - DepartmentId e ProfessorId em Courses: CourseCatalog guarda IDs de Institutional; regras recebem snapshots em vez de entidade externa.
         - HasColumnName: nomeia colunas owned para mostrar que Syllabus vive em Courses.
         - OwnsOne: Syllabus nao tem identidade fora de Course, entao vira colunas do owner.
         - OwnsMany, WithOwner e HasForeignKey: Campus pertence a University; a colecao precisa de tabela, mas nao de repository proprio.
-        - HasOne, WithMany e HasForeignKey: modelam associacoes entre entidades com identidade propria.
+        - HasOne, WithMany e HasForeignKey: modelam associacoes relacionais por ID sem forcar navegacao entre bounded contexts no dominio.
         - OnDelete(Cascade): remove dependentes que nao fazem sentido sem o owner, como Campus ou Enrollment.
         - OnDelete(Restrict): bloqueia exclusoes que poderiam quebrar referencias importantes, como Employee, Department e Professor.
         - HasIndex, IsUnique e HasDatabaseName: deixam visiveis os acessos usados pelas read queries e documentam unicidade esperada pelo dominio.
@@ -208,24 +212,34 @@ public sealed class RelationshipMappingTutorial : ITutorial
                     DateTime.UtcNow).RequireValue();
                 var course = CreateValidCourse("Curso Valido", "CS-201", 10, computerScience);
 
-                return course.AssignProfessor(professor).Errors;
+                var result = course.AssignProfessor(professor.ToAssignmentSnapshot());
+                if (course.ProfessorId is not null)
+                    throw new InvalidOperationException("Course mutated professor assignment after a failed snapshot rule.");
+
+                return result.Errors;
             }),
             ("limite de pontos no semestre", [DomainErrors.StudentCreditLimitExceeded.Code], static () =>
             {
                 var department = CreateValidDepartment();
                 var student = Student.Create("Aluno Valido", "aluno.valido@contoso.edu").RequireValue();
                 var enrolledAtUtc = DateTime.UtcNow;
+                var currentCourses = new List<CourseEnrollmentSnapshot>();
 
-                student.RegisterForCourse(CreateValidCourse("Curso Valido A", "CS-301", 25, department), 2026, 1, enrolledAtUtc).RequireValue();
+                RegisterForCourse(student, CreateValidCourse("Curso Valido A", "CS-301", 25, department), currentCourses, enrolledAtUtc);
 
-                return student.RegisterForCourse(CreateValidCourse("Curso Valido B", "CS-302", 20, department), 2026, 1, enrolledAtUtc).Errors;
+                return student.RegisterForCourse(
+                    CreateValidCourse("Curso Valido B", "CS-302", 20, department).ToEnrollmentSnapshot(),
+                    currentCourses,
+                    2026,
+                    1,
+                    enrolledAtUtc).Errors;
             }),
             ("nota final duplicada", [DomainErrors.EnrollmentFinalGradeAlreadyRecorded.Code], static () =>
             {
                 var department = CreateValidDepartment();
                 var student = Student.Create("Aluno Valido", "aluno.valido@contoso.edu").RequireValue();
                 var course = CreateValidCourse("Curso Valido", "CS-303", 10, department);
-                var enrollment = student.RegisterForCourse(course, 2026, 1, DateTime.UtcNow).RequireValue();
+                var enrollment = RegisterForCourse(student, course, [], DateTime.UtcNow);
 
                 enrollment.RecordFinalGrade(8.5m).RequireSuccess();
 
@@ -242,9 +256,9 @@ public sealed class RelationshipMappingTutorial : ITutorial
                     department,
                     hiredAtUtc).RequireValue();
                 var course = CreateValidCourse("Curso Valido", "CS-401", 10, department);
-                course.AssignProfessor(professor).RequireSuccess();
+                course.AssignProfessor(professor.ToAssignmentSnapshot()).RequireSuccess();
 
-                return university.DismissEmployee(professor, hiredAtUtc.AddDays(1), [course]).Errors;
+                return university.DismissEmployee(professor, hiredAtUtc.AddDays(1), [course.ToAssignedCourseSnapshot()]).Errors;
             })
         };
 
@@ -253,7 +267,7 @@ public sealed class RelationshipMappingTutorial : ITutorial
             ExpectDomainErrors(errors(), scenario, expectedCodes);
         }
 
-        ValidateBidirectionalEnrollment();
+        ValidateSnapshotEnrollment();
 
         return checks.Length + 1;
     }
@@ -301,7 +315,7 @@ public sealed class RelationshipMappingTutorial : ITutorial
 
     private static Course CreateValidCourse(string title, string code, int points, Department department) =>
         Course.Create(
-            department,
+            department.Id,
             title,
             code,
             points,
@@ -315,19 +329,31 @@ public sealed class RelationshipMappingTutorial : ITutorial
         return university.OpenDepartment("Computer Science").RequireValue();
     }
 
-    private static void ValidateBidirectionalEnrollment()
+    private static Enrollment RegisterForCourse(
+        Student student,
+        Course course,
+        List<CourseEnrollmentSnapshot> currentSemesterCourses,
+        DateTime enrolledAtUtc)
+    {
+        var courseSnapshot = course.ToEnrollmentSnapshot();
+        var enrollment = student.RegisterForCourse(courseSnapshot, currentSemesterCourses, 2026, 1, enrolledAtUtc).RequireValue();
+        currentSemesterCourses.Add(courseSnapshot);
+
+        return enrollment;
+    }
+
+    private static void ValidateSnapshotEnrollment()
     {
         var department = CreateValidDepartment();
         var student = Student.Create("Aluno Valido", "aluno.valido@contoso.edu").RequireValue();
         var course = CreateValidCourse("Curso Valido", "CS-304", 10, department);
-        var enrollment = student.RegisterForCourse(course, 2026, 1, DateTime.UtcNow).RequireValue();
+        var enrollment = RegisterForCourse(student, course, [], DateTime.UtcNow);
 
         if (!student.Enrollments.Contains(enrollment)
-            || !course.Enrollments.Contains(enrollment)
-            || enrollment.Student != student
-            || enrollment.Course != course)
+            || enrollment.StudentId != student.Id
+            || enrollment.CourseId != course.Id)
         {
-            throw new InvalidOperationException("Enrollment was not shared by Student and Course.");
+            throw new InvalidOperationException("Enrollment did not keep the expected StudentId and CourseId.");
         }
     }
 
@@ -593,5 +619,4 @@ public sealed class RelationshipMappingTutorial : ITutorial
     private static string FormatList(IReadOnlyCollection<string> values) =>
         values.Count == 0 ? "(none)" : string.Join(", ", values);
 
-    private sealed record UniversitySample(University University, Course[] Courses, Student[] Students);
 }

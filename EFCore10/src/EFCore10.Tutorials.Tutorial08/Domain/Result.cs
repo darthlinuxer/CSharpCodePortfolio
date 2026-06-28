@@ -46,7 +46,7 @@ internal sealed class Result<T>
 
     private Result(IReadOnlyList<DomainError> errors) => Errors = errors;
 
-    public T? Value { get; }
+    private T? Value { get; }
 
     public IReadOnlyList<DomainError> Errors { get; }
 

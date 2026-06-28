@@ -1,0 +1,41 @@
+using EFCore10.Tutorials.Tutorial08.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace EFCore10.Tutorials.Tutorial08.Infrastructure.Persistence;
+
+internal sealed class StudentConfiguration : IEntityTypeConfiguration<Student>
+{
+    /// <summary>
+    /// Configures student identity as an aggregate root.
+    /// </summary>
+    public void Configure(EntityTypeBuilder<Student> student)
+    {
+        // Student is an aggregate root, so it gets a concrete table and its own
+        // identity. Course registration happens through Enrollment.
+        student.ToTable(Tables.Students)
+            .HasTableMapping(TableMappingMetadata.ConcreteTable);
+        student.Navigation(value => value.Enrollments)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        // Value objects keep validation in the domain; converters keep EF's
+        // schema as ordinary scalar columns.
+        student.HasKey(value => value.Id);
+        student.Property(value => value.Id)
+            .HasConversion(value => value.Value, value => StudentId.FromStorage(value).RequireValue())
+            .ValueGeneratedNever();
+        student.Property(value => value.Name)
+            .HasConversion(value => value.Value, value => PersonName.FromStorage(value).RequireValue())
+            .HasMaxLength(PersonName.MaxLength)
+            .IsRequired();
+        student.Property(value => value.Email)
+            .HasConversion(value => value.Value, value => EmailAddress.FromStorage(value).RequireValue())
+            .HasMaxLength(EmailAddress.MaxLength)
+            .IsRequired();
+        // Same reasoning as employees: EmailAddress validates one value, the
+        // unique index validates the collection persisted by the database.
+        student.HasIndex(value => value.Email)
+            .IsUnique()
+            .HasDatabaseName("IX_Students_Email");
+    }
+}

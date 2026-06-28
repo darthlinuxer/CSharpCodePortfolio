@@ -1,8 +1,5 @@
-using System.ComponentModel.DataAnnotations.Schema;
+namespace EFCore10.Tutorials.Tutorial08.Domain.Common;
 
-namespace EFCore10.Tutorials.Tutorial08.Domain;
-
-[NotMapped]
 internal abstract class DomainEntity<TId>
     where TId : notnull
 {
