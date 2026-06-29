@@ -33,4 +33,8 @@ public readonly record struct PersonName(string Value)
 /// Error returned when the required user name is missing.
 /// </summary>
 public sealed record PersonNameRequiredError()
-    : DomainError(new DomainErrorCode("registration.name_required"), "Nome obrigatório.");
+    : DomainError(new DomainErrorCode("registration.name_required"), "Nome obrigatório.")
+{
+    /// <inheritdoc />
+    public override DomainErrorCategory Category => DomainErrorCategory.Validation;
+}

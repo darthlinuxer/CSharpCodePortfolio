@@ -75,4 +75,8 @@ public readonly record struct Timestamp(DateTime Value)
 /// Error returned when a domain timestamp is not UTC.
 /// </summary>
 public sealed record TimestampUtcRequiredError()
-    : DomainError(new DomainErrorCode("registration.timestamp_utc_required"), "Timestamp de domínio deve estar em UTC.");
+    : DomainError(new DomainErrorCode("registration.timestamp_utc_required"), "Timestamp de domínio deve estar em UTC.")
+{
+    /// <inheritdoc />
+    public override DomainErrorCategory Category => DomainErrorCategory.Validation;
+}

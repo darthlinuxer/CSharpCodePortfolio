@@ -39,4 +39,8 @@ public readonly record struct PhoneNumber(string Value)
 /// Error returned when an optional phone was supplied but is malformed.
 /// </summary>
 public sealed record PhoneNumberInvalidError()
-    : DomainError(new DomainErrorCode("registration.phone_invalid"), "Telefone informado é inválido.");
+    : DomainError(new DomainErrorCode("registration.phone_invalid"), "Telefone informado é inválido.")
+{
+    /// <inheritdoc />
+    public override DomainErrorCategory Category => DomainErrorCategory.Validation;
+}

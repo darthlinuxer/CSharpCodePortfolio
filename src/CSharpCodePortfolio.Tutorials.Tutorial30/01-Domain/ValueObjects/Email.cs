@@ -49,4 +49,8 @@ public readonly record struct Email(string Value)
 /// Error returned when the required email is missing or malformed.
 /// </summary>
 public sealed record EmailInvalidError()
-    : DomainError(new DomainErrorCode("registration.email_invalid"), "Email informado é inválido.");
+    : DomainError(new DomainErrorCode("registration.email_invalid"), "Email informado é inválido.")
+{
+    /// <inheritdoc />
+    public override DomainErrorCategory Category => DomainErrorCategory.Validation;
+}
