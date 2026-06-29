@@ -32,6 +32,7 @@
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial27/CSharpCodePortfolio.Tutorials.Tutorial27.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial28/CSharpCodePortfolio.Tutorials.Tutorial28.csproj" />
     <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial29/CSharpCodePortfolio.Tutorials.Tutorial29.csproj" />
+    <Project Path="src/CSharpCodePortfolio.Tutorials.Tutorial30/CSharpCodePortfolio.Tutorials.Tutorial30.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CSharpCodePortfolio.Shared.Tests/CSharpCodePortfolio.Shared.Tests.csproj" />
@@ -46,5 +47,6 @@
     <Project Path="tests/CSharpCodePortfolio.Tutorials.Tutorial27.Tests/CSharpCodePortfolio.Tutorials.Tutorial27.Tests.csproj" />
     <Project Path="tests/CSharpCodePortfolio.Tutorials.Tutorial28.Tests/CSharpCodePortfolio.Tutorials.Tutorial28.Tests.csproj" />
     <Project Path="tests/CSharpCodePortfolio.Tutorials.Tutorial29.Tests/CSharpCodePortfolio.Tutorials.Tutorial29.Tests.csproj" />
+    <Project Path="tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests.csproj" />
   </Folder>
 </Solution>

@@ -9,7 +9,7 @@ para uma tabela de outbox processável.
 
 ## Pontos principais
 
-- `PersonName`, `Cpf`, `Email`, `PhoneNumber`, `ZipCode`, `StateCode`, `Address`, `Contact`, `UserName`, `PasswordHash`, `BlogName`, `BlogUrl`, `PostTitle` e `PostContent` validam e normalizam dados.
+- `PersonName` separa nome/sobrenome e calcula `FullName`; `Cpf`, `Email`, `PhoneNumber`, `ZipCode`, `StateCode`, `Address`, `Contact`, `UserName`, `PasswordHash`, `BlogName`, `BlogUrl`, `PostTitle` e `PostContent` validam e normalizam dados.
 - Normalizacao mecanica de strings fica em extensions internas neutras; regras de negocio continuam nos value objects.
 - `PasswordHash` gera e verifica hashes Argon2id com salt por senha, parametros versionados e comparacao em tempo constante.
 - IDs fortes usam `Guid` como tipo .NET e `Guid.CreateVersion7()` para gerar UUIDv7.

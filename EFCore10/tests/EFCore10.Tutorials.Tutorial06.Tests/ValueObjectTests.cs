@@ -23,7 +23,12 @@ public sealed class ValueObjectTests
     [TestMethod]
     public void PersonValueObjectsNormalizeValidInput()
     {
-        Assert.AreEqual("Ada Lovelace", PersonName.Create("  Ada Lovelace  ").Value);
+        var personName = PersonName.Create("  Ada Lovelace  ");
+
+        Assert.AreEqual("Ada", personName.Name);
+        Assert.AreEqual("Lovelace", personName.Surname);
+        Assert.AreEqual("Ada Lovelace", personName.FullName);
+        Assert.AreEqual(personName.FullName, personName.Value);
         Assert.AreEqual("12345678901", Cpf.Create("123.456.789-01").Value);
         Assert.AreEqual("ada@example.com", Email.Create("  ADA@Example.COM  ").Value);
         Assert.AreEqual("+5511999999999", PhoneNumber.Create("+55 (11) 99999-9999").Value);

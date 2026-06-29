@@ -1,0 +1,55 @@
+using System.Net.Mail;
+using LanguageExt;
+using static LanguageExt.Prelude;
+
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+
+/// <summary>
+/// Value object for the required registration email.
+/// </summary>
+public sealed record Email
+{
+    private Email()
+    {
+    }
+
+    private Email(string value)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Gets the normalized email address.
+    /// </summary>
+    public string Value { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Validates an email that was actually supplied by the caller.
+    /// </summary>
+    public static Either<DomainError, Email> Create(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Left<DomainError, Email>(DomainErrors.EmailInvalid);
+        }
+
+        try
+        {
+            var normalized = value.Trim().ToLowerInvariant();
+            var parsed = new MailAddress(normalized);
+
+            return parsed.Address == normalized
+                ? Right<DomainError, Email>(new Email(normalized))
+                : Left<DomainError, Email>(DomainErrors.EmailInvalid);
+        }
+        catch (FormatException)
+        {
+            return Left<DomainError, Email>(DomainErrors.EmailInvalid);
+        }
+    }
+
+    /// <summary>
+    /// Returns the normalized email address for persistence and comparison.
+    /// </summary>
+    public override string ToString() => Value;
+}

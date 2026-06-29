@@ -7,12 +7,29 @@ public sealed partial record PersonName
     private const int MinLength = 3;
     private const int MaxLength = 200;
 
-    private PersonName(string value) => Value = value;
+    private PersonName(string name, string surname)
+    {
+        Name = name;
+        Surname = surname;
+    }
 
-    public string Value { get; }
+    public string Name { get; }
 
-    public static PersonName Create(string value) =>
-        new(value.NormalizeLength(nameof(PersonName), MinLength, MaxLength));
+    public string Surname { get; }
 
-    public override string ToString() => Value;
+    public string FullName => $"{Name} {Surname}";
+
+    public string Value => FullName;
+
+    public static PersonName Create(string value)
+    {
+        var fullName = value.NormalizeLength(nameof(PersonName), MinLength, MaxLength);
+        var parts = fullName.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return parts.Length == 2
+            ? new PersonName(parts[0], parts[1])
+            : throw new DomainException("PersonName must include name and surname.");
+    }
+
+    public override string ToString() => FullName;
 }
