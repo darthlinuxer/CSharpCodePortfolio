@@ -1,11 +1,17 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings;
 
 /// <summary>
-/// Maps the DDD aggregate directly, using EF Core complex properties for value objects.
+/// Maps the DDD aggregate directly, using EF Core complex properties for
+/// required value objects and a <see cref="ValueConverter"/> to translate
+/// the optional <c>Option&lt;PhoneNumber&gt;</c> phone into a nullable
+/// relational column.
 /// </summary>
 public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAccount>
 {
@@ -24,7 +30,6 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.Ignore(user => user.DomainEvents);
         builder.Ignore(user => user.CreatedAt);
         builder.Ignore(user => user.LastModified);
-        builder.Ignore(user => user.PhoneNumber);
 
         builder.ComplexProperty(user => user.Name, name =>
         {
@@ -42,11 +47,15 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
                 .IsRequired();
         });
 
-        builder.ComplexProperty(user => user.PhoneNumberValue, phone =>
-        {
-            phone.Property(value => value.Value)
-                .HasColumnName("PhoneNumber")
-                .HasMaxLength(15);
-        });
+        var phoneConverter = new ValueConverter<Option<PhoneNumber>, string?>(
+            convertToProviderExpression: option => option.Match(Some: p => p.Value, None: () => null),
+            convertFromProviderExpression: value => value is null
+                ? Option<PhoneNumber>.None
+                : Some(new PhoneNumber(value)));
+
+        builder.Property(user => user.PhoneNumber)
+            .HasColumnName("PhoneNumber")
+            .HasMaxLength(15)
+            .HasConversion(phoneConverter);
     }
 }

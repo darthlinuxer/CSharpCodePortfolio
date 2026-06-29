@@ -135,8 +135,9 @@ public sealed class LanguageExtRegistrationTests
         var complexPropertyNames = userEntity.GetComplexProperties().Select(property => property.Name).ToArray();
         Assert.Contains(nameof(UserAccount.Name), complexPropertyNames);
         Assert.Contains(nameof(UserAccount.Email), complexPropertyNames);
-        Assert.Contains("PhoneNumberValue", complexPropertyNames);
         Assert.IsFalse(complexPropertyNames.Any(name => name.Contains("ForPersistence", StringComparison.Ordinal)));
+        Assert.IsNotNull(userEntity.FindProperty(nameof(UserAccount.PhoneNumber)),
+            "PhoneNumber must be mapped as a scalar property through a ValueConverter — no internal PhoneNumberValue mirror.");
     }
 
     /// <summary>

@@ -21,7 +21,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
     {
         Name = name;
         Email = email;
-        PhoneNumberValue = ToNullable(phoneNumber);
+        PhoneNumber = phoneNumber;
         MarkCreated(registeredAtUtc);
         RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, email, registeredAtUtc));
     }
@@ -37,14 +37,12 @@ public sealed class UserAccount : AbstractEntity<Guid>
     public Email Email { get; private set; } = null!;
 
     /// <summary>
-    /// Gets the optional phone without using PhoneNumber?.
+    /// Gets or sets the optional phone. Property is the single source of truth
+    /// for absence semantics — EF Core 10 maps the underlying <c>Option&lt;PhoneNumber&gt;</c>
+    /// through a <c>ValueConverter</c> in <c>UserAccountConfiguration</c>, so the
+    /// mirror-of-mirrors <c>PhoneNumberValue</c> hack is gone.
     /// </summary>
-    public Option<PhoneNumber> PhoneNumber => ToOption(PhoneNumberValue);
-
-    /// <summary>
-    /// Gets the internal nullable phone state that EF Core can map while the public domain API stays Option-based.
-    /// </summary>
-    internal PhoneNumber? PhoneNumberValue { get; private set; }
+    public Option<PhoneNumber> PhoneNumber { get; private set; } = None;
 
     /// <summary>
     /// Creates a fully valid aggregate from raw command values and accumulates expected domain errors.
@@ -145,31 +143,6 @@ public sealed class UserAccount : AbstractEntity<Guid>
     }
 
     /// <summary>
-    /// Converts a nullable value-type EF-materialized state into an explicit
-    /// domain Option. Mirrors the AbstractEntity helper; constrained to
-    /// <c>struct</c> for compatibility with the readonly record struct VOs.
-    /// </summary>
-    private static Option<T> ToOption<T>(T? value)
-        where T : struct
-    {
-        return value.HasValue ? Some(value.Value) : None;
-    }
-
-    /// <summary>
-    /// Converts an Option value into the nullable value-type that EF Core maps.
-    /// </summary>
-    private static T? ToNullable<T>(Option<T> option)
-        where T : struct
-    {
-        foreach (var value in option)
-        {
-            return value;
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Extracts an expected value-object error for aggregate-level accumulation.
     /// </summary>
     private static Option<DomainError> ErrorOf<T>(Either<DomainError, T> result)
@@ -231,7 +204,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
         var occurredAtUtc = Timestamp.UtcNow(clock);
 
-        PhoneNumberValue = ToNullable(newPhoneNumber);
+        PhoneNumber = newPhoneNumber;
         MarkModified(occurredAtUtc);
         RaiseDomainEvent(new UserAccountPhoneNumberChangedDomainEvent(Id, previousPhoneNumber, newPhoneNumber, occurredAtUtc));
 
