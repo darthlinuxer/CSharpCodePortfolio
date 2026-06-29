@@ -13,29 +13,31 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 public readonly record struct Email(string Value)
 {
     /// <summary>
-    /// Validates and normalizes an email that was actually supplied by
-    /// the caller. Returns <see cref="Either{DomainError, Email}"/> so the
-    /// caller must close the error path explicitly.
+    /// Validates and normalizes an email that was actually supplied by the
+    /// caller. Returns the same shape as aggregate-level errors
+    /// (Seq, not single).
     /// </summary>
-    public static Either<DomainError, Email> Create(string? value)
+    public static Either<Seq<DomainError>, Email> Create(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return Left<DomainError, Email>(new EmailInvalidError());
-        }
+        return value is not { Length: > 0 } || string.IsNullOrWhiteSpace(value)
+            ? Left<Seq<DomainError>, Email>(Seq1(new EmailInvalidError() as DomainError))
+            : TryNormalize(value);
 
-        try
+        static Either<Seq<DomainError>, Email> TryNormalize(string source)
         {
-            var normalized = value.Trim().ToLowerInvariant();
-            var parsed = new MailAddress(normalized);
+            try
+            {
+                var normalized = source.Trim().ToLowerInvariant();
+                var parsed = new MailAddress(normalized);
 
-            return parsed.Address == normalized
-                ? Right<DomainError, Email>(new Email(normalized))
-                : Left<DomainError, Email>(new EmailInvalidError());
-        }
-        catch (FormatException)
-        {
-            return Left<DomainError, Email>(new EmailInvalidError());
+                return parsed.Address == normalized
+                    ? Right<Seq<DomainError>, Email>(new Email(normalized))
+                    : Left<Seq<DomainError>, Email>(Seq1(new EmailInvalidError() as DomainError));
+            }
+            catch (FormatException)
+            {
+                return Left<Seq<DomainError>, Email>(Seq1(new EmailInvalidError() as DomainError));
+            }
         }
     }
 

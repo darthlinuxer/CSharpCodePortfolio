@@ -13,14 +13,15 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 public readonly record struct PersonName(string Value)
 {
     /// <summary>
-    /// Validates raw input and returns Either instead of throwing for
-    /// expected user mistakes.
+    /// Validates raw input and returns the same shape as aggregate-level
+    /// errors (Seq, not single), so composition through <c>from x in ...</c>
+    /// LINQ syntax is uniform across the domain.
     /// </summary>
-    public static Either<DomainError, PersonName> Create(string? value)
+    public static Either<Seq<DomainError>, PersonName> Create(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
-            ? Left<DomainError, PersonName>(new PersonNameRequiredError())
-            : Right<DomainError, PersonName>(new PersonName(value.Trim()));
+            ? Left<Seq<DomainError>, PersonName>(Seq1(new PersonNameRequiredError() as DomainError))
+            : Right<Seq<DomainError>, PersonName>(new PersonName(value.Trim()));
     }
 
     /// <summary>

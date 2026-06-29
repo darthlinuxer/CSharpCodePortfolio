@@ -6,11 +6,11 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 /// DTO returned by the command service after a registration command succeeds.
 /// </summary>
 /// <remarks>
-/// <c>PhoneNumber</c> is exposed as <see cref="Option{T}"/> on purpose here:
-/// the application layer carries the domain's absence semantic forward as
-/// far as the wire DTO so HTTP adapters can decide how to present it
-/// (typically <c>string?</c>). It is NOT an <c>Option&lt;string&gt;</c> leak
-/// — the inner type is the domain value object.
+/// <c>PhoneNumber</c> is exposed as the domain <see cref="Option{T}"/> at the
+/// application layer so internal application services can compose with the
+/// domain shape. The HTTP response adapter (<c>RegistrationEndpoint</c>)
+/// closes the <c>Option</c> at the wire boundary by mapping it to
+/// <c>string?</c> — <c>Option</c> never reaches the JSON payload.
 /// </remarks>
 public sealed record RegisteredUserDto(
     Guid Id,

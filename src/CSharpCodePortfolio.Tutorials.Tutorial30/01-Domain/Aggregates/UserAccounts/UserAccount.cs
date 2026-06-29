@@ -5,14 +5,29 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 
 /// <summary>
-/// Aggregate root for registration; required values are direct VOs and optional values are explicit Option VOs.
+/// Aggregate root for registration; required values are direct VOs and
+/// optional values are explicit <see cref="Option{T}"/> VOs.
 /// </summary>
+/// <remarks>
+/// Every behaviour method returns <c>Either&lt;Seq&lt;DomainError&gt;, T&gt;</c>
+/// without a single <c>if</c> or <c>switch</c> in the domain. Composition
+/// flows through LanguageExt LINQ syntax (<c>from x in y</c>) and
+/// <c>Match</c> so the code reads as data flow, not as control flow.
+/// </remarks>
 public sealed class UserAccount : AbstractEntity<Guid>
 {
+    /// <summary>
+    /// EF Core materialisation constructor.
+    /// </summary>
     private UserAccount()
     {
     }
 
+    /// <summary>
+    /// Domain constructor used by the factory <see cref="Create"/> when all
+    /// inputs validate. Marks the aggregate as created and raises the
+    /// <see cref="UserAccountRegisteredDomainEvent"/>.
+    /// </summary>
     private UserAccount(
         PersonName name,
         Email email,
@@ -29,63 +44,54 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Gets the required non-null name.
     /// </summary>
-    public PersonName Name { get; private set; } = null!;
+    public PersonName Name { get; private set; } = default;
 
     /// <summary>
     /// Gets the required non-null email.
     /// </summary>
-    public Email Email { get; private set; } = null!;
+    public Email Email { get; private set; } = default;
 
     /// <summary>
-    /// Gets or sets the optional phone. Property is the single source of truth
-    /// for absence semantics — EF Core 10 maps the underlying <c>Option&lt;PhoneNumber&gt;</c>
-    /// through a <c>ValueConverter</c> in <c>UserAccountConfiguration</c>, so the
-    /// mirror-of-mirrors <c>PhoneNumberValue</c> hack is gone.
+    /// Gets the optional phone. The single source of truth for the
+    /// aggregate's optional phone — EF Core 10 maps it through a
+    /// <c>ValueConverter</c> in
+    /// <c>CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings.UserAccountConfiguration</c>.
     /// </summary>
     public Option<PhoneNumber> PhoneNumber { get; private set; } = None;
 
     /// <summary>
-    /// Creates a fully valid aggregate from raw command values and accumulates expected domain errors.
+    /// Creates a fully valid aggregate from raw command values.
     /// </summary>
     /// <remarks>
-    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
-    /// compatibility with the legacy call surface; the application layer will pass a real
-    /// injected clock in Task 11.
+    /// Composition is purely monadic: every step that can fail returns
+    /// <c>Either&lt;Seq&lt;DomainError&gt;, _&gt;</c> and is wired through
+    /// LanguageExt LINQ query syntax. There are no <c>if</c> statements in
+    /// this body — control flow is encoded in the type algebra.
     /// </remarks>
     public static Either<Seq<DomainError>, UserAccount> Create(
         string? name,
         string? email,
         string? phoneNumber,
-        TimeProvider? clock = null)
+        TimeProvider clock)
     {
-        var effectiveClock = clock ?? TimeProvider.System;
-        var validName = PersonName.Create(name);
-        var validEmail = Email.Create(email);
-        var validPhoneNumber = PhoneNumberVo.CreateOptional(phoneNumber);
-        var errors = Seq(
-                ErrorOf(validName),
-                ErrorOf(validEmail),
-                ErrorOf(validPhoneNumber))
-            .Somes()
-            .ToSeq();
+        ArgumentNullException.ThrowIfNull(clock);
 
-        if (!errors.IsEmpty)
-            return Left<Seq<DomainError>, UserAccount>(errors);
-
-        var account =
-            from userName in validName
-            from userEmail in validEmail
-            from userPhoneNumber in validPhoneNumber
-            select new UserAccount(userName, userEmail, userPhoneNumber, Timestamp.UtcNow(effectiveClock));
-
-        return account.MapLeft(OneError);
+        return
+            from userName        in PersonName.Create(name)
+            from userEmail       in Email.Create(email)
+            from userPhoneNumber in PhoneNumberVo.CreateOptional(phoneNumber)
+            select new UserAccount(
+                userName,
+                userEmail,
+                userPhoneNumber,
+                Timestamp.UtcNow(clock));
     }
 
     /// <summary>
     /// Decides registration uniqueness against the application-supplied
-    /// email-existence fact. Document uniqueness is no longer the aggregate's
-    /// concern; that responsibility moves into the future PF (CPF) vs PJ
-    /// (CNPJ) bounded context.
+    /// email-existence fact. Document uniqueness is no longer the
+    /// aggregate's concern — that responsibility moves into the future
+    /// PF (CPF) vs PJ (CNPJ) bounded context.
     /// </summary>
     public Either<Seq<DomainError>, Unit> EnsureCanBeRegistered(bool emailExists)
     {
@@ -96,117 +102,112 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
     /// <summary>
     /// Changes the user's required name and raises a typed domain event.
+    /// Composed entirely through LanguageExt primitives — no <c>if</c>.
     /// </summary>
-    /// <remarks>
-    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
-    /// compatibility with the legacy call surface; the application layer will pass a real
-    /// injected clock in Task 11.
-    /// </remarks>
-    public Either<Seq<DomainError>, Unit> Rename(string? value, TimeProvider? clock = null)
+    public Either<Seq<DomainError>, Unit> Rename(string? value, TimeProvider clock)
     {
-        var effectiveClock = clock ?? TimeProvider.System;
-        return PersonName.Create(value).Match(
-            Right: newName => Rename(newName, effectiveClock),
-            Left: error => Left<Seq<DomainError>, Unit>(OneError(error)));
+        ArgumentNullException.ThrowIfNull(clock);
+
+        return Rename(PersonName.Create(value), clock);
+    }
+
+    /// <summary>
+    /// Composed-overload that receives a pre-parsed <see cref="PersonName"/>.
+    /// </summary>
+    private Either<Seq<DomainError>, Unit> Rename(Either<Seq<DomainError>, PersonName> nextName, TimeProvider clock)
+    {
+        return nextName.Bind(newName => ApplyNameMutation(newName, clock));
+    }
+
+    /// <summary>
+    /// Applies a valid name change after the factory has parsed the raw value.
+    /// </summary>
+    private Either<Seq<DomainError>, Unit> ApplyNameMutation(PersonName newName, TimeProvider clock)
+    {
+        var previousName = Name;
+        var occurredAt = Timestamp.UtcNow(clock);
+
+        Name = newName;
+        MarkModified(occurredAt);
+        RaiseDomainEvent(new UserAccountNameChangedDomainEvent(
+            Id,
+            previousName,
+            newName,
+            occurredAt));
+
+        return Right<Seq<DomainError>, Unit>(default);
     }
 
     /// <summary>
     /// Changes the user's required email and raises a typed domain event.
     /// </summary>
-    /// <remarks>
-    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
-    /// compatibility with the legacy call surface; the application layer will pass a real
-    /// injected clock in Task 11.
-    /// </remarks>
-    public Either<Seq<DomainError>, Unit> ChangeEmail(string? value, TimeProvider? clock = null)
+    public Either<Seq<DomainError>, Unit> ChangeEmail(string? value, TimeProvider clock)
     {
-        var effectiveClock = clock ?? TimeProvider.System;
-        return Email.Create(value).Match(
-            Right: newEmail => ChangeEmail(newEmail, effectiveClock),
-            Left: error => Left<Seq<DomainError>, Unit>(OneError(error)));
+        ArgumentNullException.ThrowIfNull(clock);
+
+        return ChangeEmail(Email.Create(value), clock);
     }
 
     /// <summary>
-    /// Changes the user's optional phone and raises a typed domain event.
+    /// Composed-overload that receives a pre-parsed <see cref="Email"/>.
     /// </summary>
-    /// <remarks>
-    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
-    /// compatibility with the legacy call surface; the application layer will pass a real
-    /// injected clock in Task 11.
-    /// </remarks>
-    public Either<Seq<DomainError>, Unit> ChangePhoneNumber(string? value, TimeProvider? clock = null)
+    private Either<Seq<DomainError>, Unit> ChangeEmail(Either<Seq<DomainError>, Email> nextEmail, TimeProvider clock)
     {
-        var effectiveClock = clock ?? TimeProvider.System;
-        return PhoneNumberVo.CreateOptional(value).Match(
-            Right: newPhone => ChangePhoneNumber(newPhone, effectiveClock),
-            Left: error => Left<Seq<DomainError>, Unit>(OneError(error)));
-    }
-
-    /// <summary>
-    /// Extracts an expected value-object error for aggregate-level accumulation.
-    /// </summary>
-    private static Option<DomainError> ErrorOf<T>(Either<DomainError, T> result)
-    {
-        return result.Match(
-            Right: _ => None,
-            Left: error => Some(error));
-    }
-
-    /// <summary>
-    /// Wraps a single error so aggregate methods expose one consistent Result shape.
-    /// </summary>
-    private static Seq<DomainError> OneError(DomainError error) => Seq1(error);
-
-    /// <summary>
-    /// Applies a valid name change after the factory has parsed the raw value.
-    /// </summary>
-    private Either<Seq<DomainError>, Unit> Rename(PersonName newName, TimeProvider clock)
-    {
-        if (newName == Name)
-            return Right<Seq<DomainError>, Unit>(default);
-
-        var previousName = Name;
-        var occurredAtUtc = Timestamp.UtcNow(clock);
-
-        Name = newName;
-        MarkModified(occurredAtUtc);
-        RaiseDomainEvent(new UserAccountNameChangedDomainEvent(Id, previousName, newName, occurredAtUtc));
-
-        return Right<Seq<DomainError>, Unit>(default);
+        return nextEmail.Bind(newEmail => ApplyEmailMutation(newEmail, clock));
     }
 
     /// <summary>
     /// Applies a valid email change after the factory has parsed the raw value.
     /// </summary>
-    private Either<Seq<DomainError>, Unit> ChangeEmail(Email newEmail, TimeProvider clock)
+    private Either<Seq<DomainError>, Unit> ApplyEmailMutation(Email newEmail, TimeProvider clock)
     {
-        if (newEmail == Email)
-            return Right<Seq<DomainError>, Unit>(default);
-
         var previousEmail = Email;
-        var occurredAtUtc = Timestamp.UtcNow(clock);
+        var occurredAt = Timestamp.UtcNow(clock);
 
         Email = newEmail;
-        MarkModified(occurredAtUtc);
-        RaiseDomainEvent(new UserAccountEmailChangedDomainEvent(Id, previousEmail, newEmail, occurredAtUtc));
+        MarkModified(occurredAt);
+        RaiseDomainEvent(new UserAccountEmailChangedDomainEvent(
+            Id,
+            previousEmail,
+            newEmail,
+            occurredAt));
 
         return Right<Seq<DomainError>, Unit>(default);
     }
 
     /// <summary>
+    /// Changes the user's optional phone and raises a typed domain event.
+    /// </summary>
+    public Either<Seq<DomainError>, Unit> ChangePhoneNumber(string? value, TimeProvider clock)
+    {
+        ArgumentNullException.ThrowIfNull(clock);
+
+        return ChangePhoneNumber(PhoneNumberVo.CreateOptional(value), clock);
+    }
+
+    /// <summary>
+    /// Composed-overload that receives a pre-parsed <see cref="Option{PhoneNumber}"/>.
+    /// </summary>
+    private Either<Seq<DomainError>, Unit> ChangePhoneNumber(Either<Seq<DomainError>, Option<PhoneNumber>> nextPhone, TimeProvider clock)
+    {
+        return nextPhone.Bind(newPhone => ApplyPhoneMutation(newPhone, clock));
+    }
+
+    /// <summary>
     /// Applies a valid optional phone change after the factory has parsed the raw value.
     /// </summary>
-    private Either<Seq<DomainError>, Unit> ChangePhoneNumber(Option<PhoneNumber> newPhoneNumber, TimeProvider clock)
+    private Either<Seq<DomainError>, Unit> ApplyPhoneMutation(Option<PhoneNumber> newPhone, TimeProvider clock)
     {
-        var previousPhoneNumber = PhoneNumber;
-        if (previousPhoneNumber == newPhoneNumber)
-            return Right<Seq<DomainError>, Unit>(default);
+        var previousPhone = PhoneNumber;
+        var occurredAt = Timestamp.UtcNow(clock);
 
-        var occurredAtUtc = Timestamp.UtcNow(clock);
-
-        PhoneNumber = newPhoneNumber;
-        MarkModified(occurredAtUtc);
-        RaiseDomainEvent(new UserAccountPhoneNumberChangedDomainEvent(Id, previousPhoneNumber, newPhoneNumber, occurredAtUtc));
+        PhoneNumber = newPhone;
+        MarkModified(occurredAt);
+        RaiseDomainEvent(new UserAccountPhoneNumberChangedDomainEvent(
+            Id,
+            previousPhone,
+            newPhone,
+            occurredAt));
 
         return Right<Seq<DomainError>, Unit>(default);
     }

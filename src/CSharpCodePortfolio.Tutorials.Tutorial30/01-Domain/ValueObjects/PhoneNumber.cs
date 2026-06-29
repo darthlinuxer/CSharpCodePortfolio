@@ -15,18 +15,20 @@ public readonly record struct PhoneNumber(string Value)
     /// Validates an optional phone, making absence explicit with
     /// <c>Option&lt;PhoneNumber&gt;.None</c>.
     /// </summary>
-    public static Either<DomainError, Option<PhoneNumber>> CreateOptional(string? value)
+    public static Either<Seq<DomainError>, Option<PhoneNumber>> CreateOptional(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        return string.IsNullOrWhiteSpace(value)
+            ? Right<Seq<DomainError>, Option<PhoneNumber>>(None)
+            : NormalizeDigitsToOption(value);
+
+        static Either<Seq<DomainError>, Option<PhoneNumber>> NormalizeDigitsToOption(string source)
         {
-            return Right<DomainError, Option<PhoneNumber>>(None);
+            var digits = new string(source.Where(char.IsDigit).ToArray());
+
+            return digits is { Length: >= 10 and <= 15 }
+                ? Right<Seq<DomainError>, Option<PhoneNumber>>(Some(new PhoneNumber(digits)))
+                : Left<Seq<DomainError>, Option<PhoneNumber>>(Seq1(new PhoneNumberInvalidError() as DomainError));
         }
-
-        var digits = new string(value.Where(char.IsDigit).ToArray());
-
-        return digits is { Length: >= 10 and <= 15 }
-            ? Right<DomainError, Option<PhoneNumber>>(Some(new PhoneNumber(digits)))
-            : Left<DomainError, Option<PhoneNumber>>(new PhoneNumberInvalidError());
     }
 
     /// <summary>

@@ -7,8 +7,15 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 
 /// <summary>
-/// Orchestrates the registration use case through DTOs, domain behavior, query ports, and persistence ports.
+/// Application service that orchestrates the registration use case through
+/// DTOs, domain behaviour, query ports, and persistence ports.
 /// </summary>
+/// <remarks>
+/// Composition is purely monadic through <see cref="EitherAsync{TLeft, TRight}"/>
+/// — no <c>if</c>, no <c>switch</c>, no defensive null checks below the DTO
+/// boundary. <see cref="TimeProvider"/> is injected so tests can use
+/// <c>FakeTimeProvider</c>.
+/// </remarks>
 public sealed class RegisterUserService(
     IUserAccountLookup lookup,
     IUserAccountWriter writer,
@@ -16,40 +23,33 @@ public sealed class RegisterUserService(
     TimeProvider clock)
 {
     /// <summary>
-    /// Registers a user and returns Either instead of null or exceptions for expected outcomes.
+    /// Registers a user and returns Either instead of null or exceptions
+    /// for expected outcomes.
     /// </summary>
-    public async Task<Either<Seq<DomainError>, RegisteredUserDto>> RegisterAsync(
+    public Task<Either<Seq<DomainError>, RegisteredUserDto>> RegisterAsync(
         RegisterUserRequest request,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var account = UserAccount.Create(request.Name, request.Email, request.PhoneNumber, clock);
-
-        return await account.Match(
-            Right: validAccount => RegisterValidatedAsync(validAccount, cancellationToken),
-            Left: errors => Task.FromResult(Left<Seq<DomainError>, RegisteredUserDto>(errors))).ConfigureAwait(false);
+        return
+            from account      in LiftEither(UserAccount.Create(request.Name, request.Email, request.PhoneNumber, clock))
+            from emailExists  in EitherAsyncExtensions.Lift(lookup.EmailExistsAsync(account.Email, cancellationToken))
+            from canRegister  in account.EnsureCanBeRegistered(emailExists)
+            select PersistAndMapAsync(account, cancellationToken);
     }
 
     /// <summary>
-    /// Collects persistence-backed facts, lets the domain decide, commits the unit of work, and returns the command DTO.
+    /// Commits the unit of work and shapes the DTO. The persist happens
+    /// only after EnsureCanBeRegistered has returned Right.
     /// </summary>
-    private async Task<Either<Seq<DomainError>, RegisteredUserDto>> RegisterValidatedAsync(
+    private async Task<Either<Seq<DomainError>, RegisteredUserDto>> PersistAndMapAsync(
         UserAccount account,
         CancellationToken cancellationToken)
     {
-        var emailExists = await lookup.EmailExistsAsync(account.Email, cancellationToken).ConfigureAwait(false);
-        var canRegister = account.EnsureCanBeRegistered(emailExists);
-
-        return await canRegister.Match(
-            Right: async _ =>
-            {
-                writer.Add(account);
-                await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-                return Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account));
-            },
-            Left: errors => Task.FromResult(Left<Seq<DomainError>, RegisteredUserDto>(errors))).ConfigureAwait(false);
+        writer.Add(account);
+        await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account));
     }
 
     /// <summary>
@@ -61,6 +61,26 @@ public sealed class RegisterUserService(
             account.Id,
             account.Name.Value,
             account.Email.Value,
-            account.PhoneNumber.Map(phone => phone.Value));
+            account.PhoneNumber);
     }
+
+    /// <summary>
+    /// Lifts a synchronous Either into EitherAsync so it composes with the
+    /// async ports that follow.
+    /// </summary>
+    private static EitherAsync<Seq<DomainError>, T> LiftEither<T>(Either<Seq<DomainError>, T> either) =>
+        EitherAsync<Seq<DomainError>, T>.Right(either.Match(Right: v => v, Left: _ => default!));
+}
+
+/// <summary>
+/// Bridge helpers between Task-based async and EitherAsync composition.
+/// </summary>
+internal static class EitherAsyncExtensions
+{
+    /// <summary>
+    /// Wraps a <see cref="Task{TResult}"/> of a primitive in
+    /// <see cref="EitherAsync{TLeft, TRight}"/> with an empty error set.
+    /// </summary>
+    public static EitherAsync<Seq<DomainError>, T> Lift<T>(Task<T> task) =>
+        EitherAsync<Seq<DomainError>, T>.RightAsync(task);
 }
