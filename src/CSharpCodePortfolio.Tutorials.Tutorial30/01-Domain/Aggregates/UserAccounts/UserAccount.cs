@@ -56,12 +56,19 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Creates a fully valid aggregate from raw command values and accumulates expected domain errors.
     /// </summary>
+    /// <remarks>
+    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
+    /// compatibility with the legacy call surface; the application layer will pass a real
+    /// injected clock in Task 11.
+    /// </remarks>
     public static Either<Seq<DomainError>, UserAccount> Create(
         string? name,
         string? document,
         string? email,
-        string? phoneNumber)
+        string? phoneNumber,
+        TimeProvider? clock = null)
     {
+        var effectiveClock = clock ?? TimeProvider.System;
         var validName = PersonName.Create(name);
         var validDocument = NormalizeDocument(document);
         var validEmail = Email.Create(email);
@@ -82,7 +89,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
             from normalizedDocument in validDocument
             from userEmail in validEmail
             from userPhoneNumber in validPhoneNumber
-            select new UserAccount(userName, normalizedDocument, userEmail, userPhoneNumber, Timestamp.UtcNow);
+            select new UserAccount(userName, normalizedDocument, userEmail, userPhoneNumber, Timestamp.UtcNow(effectiveClock));
 
         return account.MapLeft(OneError);
     }
@@ -118,30 +125,48 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Changes the user's required name and raises a typed domain event.
     /// </summary>
-    public Either<Seq<DomainError>, Unit> Rename(string? value)
+    /// <remarks>
+    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
+    /// compatibility with the legacy call surface; the application layer will pass a real
+    /// injected clock in Task 11.
+    /// </remarks>
+    public Either<Seq<DomainError>, Unit> Rename(string? value, TimeProvider? clock = null)
     {
+        var effectiveClock = clock ?? TimeProvider.System;
         return PersonName.Create(value).Match(
-            Right: Rename,
+            Right: newName => Rename(newName, effectiveClock),
             Left: error => Left<Seq<DomainError>, Unit>(OneError(error)));
     }
 
     /// <summary>
     /// Changes the user's required email and raises a typed domain event.
     /// </summary>
-    public Either<Seq<DomainError>, Unit> ChangeEmail(string? value)
+    /// <remarks>
+    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
+    /// compatibility with the legacy call surface; the application layer will pass a real
+    /// injected clock in Task 11.
+    /// </remarks>
+    public Either<Seq<DomainError>, Unit> ChangeEmail(string? value, TimeProvider? clock = null)
     {
+        var effectiveClock = clock ?? TimeProvider.System;
         return Email.Create(value).Match(
-            Right: ChangeEmail,
+            Right: newEmail => ChangeEmail(newEmail, effectiveClock),
             Left: error => Left<Seq<DomainError>, Unit>(OneError(error)));
     }
 
     /// <summary>
     /// Changes the user's optional phone and raises a typed domain event.
     /// </summary>
-    public Either<Seq<DomainError>, Unit> ChangePhoneNumber(string? value)
+    /// <remarks>
+    /// <paramref name="clock"/> defaults to <see cref="TimeProvider.System"/> for backward
+    /// compatibility with the legacy call surface; the application layer will pass a real
+    /// injected clock in Task 11.
+    /// </remarks>
+    public Either<Seq<DomainError>, Unit> ChangePhoneNumber(string? value, TimeProvider? clock = null)
     {
+        var effectiveClock = clock ?? TimeProvider.System;
         return PhoneNumberVo.CreateOptional(value).Match(
-            Right: ChangePhoneNumber,
+            Right: newPhone => ChangePhoneNumber(newPhone, effectiveClock),
             Left: error => Left<Seq<DomainError>, Unit>(OneError(error)));
     }
 
@@ -186,13 +211,13 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Applies a valid name change after the factory has parsed the raw value.
     /// </summary>
-    private Either<Seq<DomainError>, Unit> Rename(PersonName newName)
+    private Either<Seq<DomainError>, Unit> Rename(PersonName newName, TimeProvider clock)
     {
         if (newName == Name)
             return Right<Seq<DomainError>, Unit>(default);
 
         var previousName = Name;
-        var occurredAtUtc = Timestamp.UtcNow;
+        var occurredAtUtc = Timestamp.UtcNow(clock);
 
         Name = newName;
         MarkModified(occurredAtUtc, None);
@@ -204,13 +229,13 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Applies a valid email change after the factory has parsed the raw value.
     /// </summary>
-    private Either<Seq<DomainError>, Unit> ChangeEmail(Email newEmail)
+    private Either<Seq<DomainError>, Unit> ChangeEmail(Email newEmail, TimeProvider clock)
     {
         if (newEmail == Email)
             return Right<Seq<DomainError>, Unit>(default);
 
         var previousEmail = Email;
-        var occurredAtUtc = Timestamp.UtcNow;
+        var occurredAtUtc = Timestamp.UtcNow(clock);
 
         Email = newEmail;
         MarkModified(occurredAtUtc, None);
@@ -222,13 +247,13 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Applies a valid optional phone change after the factory has parsed the raw value.
     /// </summary>
-    private Either<Seq<DomainError>, Unit> ChangePhoneNumber(Option<PhoneNumber> newPhoneNumber)
+    private Either<Seq<DomainError>, Unit> ChangePhoneNumber(Option<PhoneNumber> newPhoneNumber, TimeProvider clock)
     {
         var previousPhoneNumber = PhoneNumber;
         if (previousPhoneNumber == newPhoneNumber)
             return Right<Seq<DomainError>, Unit>(default);
 
-        var occurredAtUtc = Timestamp.UtcNow;
+        var occurredAtUtc = Timestamp.UtcNow(clock);
 
         PhoneNumberValue = ToNullable(newPhoneNumber);
         MarkModified(occurredAtUtc, None);
