@@ -22,7 +22,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         Name = name;
         Email = email;
         PhoneNumberValue = ToNullable(phoneNumber);
-        MarkCreated(registeredAtUtc, None);
+        MarkCreated(registeredAtUtc);
         RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, email, registeredAtUtc));
     }
 
@@ -196,7 +196,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         var occurredAtUtc = Timestamp.UtcNow(clock);
 
         Name = newName;
-        MarkModified(occurredAtUtc, None);
+        MarkModified(occurredAtUtc);
         RaiseDomainEvent(new UserAccountNameChangedDomainEvent(Id, previousName, newName, occurredAtUtc));
 
         return Right<Seq<DomainError>, Unit>(default);
@@ -214,7 +214,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         var occurredAtUtc = Timestamp.UtcNow(clock);
 
         Email = newEmail;
-        MarkModified(occurredAtUtc, None);
+        MarkModified(occurredAtUtc);
         RaiseDomainEvent(new UserAccountEmailChangedDomainEvent(Id, previousEmail, newEmail, occurredAtUtc));
 
         return Right<Seq<DomainError>, Unit>(default);
@@ -232,7 +232,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         var occurredAtUtc = Timestamp.UtcNow(clock);
 
         PhoneNumberValue = ToNullable(newPhoneNumber);
-        MarkModified(occurredAtUtc, None);
+        MarkModified(occurredAtUtc);
         RaiseDomainEvent(new UserAccountPhoneNumberChangedDomainEvent(Id, previousPhoneNumber, newPhoneNumber, occurredAtUtc));
 
         return Right<Seq<DomainError>, Unit>(default);

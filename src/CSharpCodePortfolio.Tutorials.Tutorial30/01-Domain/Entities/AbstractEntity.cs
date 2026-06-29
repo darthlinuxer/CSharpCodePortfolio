@@ -6,15 +6,31 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 /// <summary>
 /// Base class for entities that need identity, audit metadata, and domain events.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Audit metadata is intentionally timestamp-only: <see cref="CreatedAt"/>
+/// records when the aggregate came into existence, <see cref="LastModified"/>
+/// records when it last changed state. Attribution ("by whom") belongs
+/// at the application / authentication seam, not on the entity base —
+/// this avoids coupling the domain to a concrete <c>UserAccount</c>
+/// reference for actor identification (the original anti-pattern this class
+/// used to carry via <c>Option&lt;UserAccount&gt; CreatedBy</c>).
+/// </para>
+/// <para>
+/// Domain events accumulated here are cleared after the persistence
+/// boundary (<see cref="RegistrationDbContext.SaveChangesAsync"/>) captures
+/// them. <see cref="TimeProvider"/> is injected at the application layer
+/// so tests can supply a deterministic clock (see
+/// <c>Microsoft.Extensions.TimeProvider.Testing.FakeTimeProvider</c>).
+/// </para>
+/// </remarks>
 /// <typeparam name="TId">Identity type used by the entity.</typeparam>
 public abstract class AbstractEntity<TId> : IEntity<TId>
     where TId : notnull
 {
     private readonly List<IDomainEvent> _domainEvents = [];
     private Timestamp? _createdAt;
-    private UserAccount? _createdBy;
     private Timestamp? _lastModified;
-    private UserAccount? _lastModifiedBy;
 
     /// <summary>
     /// Initializes an empty entity for EF Core materialization.
@@ -43,19 +59,9 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     public Option<Timestamp> CreatedAt => ToOption(_createdAt);
 
     /// <summary>
-    /// Gets the optional actor that created the entity.
-    /// </summary>
-    public Option<UserAccount> CreatedBy => ToOption(_createdBy);
-
-    /// <summary>
     /// Gets the optional UTC timestamp for the latest modification.
     /// </summary>
     public Option<Timestamp> LastModified => ToOption(_lastModified);
-
-    /// <summary>
-    /// Gets the optional actor that last modified the entity.
-    /// </summary>
-    public Option<UserAccount> LastModifiedBy => ToOption(_lastModifiedBy);
 
     /// <summary>
     /// Gets events raised by completed domain behavior.
@@ -65,19 +71,17 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// <summary>
     /// Records creation metadata after a factory has validated the aggregate.
     /// </summary>
-    protected void MarkCreated(Timestamp createdAt, Option<UserAccount> createdBy)
+    protected void MarkCreated(Timestamp createdAt)
     {
         _createdAt = createdAt;
-        _createdBy = ToNullable(createdBy);
     }
 
     /// <summary>
     /// Records modification metadata after behavior changes entity state.
     /// </summary>
-    protected void MarkModified(Timestamp modifiedAt, Option<UserAccount> modifiedBy)
+    protected void MarkModified(Timestamp modifiedAt)
     {
         _lastModified = modifiedAt;
-        _lastModifiedBy = ToNullable(modifiedBy);
     }
 
     /// <summary>
@@ -116,21 +120,5 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
         where T : struct
     {
         return value.HasValue ? Some(value.Value) : None;
-    }
-
-    /// <summary>
-    /// Converts an explicit domain Option into a nullable value-type that EF
-    /// Core can materialise. Constraint is <c>struct</c> so the helper pairs
-    /// with <see cref="ToOption{T}(T?)"/>.
-    /// </summary>
-    private static T? ToNullable<T>(Option<T> option)
-        where T : struct
-    {
-        foreach (var value in option)
-        {
-            return value;
-        }
-
-        return null;
     }
 }

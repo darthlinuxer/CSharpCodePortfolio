@@ -23,9 +23,7 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
 
         builder.Ignore(user => user.DomainEvents);
         builder.Ignore(user => user.CreatedAt);
-        builder.Ignore(user => user.CreatedBy);
         builder.Ignore(user => user.LastModified);
-        builder.Ignore(user => user.LastModifiedBy);
         builder.Ignore(user => user.PhoneNumber);
 
         builder.ComplexProperty(user => user.Name, name =>
