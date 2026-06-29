@@ -1,6 +1,4 @@
 using System.Net.Mail;
-using LanguageExt;
-using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 

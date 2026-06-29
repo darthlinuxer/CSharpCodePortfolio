@@ -1,5 +1,4 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
-using LanguageExt;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
 

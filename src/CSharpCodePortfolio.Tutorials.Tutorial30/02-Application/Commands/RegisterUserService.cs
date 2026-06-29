@@ -1,8 +1,6 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
-using LanguageExt;
-using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 

@@ -1,6 +1,4 @@
-using LanguageExt;
 using PhoneNumberVo = CSharpCodePortfolio.Tutorials.Tutorial30.Domain.PhoneNumber;
-using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 

@@ -1,7 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
-using LanguageExt;
 using LanguageExt.Common;
-using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30;
 

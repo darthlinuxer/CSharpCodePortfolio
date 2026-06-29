@@ -21,4 +21,9 @@
     <PackageReference Include="SQLitePCLRaw.config.e_sqlite3" Version="3.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="LanguageExt" />
+    <Using Include="static LanguageExt.Prelude" />
+  </ItemGroup>
+
 </Project>
