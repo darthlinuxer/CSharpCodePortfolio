@@ -30,7 +30,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             ("Pacote", "LanguageExt.Core 4.4.9"),
             ("Prerelease atual", "5.0.0-beta-77"),
             ("Decisão", "Stable 4.4.9 para evitar mudanças de superfície da v5 beta"),
-            ("Persistência", "EF Core 10 InMemory + ComplexProperty"));
+            ("Persistência", "EF Core 10 SQLite em memória + ComplexProperty"));
 
         TutorialConsole.WriteQuestion(
             "Como modelar cadastro de usuário sem null checks espalhados, if/else procedural e exceptions para regra esperada?");
@@ -96,8 +96,6 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             nameof(UserAccountConfiguration.Configure));
 
         await using var dbContext = CreateDbContext();
-        await dbContext.Database.EnsureDeletedAsync(cancellationToken).ConfigureAwait(false);
-        await dbContext.Database.EnsureCreatedAsync(cancellationToken).ConfigureAwait(false);
 
         TutorialConsole.WriteEvidence(
             "Mapeamento EF Core 10",
@@ -146,15 +144,19 @@ public sealed class LanguageExtCoreTutorial : ITutorial
     }
 
     /// <summary>
-    /// Creates an isolated EF InMemory context for the tutorial run.
+    /// Creates an isolated SQLite in-memory context for the tutorial run.
     /// </summary>
     private static RegistrationDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<RegistrationDbContext>()
-            .UseInMemoryDatabase($"tutorial30-{Guid.NewGuid():N}")
+            .UseSqlite("Data Source=:memory:")
             .Options;
+        var dbContext = new RegistrationDbContext(options);
 
-        return new RegistrationDbContext(options);
+        dbContext.Database.OpenConnection();
+        dbContext.Database.EnsureCreated();
+
+        return dbContext;
     }
 
     /// <summary>

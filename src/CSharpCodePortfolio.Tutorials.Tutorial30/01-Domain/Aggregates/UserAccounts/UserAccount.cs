@@ -23,7 +23,6 @@ public sealed class UserAccount : AbstractEntity<Guid>
         Name = name;
         Document = document;
         Email = email;
-        EmailLookupValue = email.Value;
         PhoneNumberValue = ToNullable(phoneNumber);
         MarkCreated(registeredAtUtc, None);
         RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, document, email, registeredAtUtc));
@@ -43,11 +42,6 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// Gets the required non-null email.
     /// </summary>
     public Email Email { get; private set; } = null!;
-
-    /// <summary>
-    /// Gets the internal normalized email scalar used by query adapters that cannot translate complex properties.
-    /// </summary>
-    internal string EmailLookupValue { get; private set; } = string.Empty;
 
     /// <summary>
     /// Gets the optional phone without using PhoneNumber?.
@@ -219,7 +213,6 @@ public sealed class UserAccount : AbstractEntity<Guid>
         var occurredAtUtc = Timestamp.UtcNow;
 
         Email = newEmail;
-        EmailLookupValue = newEmail.Value;
         MarkModified(occurredAtUtc, None);
         RaiseDomainEvent(new UserAccountEmailChangedDomainEvent(Id, previousEmail, newEmail, occurredAtUtc));
 

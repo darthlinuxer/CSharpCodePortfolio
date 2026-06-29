@@ -145,6 +145,42 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
+    /// Proves that the aggregate does not keep a duplicated email scalar only for persistence lookups.
+    /// </summary>
+    [TestMethod]
+    public void UserAccount_DoesNotExposeEmailLookupValue()
+    {
+        using var dbContext = CreateDbContext();
+
+        var domainProperty = typeof(UserAccount).GetProperty(
+            "EmailLookupValue",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var userEntity = dbContext.Model.FindEntityType(typeof(UserAccount));
+
+        Assert.IsNull(domainProperty);
+        Assert.IsNotNull(userEntity);
+        Assert.IsNull(userEntity.FindProperty("EmailLookupValue"));
+    }
+
+    /// <summary>
+    /// Proves that physical folders teach dependency rings without implying hierarchy between external adapters.
+    /// </summary>
+    [TestMethod]
+    public void Tutorial30_PhysicalFoldersShowCleanArchitectureRings()
+    {
+        var tutorialRoot = FindTutorialRoot();
+
+        Assert.IsTrue(Directory.Exists(Path.Combine(tutorialRoot, "01-Domain")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(tutorialRoot, "02-Application")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(tutorialRoot, "03-Infrastructure")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(tutorialRoot, "03-Presentation")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(tutorialRoot, "Domain")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(tutorialRoot, "Application")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(tutorialRoot, "Infrastructure")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(tutorialRoot, "Presentation")));
+    }
+
+    /// <summary>
     /// Proves that the domain layer has no dependency on infrastructure or EF Core.
     /// </summary>
     [TestMethod]
@@ -413,15 +449,19 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
-    /// Creates an isolated EF InMemory context for each test.
+    /// Creates an isolated SQLite in-memory context for each test.
     /// </summary>
     private static RegistrationDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<RegistrationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))
+            .UseSqlite("Data Source=:memory:")
             .Options;
+        var dbContext = new RegistrationDbContext(options);
 
-        return new RegistrationDbContext(options);
+        dbContext.Database.OpenConnection();
+        dbContext.Database.EnsureCreated();
+
+        return dbContext;
     }
 
     /// <summary>
@@ -483,6 +523,25 @@ public sealed class LanguageExtRegistrationTests
     private static UserAccount CreateValidAccount()
     {
         return GetRight(UserAccount.Create("Ada Lovelace", "DOC-10000", "ada@example.com", null));
+    }
+
+    /// <summary>
+    /// Finds the tutorial source folder from the test output directory.
+    /// </summary>
+    private static string FindTutorialRoot()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (current is not null)
+        {
+            var candidate = Path.Combine(current.FullName, "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+            if (Directory.Exists(candidate))
+                return candidate;
+
+            current = current.Parent;
+        }
+
+        throw new AssertFailedException("Could not find Tutorial30 source folder.");
     }
 
     /// <summary>

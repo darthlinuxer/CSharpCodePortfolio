@@ -22,22 +22,34 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 ```
 
-Estrutura do domínio:
+Estrutura física das camadas:
 
-- `Domain/Aggregates/UserAccounts`: aggregate root, eventos e erros do `UserAccount`;
-- `Domain/Entities`: base entity e contratos comuns;
-- `Domain/ValueObjects`: `PersonName`, `Email`, `PhoneNumber`, `Timestamp`;
-- `Domain/Events`: contratos comuns de domain events;
-- `Domain/Errors`: tipos base `DomainError` e `DomainErrorCode`.
+- `01-Domain`: núcleo do modelo; não conhece EF Core, HTTP ou application service;
+- `02-Application`: casos de uso, DTOs e portas;
+- `03-Infrastructure`: adapter externo driven/outbound para EF Core;
+- `03-Presentation`: adapter externo driving/inbound para HTTP.
 
-Estrutura das camadas:
+`Infrastructure` e `Presentation` usam o mesmo número porque são adapters no
+mesmo anel externo. A numeração ensina dependência arquitetural, não ordem de
+execução. Os namespaces continuam sem número: `...Domain`, `...Application`,
+`...Infrastructure` e `...Presentation`.
 
-- `Application/Commands`: DTOs e services de caso de uso;
-- `Application/Queries`: DTOs e portas de leitura;
-- `Application/Persistence`: writer fino e unit of work;
-- `Infrastructure/Persistence`: `DbContext`, mappings, writer EF e commit;
-- `Infrastructure/Queries`: implementações EF das queries;
-- `Presentation/Http`: tradução de `Either` para HTTP e `ProblemDetails`.
+Estrutura interna do domínio:
+
+- `01-Domain/Aggregates/UserAccounts`: aggregate root, eventos e erros do `UserAccount`;
+- `01-Domain/Entities`: base entity e contratos comuns;
+- `01-Domain/ValueObjects`: `PersonName`, `Email`, `PhoneNumber`, `Timestamp`;
+- `01-Domain/Events`: contratos comuns de domain events;
+- `01-Domain/Errors`: tipos base `DomainError` e `DomainErrorCode`.
+
+Estrutura interna das outras camadas:
+
+- `02-Application/Commands`: DTOs e services de caso de uso;
+- `02-Application/Queries`: DTOs e portas de leitura;
+- `02-Application/Persistence`: writer fino e unit of work;
+- `03-Infrastructure/Persistence`: `DbContext`, mappings, writer EF e commit;
+- `03-Infrastructure/Queries`: implementações EF das queries;
+- `03-Presentation/Http`: tradução de `Either` para HTTP e `ProblemDetails`.
 
 ## 1. O problema do C# tradicional
 
@@ -147,7 +159,7 @@ public DbSet<UserAccount> Users => Set<UserAccount>();
 public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 ```
 
-O mapping fica em `Infrastructure/Persistence/ConfigurationMappings/UserAccountConfiguration`
+O mapping fica em `03-Infrastructure/Persistence/ConfigurationMappings/UserAccountConfiguration`
 e usa `ComplexProperty` para value objects:
 
 ```csharp
@@ -176,11 +188,19 @@ public Option<PhoneNumber> PhoneNumber => ToOption(PhoneNumberValue);
 internal PhoneNumber? PhoneNumberValue { get; private set; }
 ```
 
-Com o provider InMemory, predicates sobre complex properties podem ficar mais
-limitados do que em provider relacional. Por isso o aggregate mantém
-`EmailLookupValue`, um estado interno sincronizado por `Create` e `ChangeEmail`,
-para permitir `AnyAsync` de duplicidade sem consultar `Users.Local`. O domínio
-continua expondo `Email` como value object obrigatório.
+Duplicidade de email compara o value object mapeado pelo EF no adapter de
+infraestrutura:
+
+```csharp
+return dbContext.Users
+    .AsNoTracking()
+    .AnyAsync(user => user.Email.Value == email.Value, cancellationToken);
+```
+
+O aggregate não mantém scalar auxiliar de lookup. O tutorial usa SQLite em
+memória porque é um provider relacional leve e traduz o acesso ao value object
+mapeado por `ComplexProperty`. A coluna `Email` continua configurada no mapping
+e pode receber índice/constraint.
 
 Não há repository genérico. O writer é propositalmente fino:
 

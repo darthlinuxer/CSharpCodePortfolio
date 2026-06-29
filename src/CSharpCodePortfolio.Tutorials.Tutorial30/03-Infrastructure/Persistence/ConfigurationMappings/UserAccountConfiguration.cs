@@ -48,10 +48,6 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
                 .IsRequired();
         });
 
-        builder.Property(user => user.EmailLookupValue)
-            .HasMaxLength(320)
-            .IsRequired();
-
         builder.ComplexProperty(user => user.PhoneNumberValue, phone =>
         {
             phone.Property(value => value.Value)

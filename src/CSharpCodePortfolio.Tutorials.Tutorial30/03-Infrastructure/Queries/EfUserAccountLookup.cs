@@ -27,10 +27,9 @@ public sealed class EfUserAccountLookup(RegistrationDbContext dbContext) : IUser
     /// </summary>
     public Task<bool> EmailExistsAsync(Email email, CancellationToken cancellationToken)
     {
-        // ponytail: EF InMemory does not translate predicates over EF Core 10 complex properties yet; query the synced scalar.
         return dbContext.Users
             .AsNoTracking()
-            .AnyAsync(user => user.EmailLookupValue == email.Value, cancellationToken);
+            .AnyAsync(user => user.Email.Value == email.Value, cancellationToken);
     }
 
     /// <summary>
