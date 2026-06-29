@@ -29,7 +29,7 @@ public sealed record Timestamp
     {
         return value.Kind == DateTimeKind.Utc
             ? Right<DomainError, Timestamp>(new Timestamp(value))
-            : Left<DomainError, Timestamp>(DomainErrors.TimestampUtcRequired);
+            : Left<DomainError, Timestamp>(new TimestampUtcRequiredError());
     }
 
     /// <summary>
@@ -64,3 +64,9 @@ public sealed record Timestamp
     /// </summary>
     public static bool operator <=(Timestamp left, Timestamp right) => left.Value <= right.Value;
 }
+
+/// <summary>
+/// Error returned when a domain timestamp is not UTC.
+/// </summary>
+public sealed record TimestampUtcRequiredError()
+    : DomainError(new DomainErrorCode("registration.timestamp_utc_required"), "Timestamp de domínio deve estar em UTC.");

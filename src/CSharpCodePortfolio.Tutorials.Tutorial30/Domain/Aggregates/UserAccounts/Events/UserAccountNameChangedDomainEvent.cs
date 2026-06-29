@@ -3,7 +3,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 /// <summary>
 /// Domain event raised when a registered user's name changes.
 /// </summary>
-public sealed record UserNameChangedDomainEvent(
+public sealed record UserAccountNameChangedDomainEvent(
     Guid UserId,
     PersonName PreviousName,
     PersonName NewName,
@@ -12,5 +12,5 @@ public sealed record UserNameChangedDomainEvent(
     /// <summary>
     /// Gets the stable typed event name.
     /// </summary>
-    public DomainEventType EventType => DomainEventTypes.UserNameChanged;
+    public DomainEventType EventType => UserAccountDomainEventTypes.NameChanged;
 }

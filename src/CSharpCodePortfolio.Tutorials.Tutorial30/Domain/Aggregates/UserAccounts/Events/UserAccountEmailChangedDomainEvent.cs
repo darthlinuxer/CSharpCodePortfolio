@@ -3,7 +3,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 /// <summary>
 /// Domain event raised when a registered user's required email changes.
 /// </summary>
-public sealed record UserEmailChangedDomainEvent(
+public sealed record UserAccountEmailChangedDomainEvent(
     Guid UserId,
     Email PreviousEmail,
     Email NewEmail,
@@ -12,5 +12,5 @@ public sealed record UserEmailChangedDomainEvent(
     /// <summary>
     /// Gets the stable typed event name.
     /// </summary>
-    public DomainEventType EventType => DomainEventTypes.UserEmailChanged;
+    public DomainEventType EventType => UserAccountDomainEventTypes.EmailChanged;
 }

@@ -1,6 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
-using Microsoft.EntityFrameworkCore;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 
@@ -10,12 +9,18 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 public sealed class EfUserAccountWriter(RegistrationDbContext dbContext) : IUserAccountWriter
 {
     /// <summary>
-    /// Adds the aggregate, commits the unit of work, and clears captured domain events after a successful save.
+    /// Adds the aggregate to EF Core tracking; commit belongs to the unit of work.
     /// </summary>
-    public async Task AddAsync(UserAccount account, CancellationToken cancellationToken)
+    public void Add(UserAccount account)
     {
-        await dbContext.Users.AddAsync(account, cancellationToken).ConfigureAwait(false);
-        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        account.ClearDomainEvents();
+        dbContext.Users.Add(account);
+    }
+
+    /// <summary>
+    /// Marks the aggregate for deletion; commit belongs to the unit of work.
+    /// </summary>
+    public void Delete(UserAccount account)
+    {
+        dbContext.Users.Remove(account);
     }
 }

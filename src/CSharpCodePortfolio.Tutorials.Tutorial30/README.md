@@ -24,20 +24,20 @@ using static LanguageExt.Prelude;
 
 Estrutura do domínio:
 
-- `Domain/Aggregates`: aggregate roots, como `UserAccount`;
+- `Domain/Aggregates/UserAccounts`: aggregate root, eventos e erros do `UserAccount`;
 - `Domain/Entities`: base entity e contratos comuns;
 - `Domain/ValueObjects`: `PersonName`, `Email`, `PhoneNumber`, `Timestamp`;
-- `Domain/Events`: domain events;
-- `Domain/Errors`: `DomainError` e catálogo `DomainErrors`.
+- `Domain/Events`: contratos comuns de domain events;
+- `Domain/Errors`: tipos base `DomainError` e `DomainErrorCode`.
 
 Estrutura das camadas:
 
 - `Application/Commands`: DTOs e services de caso de uso;
 - `Application/Queries`: DTOs e portas de leitura;
-- `Application/Persistence`: portas finas de escrita;
-- `Infrastructure/Persistence`: `DbContext`, mappings e writer EF;
+- `Application/Persistence`: writer fino e unit of work;
+- `Infrastructure/Persistence`: `DbContext`, mappings, writer EF e commit;
 - `Infrastructure/Queries`: implementações EF das queries;
-- `Http`: tradução de `Either` para HTTP e `ProblemDetails`.
+- `Presentation/Http`: tradução de `Either` para HTTP e `ProblemDetails`.
 
 ## 1. O problema do C# tradicional
 
@@ -121,14 +121,18 @@ transforma esses valores em modelo válido é `UserAccount.Create(...)`, retorna
 domain events ficam no domínio, não no application service. A identity é criada
 no construtor do domínio com `Guid.CreateVersion7()`; quando EF Core materializa
 do banco, ele popula o valor salvo na propriedade `Id`. Quando o aggregate é
-criado, ele levanta `UserRegisteredDomainEvent`. Mudanças posteriores chamam
+criado, ele levanta `UserAccountRegisteredDomainEvent`. Mudanças posteriores chamam
 métodos de domínio como `Rename`, `ChangeEmail` e `ChangePhoneNumber`, que
-levantam `UserNameChangedDomainEvent`, `UserEmailChangedDomainEvent` e
-`UserPhoneNumberChangedDomainEvent`. A infraestrutura persiste a linha e limpa
-os eventos depois de `SaveChangesAsync`.
+levantam `UserAccountNameChangedDomainEvent`, `UserAccountEmailChangedDomainEvent`
+e `UserAccountPhoneNumberChangedDomainEvent`. A infraestrutura persiste a linha
+e limpa os eventos depois de `SaveChangesAsync`.
 
-`DomainError` e `DomainErrors` ficam no namespace `Domain`. Isso evita o
-acoplamento errado em que value objects conhecem a camada `Application`.
+`DomainError` é o tipo base e cada falha esperada é um tipo concreto próximo do
+dono da regra. `EmailInvalidError` fica perto de `Email`; `UserAccountDocumentDuplicateError`
+fica perto de `UserAccount`. Isso evita o acoplamento errado em que value objects
+conhecem a camada `Application` e também evita um catálogo global baseado em
+strings. `DomainErrorCode` continua existindo para serializar o erro em HTTP e
+evidência de console; regra interna compara tipos concretos.
 `DomainException` não é usada neste tutorial: regra esperada retorna
 `Either<DomainError,T>`. Exception fica para falha técnica ou estado impossível
 fora do fluxo normal.
@@ -136,10 +140,11 @@ fora do fluxo normal.
 ## 4. Persistência com EF Core 10
 
 O tutorial persiste `UserAccount` diretamente. Não existe mais `UserRecord`.
-`RegistrationDbContext` expõe:
+`RegistrationDbContext` expõe o `DbSet` e implementa a unit of work:
 
 ```csharp
 public DbSet<UserAccount> Users => Set<UserAccount>();
+public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 ```
 
 O mapping fica em `Infrastructure/Persistence/ConfigurationMappings/UserAccountConfiguration`
@@ -177,6 +182,19 @@ limitados do que em provider relacional. Por isso o aggregate mantém
 para permitir `AnyAsync` de duplicidade sem consultar `Users.Local`. O domínio
 continua expondo `Email` como value object obrigatório.
 
+Não há repository genérico. O writer é propositalmente fino:
+
+```csharp
+public interface IUserAccountWriter
+{
+    void Add(UserAccount account);
+    void Delete(UserAccount account);
+}
+```
+
+O commit fica no `IRegistrationUnitOfWork`. Updates são rastreados pelo próprio
+EF Core.
+
 ## 5. Fluxo de cadastro
 
 `RegisterUserService.RegisterAsync` executa:
@@ -184,9 +202,11 @@ continua expondo `Email` como value object obrigatório.
 1. recebe `RegisterUserRequest`;
 2. chama `UserAccount.Create(...)`;
 3. se o domínio retornar `Left`, devolve `Left(Seq<DomainError>)`;
-4. se o aggregate for válido, consulta duplicidade via `IUserAccountLookup`;
-5. persiste via `IUserAccountWriter`;
-6. devolve `Right(RegisteredUserDto)`.
+4. se o aggregate for válido, consulta fatos de duplicidade via `IUserAccountLookup`;
+5. chama `UserAccount.EnsureCanBeRegistered(...)` para o domínio decidir a regra;
+6. adiciona via `IUserAccountWriter`;
+7. commita via `IRegistrationUnitOfWork`;
+8. devolve `Right(RegisteredUserDto)`.
 
 Telefone opcional usa `Option<T>` no domínio:
 
@@ -205,7 +225,9 @@ Sem `PhoneNumber?` público, sem exception para regra esperada.
 - `Left(Duplicate*)` -> `409 Conflict`
 
 Controller ou endpoint não interpreta `null`. Ele fecha o `Either` com `Match`.
-Falhas esperadas viram `Results.Problem(...)` com extensão `errors`.
+Falhas esperadas viram `Results.Problem(...)` com extensão `errors`. O status
+`409 Conflict` é escolhido por pattern matching de tipo concreto, não por
+comparação de string.
 
 ## 7. O que ficou fora
 

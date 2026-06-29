@@ -3,7 +3,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 /// <summary>
 /// Domain event raised when the registration aggregate is created successfully.
 /// </summary>
-public sealed record UserRegisteredDomainEvent(
+public sealed record UserAccountRegisteredDomainEvent(
     Guid UserId,
     string Document,
     Email Email,
@@ -12,5 +12,5 @@ public sealed record UserRegisteredDomainEvent(
     /// <summary>
     /// Gets the stable event type without repeating the literal across the codebase.
     /// </summary>
-    public DomainEventType EventType => DomainEventTypes.UserRegistered;
+    public DomainEventType EventType => UserAccountDomainEventTypes.Registered;
 }

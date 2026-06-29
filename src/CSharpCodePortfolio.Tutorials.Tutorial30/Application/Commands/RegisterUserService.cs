@@ -9,7 +9,10 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 /// <summary>
 /// Orchestrates the registration use case through DTOs, domain behavior, query ports, and persistence ports.
 /// </summary>
-public sealed class RegisterUserService(IUserAccountLookup lookup, IUserAccountWriter writer)
+public sealed class RegisterUserService(
+    IUserAccountLookup lookup,
+    IUserAccountWriter writer,
+    IRegistrationUnitOfWork unitOfWork)
 {
     /// <summary>
     /// Registers a user and returns Either instead of null or exceptions for expected outcomes.
@@ -28,27 +31,26 @@ public sealed class RegisterUserService(IUserAccountLookup lookup, IUserAccountW
     }
 
     /// <summary>
-    /// Checks persistence-backed uniqueness, saves the aggregate, and returns the command DTO.
+    /// Collects persistence-backed facts, lets the domain decide, commits the unit of work, and returns the command DTO.
     /// </summary>
     private async Task<Either<Seq<DomainError>, RegisteredUserDto>> RegisterValidatedAsync(
         UserAccount account,
         CancellationToken cancellationToken)
     {
-        if (await lookup.DocumentExistsAsync(account.Document, cancellationToken).ConfigureAwait(false))
-            return Left<Seq<DomainError>, RegisteredUserDto>(OneError(DomainErrors.DocumentDuplicate));
+        var documentExists = await lookup.DocumentExistsAsync(account.Document, cancellationToken).ConfigureAwait(false);
+        var emailExists = await lookup.EmailExistsAsync(account.Email, cancellationToken).ConfigureAwait(false);
+        var canRegister = account.EnsureCanBeRegistered(documentExists, emailExists);
 
-        if (await lookup.EmailExistsAsync(account.Email, cancellationToken).ConfigureAwait(false))
-            return Left<Seq<DomainError>, RegisteredUserDto>(OneError(DomainErrors.EmailDuplicate));
+        return await canRegister.Match(
+            Right: async _ =>
+            {
+                writer.Add(account);
+                await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        await writer.AddAsync(account, cancellationToken).ConfigureAwait(false);
-
-        return Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account));
+                return Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account));
+            },
+            Left: errors => Task.FromResult(Left<Seq<DomainError>, RegisteredUserDto>(errors))).ConfigureAwait(false);
     }
-
-    /// <summary>
-    /// Wraps one expected error in Seq so Either keeps a consistent left type.
-    /// </summary>
-    private static Seq<DomainError> OneError(DomainError error) => Seq1(error);
 
     /// <summary>
     /// Maps the aggregate to the application DTO returned to callers.

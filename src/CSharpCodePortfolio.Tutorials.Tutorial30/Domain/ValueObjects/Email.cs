@@ -30,7 +30,7 @@ public sealed record Email
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Left<DomainError, Email>(DomainErrors.EmailInvalid);
+            return Left<DomainError, Email>(new EmailInvalidError());
         }
 
         try
@@ -40,11 +40,11 @@ public sealed record Email
 
             return parsed.Address == normalized
                 ? Right<DomainError, Email>(new Email(normalized))
-                : Left<DomainError, Email>(DomainErrors.EmailInvalid);
+                : Left<DomainError, Email>(new EmailInvalidError());
         }
         catch (FormatException)
         {
-            return Left<DomainError, Email>(DomainErrors.EmailInvalid);
+            return Left<DomainError, Email>(new EmailInvalidError());
         }
     }
 
@@ -53,3 +53,9 @@ public sealed record Email
     /// </summary>
     public override string ToString() => Value;
 }
+
+/// <summary>
+/// Error returned when the required email is missing or malformed.
+/// </summary>
+public sealed record EmailInvalidError()
+    : DomainError(new DomainErrorCode("registration.email_invalid"), "Email informado é inválido.");

@@ -9,6 +9,7 @@ public interface IEntity
     Option<Timestamp> LastModified { get; }
     Option<UserAccount> LastModifiedBy { get; }
     Seq<IDomainEvent> DomainEvents { get; }
+    void ClearDomainEvents();
 }
 
 public interface IEntity<out TId> : IEntity

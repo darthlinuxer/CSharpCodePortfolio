@@ -8,7 +8,12 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 public interface IUserAccountWriter
 {
     /// <summary>
-    /// Adds a new aggregate and commits the unit of work.
+    /// Adds a new aggregate to the current unit of work.
     /// </summary>
-    Task AddAsync(UserAccount account, CancellationToken cancellationToken);
+    void Add(UserAccount account);
+
+    /// <summary>
+    /// Removes an aggregate from the current unit of work.
+    /// </summary>
+    void Delete(UserAccount account);
 }

@@ -28,7 +28,7 @@ public sealed record PersonName
     public static Either<DomainError, PersonName> Create(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
-            ? Left<DomainError, PersonName>(DomainErrors.NameRequired)
+            ? Left<DomainError, PersonName>(new PersonNameRequiredError())
             : Right<DomainError, PersonName>(new PersonName(value.Trim()));
     }
 
@@ -37,3 +37,9 @@ public sealed record PersonName
     /// </summary>
     public override string ToString() => Value;
 }
+
+/// <summary>
+/// Error returned when the required user name is missing.
+/// </summary>
+public sealed record PersonNameRequiredError()
+    : DomainError(new DomainErrorCode("registration.name_required"), "Nome obrigatório.");

@@ -5,7 +5,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 /// <summary>
 /// Domain event raised when a registered user's optional phone changes.
 /// </summary>
-public sealed record UserPhoneNumberChangedDomainEvent(
+public sealed record UserAccountPhoneNumberChangedDomainEvent(
     Guid UserId,
     Option<PhoneNumber> PreviousPhoneNumber,
     Option<PhoneNumber> NewPhoneNumber,
@@ -14,5 +14,5 @@ public sealed record UserPhoneNumberChangedDomainEvent(
     /// <summary>
     /// Gets the stable typed event name.
     /// </summary>
-    public DomainEventType EventType => DomainEventTypes.UserPhoneNumberChanged;
+    public DomainEventType EventType => UserAccountDomainEventTypes.PhoneNumberChanged;
 }

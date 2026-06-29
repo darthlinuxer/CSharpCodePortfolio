@@ -2,7 +2,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Http;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
 
 /// <summary>
 /// Creates RFC 7807 problem results for expected application/domain errors.
@@ -25,7 +25,7 @@ public static class ProblemResult
                 : "Cadastro inválido.",
             extensions: new Dictionary<string, object?>
             {
-                ["errors"] = errors.Map(error => new ProblemError(error.Code, error.Message)).ToArray()
+                ["errors"] = errors.Map(error => new ProblemError(error.Code.ToString(), error.Message)).ToArray()
             });
     }
 
@@ -35,7 +35,7 @@ public static class ProblemResult
     private static bool IsConflict(Seq<DomainError> errors)
     {
         return errors.Exists(error =>
-            error.Code == DomainErrors.DocumentDuplicate.Code || error.Code == DomainErrors.EmailDuplicate.Code);
+            error is UserAccountDocumentDuplicateError or UserAccountEmailDuplicateError);
     }
 }
 

@@ -36,7 +36,7 @@ public sealed record PhoneNumber
 
         return digits is { Length: >= 10 and <= 15 }
             ? Right<DomainError, Option<PhoneNumber>>(Some(new PhoneNumber(digits)))
-            : Left<DomainError, Option<PhoneNumber>>(DomainErrors.PhoneNumberInvalid);
+            : Left<DomainError, Option<PhoneNumber>>(new PhoneNumberInvalidError());
     }
 
     /// <summary>
@@ -44,3 +44,9 @@ public sealed record PhoneNumber
     /// </summary>
     public override string ToString() => Value;
 }
+
+/// <summary>
+/// Error returned when an optional phone was supplied but is malformed.
+/// </summary>
+public sealed record PhoneNumberInvalidError()
+    : DomainError(new DomainErrorCode("registration.phone_invalid"), "Telefone informado é inválido.");

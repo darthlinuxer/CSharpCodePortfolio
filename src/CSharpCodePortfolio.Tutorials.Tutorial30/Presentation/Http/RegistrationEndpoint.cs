@@ -3,7 +3,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Http;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
 
 /// <summary>
 /// Minimal API style adapter that translates application outcomes into HTTP results.
@@ -24,7 +24,7 @@ public static class RegistrationEndpoint
     }
 
     /// <summary>
-    /// Maps Either to Created, BadRequest, or Conflict based on explicit domain error codes.
+    /// Maps Either to Created, BadRequest, or Conflict based on explicit domain errors.
     /// </summary>
     public static IResult ToHttpResult(Either<Seq<DomainError>, RegisteredUserDto> result)
     {

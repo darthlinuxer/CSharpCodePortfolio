@@ -3,9 +3,9 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Http;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Queries;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -30,8 +30,8 @@ public sealed class LanguageExtRegistrationTests
         var absent = Email.Create(null);
         var invalid = Email.Create("email-invalido");
 
-        Assert.AreEqual(DomainErrors.EmailInvalid.Code, GetLeft(absent).Code);
-        Assert.AreEqual(DomainErrors.EmailInvalid.Code, GetLeft(invalid).Code);
+        Assert.IsInstanceOfType<EmailInvalidError>(GetLeft(absent));
+        Assert.IsInstanceOfType<EmailInvalidError>(GetLeft(invalid));
     }
 
     /// <summary>
@@ -43,8 +43,8 @@ public sealed class LanguageExtRegistrationTests
         var name = PersonName.Create(" ");
         var document = UserAccount.NormalizeDocument(null);
 
-        Assert.AreEqual(DomainErrors.NameRequired.Code, GetLeft(name).Code);
-        Assert.AreEqual(DomainErrors.DocumentInvalid.Code, GetLeft(document).Code);
+        Assert.IsInstanceOfType<PersonNameRequiredError>(GetLeft(name));
+        Assert.IsInstanceOfType<UserAccountDocumentInvalidError>(GetLeft(document));
     }
 
     /// <summary>
@@ -63,18 +63,18 @@ public sealed class LanguageExtRegistrationTests
     /// Proves that aggregate behavior records a domain event when registration succeeds.
     /// </summary>
     [TestMethod]
-    public void UserAccountCreate_RaisesUserRegisteredDomainEvent()
+    public void UserAccountCreate_RaisesUserAccountRegisteredDomainEvent()
     {
         var account = GetRight(UserAccount.Create("Ada Lovelace", "DOC-10000", "ada@example.com", null));
 
         var events = account.DomainEvents.ToArray();
 
         Assert.HasCount(1, events);
-        var domainEvent = Assert.IsInstanceOfType<UserRegisteredDomainEvent>(events[0]);
+        var domainEvent = Assert.IsInstanceOfType<UserAccountRegisteredDomainEvent>(events[0]);
         Assert.AreEqual(account.Id, domainEvent.UserId);
         Assert.AreEqual(account.Document, domainEvent.Document);
         Assert.AreEqual(account.Email, domainEvent.Email);
-        Assert.AreEqual(DomainEventTypes.UserRegistered, domainEvent.EventType);
+        Assert.AreEqual(UserAccountDomainEventTypes.Registered, domainEvent.EventType);
     }
 
     /// <summary>
@@ -85,12 +85,12 @@ public sealed class LanguageExtRegistrationTests
     {
         var result = UserAccount.Create(" ", " ", null, "1");
 
-        var errors = GetLeft(result).Select(error => error.Code).ToArray();
+        var errors = GetLeft(result).Select(error => error.GetType()).ToArray();
 
-        CollectionAssert.Contains(errors, DomainErrors.NameRequired.Code);
-        CollectionAssert.Contains(errors, DomainErrors.DocumentInvalid.Code);
-        CollectionAssert.Contains(errors, DomainErrors.EmailInvalid.Code);
-        CollectionAssert.Contains(errors, DomainErrors.PhoneNumberInvalid.Code);
+        CollectionAssert.Contains(errors, typeof(PersonNameRequiredError));
+        CollectionAssert.Contains(errors, typeof(UserAccountDocumentInvalidError));
+        CollectionAssert.Contains(errors, typeof(EmailInvalidError));
+        CollectionAssert.Contains(errors, typeof(PhoneNumberInvalidError));
     }
 
     /// <summary>
@@ -107,9 +107,9 @@ public sealed class LanguageExtRegistrationTests
         Assert.IsTrue(account.ChangePhoneNumber("(11) 99999-8888").IsRight);
 
         var eventTypes = account.DomainEvents.Map(domainEvent => domainEvent.EventType).ToArray();
-        CollectionAssert.Contains(eventTypes, DomainEventTypes.UserNameChanged);
-        CollectionAssert.Contains(eventTypes, DomainEventTypes.UserEmailChanged);
-        CollectionAssert.Contains(eventTypes, DomainEventTypes.UserPhoneNumberChanged);
+        CollectionAssert.Contains(eventTypes, UserAccountDomainEventTypes.NameChanged);
+        CollectionAssert.Contains(eventTypes, UserAccountDomainEventTypes.EmailChanged);
+        CollectionAssert.Contains(eventTypes, UserAccountDomainEventTypes.PhoneNumberChanged);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public sealed class LanguageExtRegistrationTests
 
         var result = Timestamp.Create(localTime);
 
-        Assert.AreEqual(DomainErrors.TimestampUtcRequired.Code, GetLeft(result).Code);
+        Assert.IsInstanceOfType<TimestampUtcRequiredError>(GetLeft(result));
     }
 
     /// <summary>
@@ -167,6 +167,56 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
+    /// Proves that the entity base does not expose duplicated nullable properties only for EF mapping.
+    /// </summary>
+    [TestMethod]
+    public void AbstractEntity_DoesNotExposeMappingOnlyAuditProperties()
+    {
+        var mappingOnlyProperties = typeof(AbstractEntity<Guid>)
+            .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
+            .Where(property => property.Name.EndsWith("Value", StringComparison.Ordinal))
+            .Select(property => property.Name)
+            .ToArray();
+
+        Assert.IsEmpty(mappingOnlyProperties);
+    }
+
+    /// <summary>
+    /// Proves that the old global string-based error catalog is gone.
+    /// </summary>
+    [TestMethod]
+    public void DomainLayer_DoesNotExposeGlobalDomainErrorsCatalog()
+    {
+        var domainErrorsType = typeof(UserAccount).Assembly.GetType(
+            "CSharpCodePortfolio.Tutorials.Tutorial30.Domain.DomainErrors");
+
+        Assert.IsNull(domainErrorsType);
+    }
+
+    /// <summary>
+    /// Proves that application code has no dependency on EF Core, Infrastructure, or ASP.NET Core.
+    /// </summary>
+    [TestMethod]
+    public void ApplicationLayer_DoesNotReferenceInfrastructureEntityFrameworkOrAspNetCore()
+    {
+        var applicationTypes = typeof(RegisterUserService).Assembly
+            .GetTypes()
+            .Where(type => type.Namespace?.Contains(".Application", StringComparison.Ordinal) == true)
+            .ToArray();
+
+        var forbiddenReferences = applicationTypes
+            .SelectMany(type => type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+            .Select(member => member.ToString() ?? string.Empty)
+            .Where(signature =>
+                signature.Contains("Infrastructure", StringComparison.Ordinal) ||
+                signature.Contains("EntityFrameworkCore", StringComparison.Ordinal) ||
+                signature.Contains("AspNetCore", StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.IsEmpty(forbiddenReferences);
+    }
+
+    /// <summary>
     /// Proves that the application service depends on application ports, not EF Core infrastructure types.
     /// </summary>
     [TestMethod]
@@ -180,8 +230,19 @@ public sealed class LanguageExtRegistrationTests
             .ToArray();
 
         CollectionAssert.AreEquivalent(
-            new[] { typeof(IUserAccountLookup), typeof(IUserAccountWriter) },
+            new[] { typeof(IUserAccountLookup), typeof(IUserAccountWriter), typeof(IRegistrationUnitOfWork) },
             constructorParameterTypes);
+    }
+
+    /// <summary>
+    /// Proves that HTTP adapters live at the presentation boundary.
+    /// </summary>
+    [TestMethod]
+    public void RegistrationEndpoint_LivesInPresentationHttpNamespace()
+    {
+        Assert.AreEqual(
+            "CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http",
+            typeof(RegistrationEndpoint).Namespace);
     }
 
     /// <summary>
@@ -196,7 +257,7 @@ public sealed class LanguageExtRegistrationTests
         var result = await service.RegisterAsync(
             new RegisterUserRequest("Ada Lovelace", "DOC-10000", null, null));
 
-        Assert.AreEqual(DomainErrors.EmailInvalid.Code, GetOnlyError(result).Code);
+        Assert.IsInstanceOfType<EmailInvalidError>(GetOnlyError(result));
         Assert.AreEqual(0, await dbContext.Users.CountAsync());
     }
 
@@ -221,18 +282,50 @@ public sealed class LanguageExtRegistrationTests
     /// Proves that the persistence boundary clears captured domain events after commit.
     /// </summary>
     [TestMethod]
-    public async Task EfUserAccountWriterAddAsync_ClearsDomainEventsAfterCommit()
+    public void EfUserAccountWriterAdd_DoesNotCommitOrClearDomainEvents()
     {
-        await using var dbContext = CreateDbContext();
+        using var dbContext = CreateDbContext();
         var writer = new EfUserAccountWriter(dbContext);
         var account = CreateValidAccount();
 
         Assert.HasCount(1, account.DomainEvents.ToArray());
 
-        await writer.AddAsync(account, CancellationToken.None);
+        writer.Add(account);
+
+        Assert.HasCount(1, account.DomainEvents.ToArray());
+        Assert.AreEqual(EntityState.Added, dbContext.Entry(account).State);
+    }
+
+    /// <summary>
+    /// Proves that the EF Core Unit of Work commits and clears domain events after persistence succeeds.
+    /// </summary>
+    [TestMethod]
+    public async Task RegistrationDbContextSaveChangesAsync_ClearsDomainEventsAfterCommit()
+    {
+        await using var dbContext = CreateDbContext();
+        var writer = new EfUserAccountWriter(dbContext);
+        var account = CreateValidAccount();
+
+        writer.Add(account);
+        await ((IRegistrationUnitOfWork)dbContext).SaveChangesAsync(CancellationToken.None);
 
         Assert.IsEmpty(account.DomainEvents.ToArray());
         Assert.AreEqual(1, await dbContext.Users.CountAsync());
+    }
+
+    /// <summary>
+    /// Proves that registration uniqueness is decided by the aggregate from application-provided facts.
+    /// </summary>
+    [TestMethod]
+    public void UserAccountEnsureCanBeRegistered_ReturnsTypedDuplicateErrors()
+    {
+        var account = CreateValidAccount();
+
+        var duplicateDocument = account.EnsureCanBeRegistered(documentExists: true, emailExists: false);
+        var duplicateEmail = account.EnsureCanBeRegistered(documentExists: false, emailExists: true);
+
+        Assert.IsInstanceOfType<UserAccountDocumentDuplicateError>(GetOnlyError(duplicateDocument));
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(duplicateEmail));
     }
 
     /// <summary>
@@ -248,7 +341,7 @@ public sealed class LanguageExtRegistrationTests
         var result = await service.RegisterAsync(
             new RegisterUserRequest("Outra Ada", "DOC-10000", "outra@example.com", null));
 
-        Assert.AreEqual(DomainErrors.DocumentDuplicate.Code, GetOnlyError(result).Code);
+        Assert.IsInstanceOfType<UserAccountDocumentDuplicateError>(GetOnlyError(result));
     }
 
     /// <summary>
@@ -263,7 +356,7 @@ public sealed class LanguageExtRegistrationTests
 
         var duplicateEmail = await service.RegisterAsync(new RegisterUserRequest("Outro Email", "DOC-40000", "same@example.com", null));
 
-        Assert.AreEqual(DomainErrors.EmailDuplicate.Code, GetOnlyError(duplicateEmail).Code);
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(duplicateEmail));
     }
 
     /// <summary>
@@ -277,10 +370,10 @@ public sealed class LanguageExtRegistrationTests
                 new RegisteredUserDto(Guid.NewGuid(), "Ada", "100", "ada@example.com", Prelude.None)));
         var badRequest = RegistrationEndpoint.ToHttpResult(
             Prelude.Left<Seq<DomainError>, RegisteredUserDto>(
-                Prelude.Seq1(DomainErrors.EmailInvalid)));
+                Prelude.Seq1<DomainError>(new EmailInvalidError())));
         var conflict = RegistrationEndpoint.ToHttpResult(
             Prelude.Left<Seq<DomainError>, RegisteredUserDto>(
-                Prelude.Seq1(DomainErrors.DocumentDuplicate)));
+                Prelude.Seq1<DomainError>(new UserAccountDocumentDuplicateError())));
 
         Assert.AreEqual(StatusCodes.Status201Created, GetStatus(created));
         Assert.AreEqual(StatusCodes.Status400BadRequest, GetStatus(badRequest));
@@ -293,7 +386,7 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void ProblemResult_ReturnsProblemDetailsWithErrorsExtension()
     {
-        var result = ProblemResult.FromErrors(Prelude.Seq1(DomainErrors.EmailInvalid));
+        var result = ProblemResult.FromErrors(Prelude.Seq1<DomainError>(new EmailInvalidError()));
 
         var problem = Assert.IsInstanceOfType<ProblemHttpResult>(result);
 
@@ -338,7 +431,8 @@ public sealed class LanguageExtRegistrationTests
     {
         return new RegisterUserService(
             new EfUserAccountLookup(dbContext),
-            new EfUserAccountWriter(dbContext));
+            new EfUserAccountWriter(dbContext),
+            dbContext);
     }
 
     /// <summary>
@@ -365,6 +459,17 @@ public sealed class LanguageExtRegistrationTests
     /// Reads the only registration error expected by conflict validation tests.
     /// </summary>
     private static DomainError GetOnlyError(Either<Seq<DomainError>, RegisteredUserDto> result)
+    {
+        var errors = GetLeft(result).ToArray();
+
+        Assert.HasCount(1, errors);
+        return errors[0];
+    }
+
+    /// <summary>
+    /// Reads the only domain error expected by aggregate result tests.
+    /// </summary>
+    private static DomainError GetOnlyError(Either<Seq<DomainError>, Unit> result)
     {
         var errors = GetLeft(result).ToArray();
 

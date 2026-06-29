@@ -1,10 +1,10 @@
 using CSharpCodePortfolio.Shared;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Http;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Queries;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Traditional;
 using CSharpCodePortfolio.Tutorials.Abstractions;
 using Microsoft.AspNetCore.Http;
@@ -106,7 +106,8 @@ public sealed class LanguageExtCoreTutorial : ITutorial
 
         var service = new RegisterUserService(
             new EfUserAccountLookup(dbContext),
-            new EfUserAccountWriter(dbContext));
+            new EfUserAccountWriter(dbContext),
+            dbContext);
         var missingEmail = await service.RegisterAsync(
             new RegisterUserRequest("Ada Lovelace", "DOC-10000", null, "11999998888"),
             cancellationToken).ConfigureAwait(false);
@@ -180,7 +181,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
                 var events = user.DomainEvents.ToArray();
                 return $"{events.Length} {events[0].GetType().Name}";
             },
-            Left: errors => string.Join(", ", errors.Map(error => error.Code)));
+            Left: errors => string.Join(", ", errors.Map(error => error.Code.ToString())));
     }
 
     /// <summary>

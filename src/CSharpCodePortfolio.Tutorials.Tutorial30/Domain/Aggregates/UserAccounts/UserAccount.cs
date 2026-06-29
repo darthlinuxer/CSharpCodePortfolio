@@ -26,7 +26,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         EmailLookupValue = email.Value;
         PhoneNumberValue = ToNullable(phoneNumber);
         MarkCreated(registeredAtUtc, None);
-        RaiseDomainEvent(new UserRegisteredDomainEvent(Id, document, email, registeredAtUtc));
+        RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, document, email, registeredAtUtc));
     }
 
     /// <summary>
@@ -102,7 +102,23 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
         return digits is { Length: >= 5 and <= 20 }
             ? Right<DomainError, string>(digits)
-            : Left<DomainError, string>(DomainErrors.DocumentInvalid);
+            : Left<DomainError, string>(new UserAccountDocumentInvalidError());
+    }
+
+    /// <summary>
+    /// Decides registration uniqueness from persistence facts supplied by the application layer.
+    /// </summary>
+    public Either<Seq<DomainError>, Unit> EnsureCanBeRegistered(bool documentExists, bool emailExists)
+    {
+        var errors = Seq(
+                documentExists ? Some<DomainError>(new UserAccountDocumentDuplicateError()) : None,
+                emailExists ? Some<DomainError>(new UserAccountEmailDuplicateError()) : None)
+            .Somes()
+            .ToSeq();
+
+        return errors.IsEmpty
+            ? Right<Seq<DomainError>, Unit>(default)
+            : Left<Seq<DomainError>, Unit>(errors);
     }
 
     /// <summary>
@@ -186,7 +202,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
         Name = newName;
         MarkModified(occurredAtUtc, None);
-        RaiseDomainEvent(new UserNameChangedDomainEvent(Id, previousName, newName, occurredAtUtc));
+        RaiseDomainEvent(new UserAccountNameChangedDomainEvent(Id, previousName, newName, occurredAtUtc));
 
         return Right<Seq<DomainError>, Unit>(default);
     }
@@ -205,7 +221,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         Email = newEmail;
         EmailLookupValue = newEmail.Value;
         MarkModified(occurredAtUtc, None);
-        RaiseDomainEvent(new UserEmailChangedDomainEvent(Id, previousEmail, newEmail, occurredAtUtc));
+        RaiseDomainEvent(new UserAccountEmailChangedDomainEvent(Id, previousEmail, newEmail, occurredAtUtc));
 
         return Right<Seq<DomainError>, Unit>(default);
     }
@@ -223,7 +239,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
         PhoneNumberValue = ToNullable(newPhoneNumber);
         MarkModified(occurredAtUtc, None);
-        RaiseDomainEvent(new UserPhoneNumberChangedDomainEvent(Id, previousPhoneNumber, newPhoneNumber, occurredAtUtc));
+        RaiseDomainEvent(new UserAccountPhoneNumberChangedDomainEvent(Id, previousPhoneNumber, newPhoneNumber, occurredAtUtc));
 
         return Right<Seq<DomainError>, Unit>(default);
     }

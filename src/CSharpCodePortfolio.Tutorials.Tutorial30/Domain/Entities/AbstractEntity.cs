@@ -11,6 +11,10 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     where TId : notnull
 {
     private readonly List<IDomainEvent> _domainEvents = [];
+    private Timestamp? _createdAt;
+    private UserAccount? _createdBy;
+    private Timestamp? _lastModified;
+    private UserAccount? _lastModifiedBy;
 
     /// <summary>
     /// Initializes an empty entity for EF Core materialization.
@@ -36,42 +40,22 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// <summary>
     /// Gets the optional UTC creation timestamp.
     /// </summary>
-    public Option<Timestamp> CreatedAt => ToOption(CreatedAtValue);
+    public Option<Timestamp> CreatedAt => ToOption(_createdAt);
 
     /// <summary>
     /// Gets the optional actor that created the entity.
     /// </summary>
-    public Option<UserAccount> CreatedBy => ToOption(CreatedByValue);
+    public Option<UserAccount> CreatedBy => ToOption(_createdBy);
 
     /// <summary>
     /// Gets the optional UTC timestamp for the latest modification.
     /// </summary>
-    public Option<Timestamp> LastModified => ToOption(LastModifiedValue);
+    public Option<Timestamp> LastModified => ToOption(_lastModified);
 
     /// <summary>
     /// Gets the optional actor that last modified the entity.
     /// </summary>
-    public Option<UserAccount> LastModifiedBy => ToOption(LastModifiedByValue);
-
-    /// <summary>
-    /// Gets the internal nullable creation timestamp state that EF Core can map.
-    /// </summary>
-    internal Timestamp? CreatedAtValue { get; private set; }
-
-    /// <summary>
-    /// Gets the internal nullable actor state that EF Core can map as a self-reference.
-    /// </summary>
-    internal UserAccount? CreatedByValue { get; private set; }
-
-    /// <summary>
-    /// Gets the internal nullable modification timestamp state that EF Core can map.
-    /// </summary>
-    internal Timestamp? LastModifiedValue { get; private set; }
-
-    /// <summary>
-    /// Gets the internal nullable actor state that EF Core can map as a self-reference.
-    /// </summary>
-    internal UserAccount? LastModifiedByValue { get; private set; }
+    public Option<UserAccount> LastModifiedBy => ToOption(_lastModifiedBy);
 
     /// <summary>
     /// Gets events raised by completed domain behavior.
@@ -83,8 +67,8 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// </summary>
     protected void MarkCreated(Timestamp createdAt, Option<UserAccount> createdBy)
     {
-        CreatedAtValue = createdAt;
-        CreatedByValue = ToNullable(createdBy);
+        _createdAt = createdAt;
+        _createdBy = ToNullable(createdBy);
     }
 
     /// <summary>
@@ -92,8 +76,8 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// </summary>
     protected void MarkModified(Timestamp modifiedAt, Option<UserAccount> modifiedBy)
     {
-        LastModifiedValue = modifiedAt;
-        LastModifiedByValue = ToNullable(modifiedBy);
+        _lastModified = modifiedAt;
+        _lastModifiedBy = ToNullable(modifiedBy);
     }
 
     /// <summary>
