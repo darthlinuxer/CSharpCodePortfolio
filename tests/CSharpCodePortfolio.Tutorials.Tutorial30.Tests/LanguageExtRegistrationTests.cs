@@ -41,10 +41,8 @@ public sealed class LanguageExtRegistrationTests
     public void RequiredValueObjects_ReturnErrorsWithoutBusinessExceptions()
     {
         var name = PersonName.Create(" ");
-        var document = UserAccount.NormalizeDocument(null);
 
         Assert.IsInstanceOfType<PersonNameRequiredError>(GetLeft(name));
-        Assert.IsInstanceOfType<UserAccountDocumentInvalidError>(GetLeft(document));
     }
 
     /// <summary>
@@ -65,14 +63,13 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void UserAccountCreate_RaisesUserAccountRegisteredDomainEvent()
     {
-        var account = GetRight(UserAccount.Create("Ada Lovelace", "DOC-10000", "ada@example.com", null));
+        var account = GetRight(UserAccount.Create("Ada Lovelace", "ada@example.com", null));
 
         var events = account.DomainEvents.ToArray();
 
         Assert.HasCount(1, events);
         var domainEvent = Assert.IsInstanceOfType<UserAccountRegisteredDomainEvent>(events[0]);
         Assert.AreEqual(account.Id, domainEvent.UserId);
-        Assert.AreEqual(account.Document, domainEvent.Document);
         Assert.AreEqual(account.Email, domainEvent.Email);
         Assert.AreEqual(UserAccountDomainEventTypes.Registered, domainEvent.EventType);
     }
@@ -83,12 +80,11 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void UserAccountCreate_AccumulatesRequiredFieldErrors()
     {
-        var result = UserAccount.Create(" ", " ", null, "1");
+        var result = UserAccount.Create(" ", null, "1");
 
         var errors = GetLeft(result).Select(error => error.GetType()).ToArray();
 
         CollectionAssert.Contains(errors, typeof(PersonNameRequiredError));
-        CollectionAssert.Contains(errors, typeof(UserAccountDocumentInvalidError));
         CollectionAssert.Contains(errors, typeof(EmailInvalidError));
         CollectionAssert.Contains(errors, typeof(PhoneNumberInvalidError));
     }
@@ -99,7 +95,7 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void UserAccountChangeMethods_RaiseTypedDomainEvents()
     {
-        var account = GetRight(UserAccount.Create("Ada Lovelace", "DOC-10000", "ada@example.com", null));
+        var account = GetRight(UserAccount.Create("Ada Lovelace", "ada@example.com", null));
         account.ClearDomainEvents();
 
         Assert.IsTrue(account.Rename("Augusta Ada").IsRight);
@@ -141,7 +137,6 @@ public sealed class LanguageExtRegistrationTests
         Assert.Contains(nameof(UserAccount.Email), complexPropertyNames);
         Assert.Contains("PhoneNumberValue", complexPropertyNames);
         Assert.IsFalse(complexPropertyNames.Any(name => name.Contains("ForPersistence", StringComparison.Ordinal)));
-        Assert.IsNotNull(userEntity.FindProperty(nameof(UserAccount.Document)));
     }
 
     /// <summary>
@@ -160,6 +155,24 @@ public sealed class LanguageExtRegistrationTests
         Assert.IsNull(domainProperty);
         Assert.IsNotNull(userEntity);
         Assert.IsNull(userEntity.FindProperty("EmailLookupValue"));
+    }
+
+    /// <summary>
+    /// Proves that the Document concept is no longer part of the aggregate nor its EF mapping.
+    /// </summary>
+    [TestMethod]
+    public void UserAccount_DoesNotExposeDocumentInDomainOrDatabase()
+    {
+        using var dbContext = CreateDbContext();
+
+        var domainDocumentProperty = typeof(UserAccount).GetProperty(
+            "Document",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var userEntity = dbContext.Model.FindEntityType(typeof(UserAccount));
+
+        Assert.IsNull(domainDocumentProperty);
+        Assert.IsNotNull(userEntity);
+        Assert.IsNull(userEntity.FindProperty("Document"));
     }
 
     /// <summary>
@@ -253,7 +266,8 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
-    /// Proves that the application service depends on application ports, not EF Core infrastructure types.
+    /// Proves that the application service depends on application ports and an injected clock,
+    /// not on EF Core infrastructure types.
     /// </summary>
     [TestMethod]
     public void RegisterUserService_DependsOnApplicationPortsOnly()
@@ -266,7 +280,13 @@ public sealed class LanguageExtRegistrationTests
             .ToArray();
 
         CollectionAssert.AreEquivalent(
-            new[] { typeof(IUserAccountLookup), typeof(IUserAccountWriter), typeof(IRegistrationUnitOfWork) },
+            new[]
+            {
+                typeof(IUserAccountLookup),
+                typeof(IUserAccountWriter),
+                typeof(IRegistrationUnitOfWork),
+                typeof(TimeProvider),
+            },
             constructorParameterTypes);
     }
 
@@ -291,7 +311,7 @@ public sealed class LanguageExtRegistrationTests
         var service = CreateService(dbContext);
 
         var result = await service.RegisterAsync(
-            new RegisterUserRequest("Ada Lovelace", "DOC-10000", null, null));
+            new RegisterUserRequest("Ada Lovelace", null, null));
 
         Assert.IsInstanceOfType<EmailInvalidError>(GetOnlyError(result));
         Assert.AreEqual(0, await dbContext.Users.CountAsync());
@@ -307,11 +327,11 @@ public sealed class LanguageExtRegistrationTests
         var service = CreateService(dbContext);
 
         var result = await service.RegisterAsync(
-            new RegisterUserRequest("Grace Hopper", "DOC-20000", "GRACE@EXAMPLE.COM", "(11) 99999-8888"));
+            new RegisterUserRequest("Grace Hopper", "GRACE@EXAMPLE.COM", "(11) 99999-8888"));
 
         var user = GetRight(result);
         Assert.AreEqual("grace@example.com", user.Email);
-        Assert.AreEqual("11999998888", user.PhoneNumber.Match(Some: phone => phone, None: () => string.Empty));
+        Assert.AreEqual("11999998888", user.PhoneNumber.Match(Some: phone => phone.Value, None: () => string.Empty));
     }
 
     /// <summary>
@@ -350,66 +370,53 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
-    /// Proves that registration uniqueness is decided by the aggregate from application-provided facts.
+    /// Proves that EnsureCanBeRegistered now exposes only the email-uniqueness axis.
+    /// Document uniqueness is no longer the aggregate's concern.
     /// </summary>
     [TestMethod]
-    public void UserAccountEnsureCanBeRegistered_ReturnsTypedDuplicateErrors()
+    public void UserAccountEnsureCanBeRegistered_ReturnsTypedDuplicateEmailError()
     {
         var account = CreateValidAccount();
 
-        var duplicateDocument = account.EnsureCanBeRegistered(documentExists: true, emailExists: false);
-        var duplicateEmail = account.EnsureCanBeRegistered(documentExists: false, emailExists: true);
+        var conflict = account.EnsureCanBeRegistered(emailExists: true);
+        var ok = account.EnsureCanBeRegistered(emailExists: false);
 
-        Assert.IsInstanceOfType<UserAccountDocumentDuplicateError>(GetOnlyError(duplicateDocument));
-        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(duplicateEmail));
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(conflict));
+        Assert.IsTrue(ok.IsRight);
     }
 
     /// <summary>
-    /// Proves that duplicate document is an expected conflict error.
-    /// </summary>
-    [TestMethod]
-    public async Task RegisterAsync_ReturnsConflictErrorForDuplicateDocument()
-    {
-        await using var dbContext = CreateDbContext();
-        var service = CreateService(dbContext);
-        await service.RegisterAsync(new RegisterUserRequest("Ada Lovelace", "DOC-10000", "ada@example.com", null));
-
-        var result = await service.RegisterAsync(
-            new RegisterUserRequest("Outra Ada", "DOC-10000", "outra@example.com", null));
-
-        Assert.IsInstanceOfType<UserAccountDocumentDuplicateError>(GetOnlyError(result));
-    }
-
-    /// <summary>
-    /// Proves that required email uniqueness is an expected conflict error.
+    /// Proves that required email uniqueness is an expected conflict error
+    /// surfaced through the application service.
     /// </summary>
     [TestMethod]
     public async Task RegisterAsync_ReturnsConflictErrorForDuplicateEmail()
     {
         await using var dbContext = CreateDbContext();
         var service = CreateService(dbContext);
-        await service.RegisterAsync(new RegisterUserRequest("Com Email", "DOC-20000", "same@example.com", null));
+        await service.RegisterAsync(new RegisterUserRequest("Com Email", "same@example.com", null));
 
-        var duplicateEmail = await service.RegisterAsync(new RegisterUserRequest("Outro Email", "DOC-40000", "same@example.com", null));
+        var duplicateEmail = await service.RegisterAsync(new RegisterUserRequest("Outro Email", "same@example.com", null));
 
         Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(duplicateEmail));
     }
 
     /// <summary>
-    /// Proves that Either results become explicit HTTP status codes.
+    /// Proves that Either results become explicit HTTP status codes driven by
+    /// <see cref="DomainError.Category"/>, never by concrete-error pattern matching.
     /// </summary>
     [TestMethod]
     public void RegistrationEndpoint_MapsApplicationResultToHttpStatus()
     {
         var created = RegistrationEndpoint.ToHttpResult(
             Prelude.Right<Seq<DomainError>, RegisteredUserDto>(
-                new RegisteredUserDto(Guid.NewGuid(), "Ada", "100", "ada@example.com", Prelude.None)));
+                new RegisteredUserDto(Guid.NewGuid(), "Ada", "ada@example.com", Prelude.None)));
         var badRequest = RegistrationEndpoint.ToHttpResult(
             Prelude.Left<Seq<DomainError>, RegisteredUserDto>(
                 Prelude.Seq1<DomainError>(new EmailInvalidError())));
         var conflict = RegistrationEndpoint.ToHttpResult(
             Prelude.Left<Seq<DomainError>, RegisteredUserDto>(
-                Prelude.Seq1<DomainError>(new UserAccountDocumentDuplicateError())));
+                Prelude.Seq1<DomainError>(new UserAccountEmailDuplicateError())));
 
         Assert.AreEqual(StatusCodes.Status201Created, GetStatus(created));
         Assert.AreEqual(StatusCodes.Status400BadRequest, GetStatus(badRequest));
@@ -429,6 +436,20 @@ public sealed class LanguageExtRegistrationTests
         Assert.AreEqual(StatusCodes.Status400BadRequest, problem.StatusCode);
         Assert.IsNotNull(problem.ProblemDetails);
         Assert.IsTrue(problem.ProblemDetails.Extensions.ContainsKey("errors"));
+    }
+
+    /// <summary>
+    /// Proves that the DomainErrorHttpMap returns the canonical mapping for each
+    /// canonical domain error category (Open/Closed-friendly transport layer).
+    /// </summary>
+    [TestMethod]
+    public void DomainErrorHttpMap_ResolvesCanonicalCategories()
+    {
+        var validation = DomainErrorHttpMap.Resolve(DomainErrorCategory.Validation);
+        var conflict = DomainErrorHttpMap.Resolve(DomainErrorCategory.Conflict);
+
+        Assert.AreEqual(StatusCodes.Status400BadRequest, validation.Status);
+        Assert.AreEqual(StatusCodes.Status409Conflict, conflict.Status);
     }
 
     /// <summary>
@@ -472,7 +493,8 @@ public sealed class LanguageExtRegistrationTests
         return new RegisterUserService(
             new EfUserAccountLookup(dbContext),
             new EfUserAccountWriter(dbContext),
-            dbContext);
+            dbContext,
+            TimeProvider.System);
     }
 
     /// <summary>
@@ -522,7 +544,7 @@ public sealed class LanguageExtRegistrationTests
     /// </summary>
     private static UserAccount CreateValidAccount()
     {
-        return GetRight(UserAccount.Create("Ada Lovelace", "DOC-10000", "ada@example.com", null));
+        return GetRight(UserAccount.Create("Ada Lovelace", "ada@example.com", null));
     }
 
     /// <summary>

@@ -36,10 +36,6 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
                 .IsRequired();
         });
 
-        builder.Property(user => user.Document)
-            .HasMaxLength(20)
-            .IsRequired();
-
         builder.ComplexProperty(user => user.Email, email =>
         {
             email.Property(value => value.Value)

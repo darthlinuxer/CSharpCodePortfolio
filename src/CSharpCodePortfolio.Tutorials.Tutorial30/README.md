@@ -114,9 +114,10 @@ Campo obrigatório fica direto:
 
 ```csharp
 public PersonName Name { get; }
-public string Document { get; }
 public Email Email { get; }
 ```
+
+> **Document foi removido** (Task 4 do plano de refatoração monádico). Modelagem de PF (CPF) vs PJ (CNPJ) é tratada em tutorial dedicado futuro — não é responsabilidade do agregado de cadastro abstrato. O campo `Document` deixou a API do domínio junto com `NormalizeDocument` e os erros relacionados.
 
 Campo opcional vira `Option<T>`:
 

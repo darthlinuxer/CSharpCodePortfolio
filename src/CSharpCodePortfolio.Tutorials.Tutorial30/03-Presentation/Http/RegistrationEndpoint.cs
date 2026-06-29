@@ -41,24 +41,9 @@ public static class RegistrationEndpoint
         return new RegisteredUserResponse(
             user.Id,
             user.Name,
-            user.Document,
             user.Email,
-            ToNullable(user.PhoneNumber));
+            user.PhoneNumber.Match(Some: phone => phone.Value, None: () => null));
     }
-
-    /// <summary>
-    /// Converts Option&lt;string&gt; into a nullable wire value without returning null from Option.Match.
-    /// </summary>
-    private static string? ToNullable(Option<string> option)
-    {
-        foreach (var value in option)
-        {
-            return value;
-        }
-
-        return null;
-    }
-
 }
 
 /// <summary>
@@ -67,6 +52,5 @@ public static class RegistrationEndpoint
 public sealed record RegisteredUserResponse(
     Guid Id,
     string Name,
-    string Document,
     string Email,
     string? PhoneNumber);

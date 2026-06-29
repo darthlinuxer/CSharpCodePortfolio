@@ -12,30 +12,31 @@ public static class ProblemResult
     /// <summary>
     /// Converts typed errors into an ASP.NET Core problem response with a compact errors extension.
     /// </summary>
+    /// <remarks>
+    /// The presentation layer dispatches on the domain <see cref="DomainError.Category"/>
+    /// only — it never pattern-matches concrete domain error types. This keeps the
+    /// presentation ignorant of domain taxonomy and lets new errors extend (Open/Closed)
+    /// the catalog without touching this file.
+    /// </remarks>
     public static IResult FromErrors(Seq<DomainError> errors)
     {
-        var statusCode = IsConflict(errors)
-            ? StatusCodes.Status409Conflict
-            : StatusCodes.Status400BadRequest;
+        var dominantCategory = errors
+            .Map(error => error.Category)
+            .Fold<DomainErrorCategory, DomainErrorCategory>(
+                seed: DomainErrorCategory.Validation,
+                folder: (current, next) => current == DomainErrorCategory.Conflict || next == DomainErrorCategory.Conflict
+                    ? DomainErrorCategory.Conflict
+                    : next);
+
+        var (statusCode, title) = DomainErrorHttpMap.Resolve(dominantCategory);
 
         return Results.Problem(
             statusCode: statusCode,
-            title: statusCode == StatusCodes.Status409Conflict
-                ? "Conflito de cadastro."
-                : "Cadastro inválido.",
+            title: title,
             extensions: new Dictionary<string, object?>
             {
                 ["errors"] = errors.Map(error => new ProblemError(error.Code.ToString(), error.Message)).ToArray()
             });
-    }
-
-    /// <summary>
-    /// Detects errors that should become HTTP 409 instead of HTTP 400.
-    /// </summary>
-    private static bool IsConflict(Seq<DomainError> errors)
-    {
-        return errors.Exists(error =>
-            error is UserAccountDocumentDuplicateError or UserAccountEmailDuplicateError);
     }
 }
 

@@ -13,16 +13,6 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Queries;
 public sealed class EfUserAccountLookup(RegistrationDbContext dbContext) : IUserAccountLookup
 {
     /// <summary>
-    /// Checks persisted users for an existing normalized document.
-    /// </summary>
-    public Task<bool> DocumentExistsAsync(string document, CancellationToken cancellationToken)
-    {
-        return dbContext.Users
-            .AsNoTracking()
-            .AnyAsync(user => user.Document == document, cancellationToken);
-    }
-
-    /// <summary>
     /// Checks persisted users for an existing required email.
     /// </summary>
     public Task<bool> EmailExistsAsync(Email email, CancellationToken cancellationToken)
@@ -47,8 +37,7 @@ public sealed class EfUserAccountLookup(RegistrationDbContext dbContext) : IUser
             : Some(new UserAccountQueryDto(
                 user.Id,
                 user.Name.Value,
-                user.Document,
                 user.Email.Value,
-                user.PhoneNumber.Map(phone => phone.Value)));
+                user.PhoneNumber));
     }
 }

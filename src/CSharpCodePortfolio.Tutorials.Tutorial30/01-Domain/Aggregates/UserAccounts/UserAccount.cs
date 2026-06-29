@@ -15,28 +15,21 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
     private UserAccount(
         PersonName name,
-        string document,
         Email email,
         Option<PhoneNumber> phoneNumber,
         Timestamp registeredAtUtc)
     {
         Name = name;
-        Document = document;
         Email = email;
         PhoneNumberValue = ToNullable(phoneNumber);
         MarkCreated(registeredAtUtc, None);
-        RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, document, email, registeredAtUtc));
+        RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, email, registeredAtUtc));
     }
 
     /// <summary>
     /// Gets the required non-null name.
     /// </summary>
     public PersonName Name { get; private set; } = null!;
-
-    /// <summary>
-    /// Gets the required normalized document string without an extra persistence-only value object.
-    /// </summary>
-    public string Document { get; private set; } = string.Empty;
 
     /// <summary>
     /// Gets the required non-null email.
@@ -63,19 +56,16 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// </remarks>
     public static Either<Seq<DomainError>, UserAccount> Create(
         string? name,
-        string? document,
         string? email,
         string? phoneNumber,
         TimeProvider? clock = null)
     {
         var effectiveClock = clock ?? TimeProvider.System;
         var validName = PersonName.Create(name);
-        var validDocument = NormalizeDocument(document);
         var validEmail = Email.Create(email);
         var validPhoneNumber = PhoneNumberVo.CreateOptional(phoneNumber);
         var errors = Seq(
                 ErrorOf(validName),
-                ErrorOf(validDocument),
                 ErrorOf(validEmail),
                 ErrorOf(validPhoneNumber))
             .Somes()
@@ -86,40 +76,24 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
         var account =
             from userName in validName
-            from normalizedDocument in validDocument
             from userEmail in validEmail
             from userPhoneNumber in validPhoneNumber
-            select new UserAccount(userName, normalizedDocument, userEmail, userPhoneNumber, Timestamp.UtcNow(effectiveClock));
+            select new UserAccount(userName, userEmail, userPhoneNumber, Timestamp.UtcNow(effectiveClock));
 
         return account.MapLeft(OneError);
     }
 
     /// <summary>
-    /// Normalizes the required document without keeping a dedicated DocumentNumber type.
+    /// Decides registration uniqueness against the application-supplied
+    /// email-existence fact. Document uniqueness is no longer the aggregate's
+    /// concern; that responsibility moves into the future PF (CPF) vs PJ
+    /// (CNPJ) bounded context.
     /// </summary>
-    public static Either<DomainError, string> NormalizeDocument(string? value)
+    public Either<Seq<DomainError>, Unit> EnsureCanBeRegistered(bool emailExists)
     {
-        var digits = new string((value ?? string.Empty).Where(char.IsDigit).ToArray());
-
-        return digits is { Length: >= 5 and <= 20 }
-            ? Right<DomainError, string>(digits)
-            : Left<DomainError, string>(new UserAccountDocumentInvalidError());
-    }
-
-    /// <summary>
-    /// Decides registration uniqueness from persistence facts supplied by the application layer.
-    /// </summary>
-    public Either<Seq<DomainError>, Unit> EnsureCanBeRegistered(bool documentExists, bool emailExists)
-    {
-        var errors = Seq(
-                documentExists ? Some<DomainError>(new UserAccountDocumentDuplicateError()) : None,
-                emailExists ? Some<DomainError>(new UserAccountEmailDuplicateError()) : None)
-            .Somes()
-            .ToSeq();
-
-        return errors.IsEmpty
-            ? Right<Seq<DomainError>, Unit>(default)
-            : Left<Seq<DomainError>, Unit>(errors);
+        return emailExists
+            ? Left<Seq<DomainError>, Unit>(Seq1(new UserAccountEmailDuplicateError() as DomainError))
+            : Right<Seq<DomainError>, Unit>(default);
     }
 
     /// <summary>
