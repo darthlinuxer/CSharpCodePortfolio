@@ -1,4 +1,5 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;

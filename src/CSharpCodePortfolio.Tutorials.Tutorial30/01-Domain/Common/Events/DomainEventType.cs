@@ -1,4 +1,4 @@
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
 
 /// <summary>
 /// Value object that names a domain event without exposing raw strings as the public contract.

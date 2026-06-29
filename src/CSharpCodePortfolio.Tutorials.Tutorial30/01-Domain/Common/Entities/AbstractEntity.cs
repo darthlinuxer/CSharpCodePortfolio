@@ -1,20 +1,24 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Functional;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using LanguageExt;
-using static LanguageExt.Prelude;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Entities;
 
 /// <summary>
 /// Base class for entities that need identity, audit metadata, and domain events.
 /// </summary>
 /// <typeparam name="TId">Identity type used by the entity.</typeparam>
-public abstract class AbstractEntity<TId> : IEntity<TId>
+/// <typeparam name="TActor">Actor aggregate type used by audit metadata.</typeparam>
+public abstract class AbstractEntity<TId, TActor> : IEntity<TId, TActor>
     where TId : notnull
+    where TActor : class
 {
     private readonly List<IDomainEvent> _domainEvents = [];
     private Timestamp? _createdAt;
-    private UserAccount? _createdBy;
+    private TActor? _createdBy;
     private Timestamp? _lastModified;
-    private UserAccount? _lastModifiedBy;
+    private TActor? _lastModifiedBy;
 
     /// <summary>
     /// Initializes an empty entity for EF Core materialization.
@@ -40,22 +44,22 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// <summary>
     /// Gets the optional UTC creation timestamp.
     /// </summary>
-    public Option<Timestamp> CreatedAt => ToOption(_createdAt);
+    public Option<Timestamp> CreatedAt => _createdAt.ToOption();
 
     /// <summary>
     /// Gets the optional actor that created the entity.
     /// </summary>
-    public Option<UserAccount> CreatedBy => ToOption(_createdBy);
+    public Option<TActor> CreatedBy => _createdBy.ToOption();
 
     /// <summary>
     /// Gets the optional UTC timestamp for the latest modification.
     /// </summary>
-    public Option<Timestamp> LastModified => ToOption(_lastModified);
+    public Option<Timestamp> LastModified => _lastModified.ToOption();
 
     /// <summary>
     /// Gets the optional actor that last modified the entity.
     /// </summary>
-    public Option<UserAccount> LastModifiedBy => ToOption(_lastModifiedBy);
+    public Option<TActor> LastModifiedBy => _lastModifiedBy.ToOption();
 
     /// <summary>
     /// Gets events raised by completed domain behavior.
@@ -65,19 +69,19 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// <summary>
     /// Records creation metadata after a factory has validated the aggregate.
     /// </summary>
-    protected void MarkCreated(Timestamp createdAt, Option<UserAccount> createdBy)
+    protected void MarkCreated(Timestamp createdAt, Option<TActor> createdBy)
     {
         _createdAt = createdAt;
-        _createdBy = ToNullable(createdBy);
+        _createdBy = createdBy.ToNullable();
     }
 
     /// <summary>
     /// Records modification metadata after behavior changes entity state.
     /// </summary>
-    protected void MarkModified(Timestamp modifiedAt, Option<UserAccount> modifiedBy)
+    protected void MarkModified(Timestamp modifiedAt, Option<TActor> modifiedBy)
     {
         _lastModified = modifiedAt;
-        _lastModifiedBy = ToNullable(modifiedBy);
+        _lastModifiedBy = modifiedBy.ToNullable();
     }
 
     /// <summary>
@@ -107,26 +111,4 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
             : default!;
     }
 
-    /// <summary>
-    /// Converts nullable EF materialized state into explicit domain optionality.
-    /// </summary>
-    private static Option<T> ToOption<T>(T? value)
-        where T : class
-    {
-        return value is null ? None : Some(value);
-    }
-
-    /// <summary>
-    /// Converts explicit domain optionality into nullable state EF Core can map.
-    /// </summary>
-    private static T? ToNullable<T>(Option<T> option)
-        where T : class
-    {
-        foreach (var value in option)
-        {
-            return value;
-        }
-
-        return null;
-    }
 }

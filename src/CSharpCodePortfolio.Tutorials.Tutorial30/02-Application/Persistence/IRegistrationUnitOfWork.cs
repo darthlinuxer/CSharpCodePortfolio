@@ -1,3 +1,6 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
+using LanguageExt;
+
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 
 /// <summary>
@@ -6,7 +9,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 public interface IRegistrationUnitOfWork
 {
     /// <summary>
-    /// Commits tracked changes and returns the number of affected entries.
+    /// Commits tracked changes and returns expected persistence conflicts as domain errors.
     /// </summary>
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<Either<Seq<DomainError>, int>> CommitAsync(CancellationToken cancellationToken);
 }

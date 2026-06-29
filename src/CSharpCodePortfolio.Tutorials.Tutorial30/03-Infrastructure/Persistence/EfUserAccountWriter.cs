@@ -1,5 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 

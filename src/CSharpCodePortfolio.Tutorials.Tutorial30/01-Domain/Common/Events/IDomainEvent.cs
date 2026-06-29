@@ -1,4 +1,6 @@
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
+
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
 
 /// <summary>
 /// Marker contract for facts raised by domain behavior inside the aggregate.

@@ -1,6 +1,9 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using LanguageExt;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Events;
 
 /// <summary>
 /// Domain event raised when a registered user's optional phone changes.
@@ -9,10 +12,5 @@ public sealed record UserAccountPhoneNumberChangedDomainEvent(
     Guid UserId,
     Option<PhoneNumber> PreviousPhoneNumber,
     Option<PhoneNumber> NewPhoneNumber,
-    Timestamp OccurredAtUtc) : IDomainEvent
-{
-    /// <summary>
-    /// Gets the stable typed event name.
-    /// </summary>
-    public DomainEventType EventType => UserAccountDomainEventTypes.PhoneNumberChanged;
-}
+    Timestamp OccurredAtUtc)
+    : DomainEvent(UserAccountDomainEventTypes.PhoneNumberChanged, OccurredAtUtc);

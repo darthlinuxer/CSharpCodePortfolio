@@ -1,4 +1,4 @@
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 
 /// <summary>
 /// Stable serializable code for expected domain failures.

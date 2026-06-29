@@ -1,6 +1,7 @@
 using CSharpCodePortfolio.Shared;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Queries;
@@ -30,7 +31,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             ("Pacote", "LanguageExt.Core 4.4.9"),
             ("Prerelease atual", "5.0.0-beta-77"),
             ("Decisão", "Stable 4.4.9 para evitar mudanças de superfície da v5 beta"),
-            ("Persistência", "EF Core 10 SQLite em memória + ComplexProperty"));
+            ("Persistência", "EF Core 10 SQLite em memória + ComplexProperty/HasConversion"));
 
         TutorialConsole.WriteQuestion(
             "Como modelar cadastro de usuário sem null checks espalhados, if/else procedural e exceptions para regra esperada?");
@@ -91,7 +92,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             typeof(RegisterUserService),
             nameof(RegisterUserService.RegisterAsync));
         TutorialConsole.WriteCodeSnippet(
-            "ConfigurationMappings | ComplexProperty",
+            "ConfigurationMappings | ComplexProperty + HasConversion",
             typeof(UserAccountConfiguration),
             nameof(UserAccountConfiguration.Configure));
 

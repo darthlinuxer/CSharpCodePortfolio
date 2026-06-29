@@ -1,8 +1,9 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using System.Net.Mail;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
 
 /// <summary>
 /// Value object for the required registration email.
@@ -47,6 +48,11 @@ public sealed record Email
             return Left<DomainError, Email>(new EmailInvalidError());
         }
     }
+
+    /// <summary>
+    /// Rehydrates an already normalized value from a trusted storage boundary.
+    /// </summary>
+    internal static Email FromTrustedValue(string value) => new(value);
 
     /// <summary>
     /// Returns the normalized email address for persistence and comparison.

@@ -1,6 +1,7 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -45,9 +46,11 @@ public sealed class RegisterUserService(
             Right: async _ =>
             {
                 writer.Add(account);
-                await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
 
-                return Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account));
+                return commit.Match(
+                    Right: _ => Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account)),
+                    Left: errors => Left<Seq<DomainError>, RegisteredUserDto>(errors));
             },
             Left: errors => Task.FromResult(Left<Seq<DomainError>, RegisteredUserDto>(errors))).ConfigureAwait(false);
     }

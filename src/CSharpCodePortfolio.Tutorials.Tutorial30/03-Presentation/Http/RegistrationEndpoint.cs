@@ -1,5 +1,6 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Functional;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
 
@@ -43,20 +44,7 @@ public static class RegistrationEndpoint
             user.Name,
             user.Document,
             user.Email,
-            ToNullable(user.PhoneNumber));
-    }
-
-    /// <summary>
-    /// Converts Option&lt;string&gt; into a nullable wire value without returning null from Option.Match.
-    /// </summary>
-    private static string? ToNullable(Option<string> option)
-    {
-        foreach (var value in option)
-        {
-            return value;
-        }
-
-        return null;
+            user.PhoneNumber.ToNullable());
     }
 
 }

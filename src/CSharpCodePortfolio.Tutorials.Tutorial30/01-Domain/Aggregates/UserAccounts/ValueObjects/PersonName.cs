@@ -1,7 +1,8 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
 
 /// <summary>
 /// Value object that keeps the required user name non-null and normalized.

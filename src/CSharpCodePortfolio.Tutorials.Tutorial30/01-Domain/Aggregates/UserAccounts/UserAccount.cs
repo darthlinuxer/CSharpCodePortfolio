@@ -1,13 +1,20 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Entities;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Functional;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using LanguageExt;
-using PhoneNumberVo = CSharpCodePortfolio.Tutorials.Tutorial30.Domain.PhoneNumber;
 using static LanguageExt.Prelude;
+using PhoneNumberVo = CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects.PhoneNumber;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
 
 /// <summary>
 /// Aggregate root for registration; required values are direct VOs and optional values are explicit Option VOs.
 /// </summary>
-public sealed class UserAccount : AbstractEntity<Guid>
+public sealed class UserAccount : AbstractEntity<Guid, UserAccount>
 {
     private UserAccount()
     {
@@ -23,7 +30,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
         Name = name;
         Document = document;
         Email = email;
-        PhoneNumberValue = ToNullable(phoneNumber);
+        PhoneNumberValue = phoneNumber.ToNullable();
         MarkCreated(registeredAtUtc, None);
         RaiseDomainEvent(new UserAccountRegisteredDomainEvent(Id, document, email, registeredAtUtc));
     }
@@ -46,7 +53,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
     /// <summary>
     /// Gets the optional phone without using PhoneNumber?.
     /// </summary>
-    public Option<PhoneNumber> PhoneNumber => ToOption(PhoneNumberValue);
+    public Option<PhoneNumber> PhoneNumber => PhoneNumberValue.ToOption();
 
     /// <summary>
     /// Gets the internal nullable phone state that EF Core can map while the public domain API stays Option-based.
@@ -146,29 +153,6 @@ public sealed class UserAccount : AbstractEntity<Guid>
     }
 
     /// <summary>
-    /// Converts a nullable EF materialized value into an explicit domain Option.
-    /// </summary>
-    private static Option<T> ToOption<T>(T? value)
-        where T : class
-    {
-        return value is null ? None : Some(value);
-    }
-
-    /// <summary>
-    /// Converts an Option value into the nullable complex type EF Core maps.
-    /// </summary>
-    private static T? ToNullable<T>(Option<T> option)
-        where T : class
-    {
-        foreach (var value in option)
-        {
-            return value;
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Extracts an expected value-object error for aggregate-level accumulation.
     /// </summary>
     private static Option<DomainError> ErrorOf<T>(Either<DomainError, T> result)
@@ -230,7 +214,7 @@ public sealed class UserAccount : AbstractEntity<Guid>
 
         var occurredAtUtc = Timestamp.UtcNow;
 
-        PhoneNumberValue = ToNullable(newPhoneNumber);
+        PhoneNumberValue = newPhoneNumber.ToNullable();
         MarkModified(occurredAtUtc, None);
         RaiseDomainEvent(new UserAccountPhoneNumberChangedDomainEvent(Id, previousPhoneNumber, newPhoneNumber, occurredAtUtc));
 

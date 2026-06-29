@@ -1,4 +1,4 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 

@@ -1,6 +1,9 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings;
 
@@ -9,6 +12,10 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.Co
 /// </summary>
 public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAccount>
 {
+    private static readonly ValueConverter<Timestamp?, DateTime?> TimestampConverter = new(
+        timestamp => timestamp == null ? null : timestamp.Value,
+        value => value == null ? null : Timestamp.FromTrustedUtc(value.Value));
+
     /// <summary>
     /// Configures the aggregate table without introducing a persistence-only record type.
     /// </summary>
@@ -28,6 +35,14 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.Ignore(user => user.LastModifiedBy);
         builder.Ignore(user => user.PhoneNumber);
 
+        builder.Property<Timestamp?>("_createdAt")
+            .HasConversion(TimestampConverter)
+            .HasColumnName("CreatedAtUtc");
+
+        builder.Property<Timestamp?>("_lastModified")
+            .HasConversion(TimestampConverter)
+            .HasColumnName("LastModifiedAtUtc");
+
         builder.ComplexProperty(user => user.Name, name =>
         {
             name.Property(value => value.Value)
@@ -40,13 +55,19 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.ComplexProperty(user => user.Email, email =>
-        {
-            email.Property(value => value.Value)
-                .HasColumnName("Email")
-                .HasMaxLength(320)
-                .IsRequired();
-        });
+        builder.HasIndex(user => user.Document)
+            .IsUnique();
+
+        builder.Property(user => user.Email)
+            .HasConversion(
+                email => email.Value,
+                value => Email.FromTrustedValue(value))
+            .HasColumnName("Email")
+            .HasMaxLength(320)
+            .IsRequired();
+
+        builder.HasIndex(user => user.Email)
+            .IsUnique();
 
         builder.ComplexProperty(user => user.PhoneNumberValue, phone =>
         {

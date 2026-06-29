@@ -1,5 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ public sealed class EfUserAccountLookup(RegistrationDbContext dbContext) : IUser
     {
         return dbContext.Users
             .AsNoTracking()
-            .AnyAsync(user => user.Email.Value == email.Value, cancellationToken);
+            .AnyAsync(user => user.Email == email, cancellationToken);
     }
 
     /// <summary>

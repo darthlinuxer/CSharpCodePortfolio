@@ -2,7 +2,14 @@ using CSharpCodePortfolio.Tutorials.Tutorial30;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Entities;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
@@ -126,7 +133,7 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
-    /// Proves that EF Core maps the aggregate directly and uses complex properties for value objects.
+    /// Proves that EF Core maps the aggregate directly, using complex properties where they do not block indexes.
     /// </summary>
     [TestMethod]
     public void RegistrationDbContext_MapsUserAccountWithComplexProperties()
@@ -138,10 +145,18 @@ public sealed class LanguageExtRegistrationTests
         Assert.IsNotNull(userEntity);
         var complexPropertyNames = userEntity.GetComplexProperties().Select(property => property.Name).ToArray();
         Assert.Contains(nameof(UserAccount.Name), complexPropertyNames);
-        Assert.Contains(nameof(UserAccount.Email), complexPropertyNames);
         Assert.Contains("PhoneNumberValue", complexPropertyNames);
         Assert.IsFalse(complexPropertyNames.Any(name => name.Contains("ForPersistence", StringComparison.Ordinal)));
         Assert.IsNotNull(userEntity.FindProperty(nameof(UserAccount.Document)));
+        Assert.IsNotNull(userEntity.FindProperty(nameof(UserAccount.Email)));
+
+        var uniqueIndexes = userEntity.GetIndexes()
+            .Where(index => index.IsUnique)
+            .Select(index => index.Properties.Select(property => property.GetColumnName()).ToArray())
+            .ToArray();
+
+        Assert.IsTrue(uniqueIndexes.Any(columns => columns.SequenceEqual(["Document"])));
+        Assert.IsTrue(uniqueIndexes.Any(columns => columns.SequenceEqual(["Email"])));
     }
 
     /// <summary>
@@ -181,6 +196,26 @@ public sealed class LanguageExtRegistrationTests
     }
 
     /// <summary>
+    /// Proves that common DDD building blocks and aggregate-owned value objects are grouped by ownership.
+    /// </summary>
+    [TestMethod]
+    public void DomainFolders_GroupCommonBuildingBlocksAndUserAccountValueObjects()
+    {
+        var domainRoot = Path.Combine(FindTutorialRoot(), "01-Domain");
+
+        Assert.IsTrue(Directory.Exists(Path.Combine(domainRoot, "Common", "Entities")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(domainRoot, "Common", "Errors")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(domainRoot, "Common", "Events")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(domainRoot, "Common", "Functional")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(domainRoot, "Common", "ValueObjects")));
+        Assert.IsTrue(Directory.Exists(Path.Combine(domainRoot, "Aggregates", "UserAccounts", "ValueObjects")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(domainRoot, "Entities")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(domainRoot, "Errors")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(domainRoot, "Events")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(domainRoot, "ValueObjects")));
+    }
+
+    /// <summary>
     /// Proves that the domain layer has no dependency on infrastructure or EF Core.
     /// </summary>
     [TestMethod]
@@ -208,13 +243,61 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void AbstractEntity_DoesNotExposeMappingOnlyAuditProperties()
     {
-        var mappingOnlyProperties = typeof(AbstractEntity<Guid>)
+        var mappingOnlyProperties = typeof(AbstractEntity<Guid, UserAccount>)
             .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
             .Where(property => property.Name.EndsWith("Value", StringComparison.Ordinal))
             .Select(property => property.Name)
             .ToArray();
 
         Assert.IsEmpty(mappingOnlyProperties);
+    }
+
+    /// <summary>
+    /// Proves that the common entity base does not depend directly on the UserAccount aggregate type.
+    /// </summary>
+    [TestMethod]
+    public void AbstractEntity_UsesGenericActorWhileUserAccountKeepsTypedAudit()
+    {
+        Assert.AreEqual(2, typeof(UserAccount).BaseType?.GetGenericArguments().Length);
+        Assert.AreEqual(typeof(Option<UserAccount>), typeof(UserAccount).GetProperty(nameof(UserAccount.CreatedBy))?.PropertyType);
+        Assert.IsFalse(typeof(AbstractEntity<,>).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Any(field => field.FieldType == typeof(UserAccount)));
+    }
+
+    /// <summary>
+    /// Proves that domain events reuse a common event base while preserving typed event constants.
+    /// </summary>
+    [TestMethod]
+    public void UserAccountDomainEvents_InheritCommonDomainEventBase()
+    {
+        var domainEvent = new UserAccountRegisteredDomainEvent(
+            Guid.NewGuid(),
+            "10000",
+            GetRight(Email.Create("ada@example.com")),
+            Timestamp.UtcNow);
+
+        Assert.IsInstanceOfType<DomainEvent>(domainEvent);
+        Assert.AreEqual(UserAccountDomainEventTypes.Registered, domainEvent.EventType);
+    }
+
+    /// <summary>
+    /// Proves that Option conversion is centralized instead of duplicated in each caller.
+    /// </summary>
+    [TestMethod]
+    public void OptionConversions_AreCentralizedInOneExtensionType()
+    {
+        var duplicatedHelpers = new[]
+            {
+                typeof(UserAccount),
+                typeof(AbstractEntity<Guid, UserAccount>),
+                typeof(RegistrationEndpoint)
+            }
+            .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+            .Where(method => method.Name is "ToOption" or "ToNullable")
+            .Select(method => $"{method.DeclaringType?.Name}.{method.Name}")
+            .ToArray();
+
+        Assert.IsEmpty(duplicatedHelpers);
     }
 
     /// <summary>
@@ -336,17 +419,48 @@ public sealed class LanguageExtRegistrationTests
     /// Proves that the EF Core Unit of Work commits and clears domain events after persistence succeeds.
     /// </summary>
     [TestMethod]
-    public async Task RegistrationDbContextSaveChangesAsync_ClearsDomainEventsAfterCommit()
+    public async Task RegistrationDbContextCommitAsync_ClearsDomainEventsAfterCommit()
     {
         await using var dbContext = CreateDbContext();
         var writer = new EfUserAccountWriter(dbContext);
         var account = CreateValidAccount();
 
         writer.Add(account);
-        await ((IRegistrationUnitOfWork)dbContext).SaveChangesAsync(CancellationToken.None);
+        var commit = await ((IRegistrationUnitOfWork)dbContext).CommitAsync(CancellationToken.None);
 
+        Assert.IsTrue(commit.IsRight);
         Assert.IsEmpty(account.DomainEvents.ToArray());
         Assert.AreEqual(1, await dbContext.Users.CountAsync());
+
+        dbContext.ChangeTracker.Clear();
+        var persisted = await dbContext.Users.SingleAsync();
+
+        Assert.IsTrue(persisted.CreatedAt.IsSome);
+    }
+
+    /// <summary>
+    /// Proves that a stale pre-check still becomes a typed conflict when the database unique index wins the race.
+    /// </summary>
+    [TestMethod]
+    public async Task RegisterAsync_ReturnsConflictErrorWhenUniqueConstraintRejectsDuplicateEmail()
+    {
+        await using var dbContext = CreateDbContext();
+        var writer = new EfUserAccountWriter(dbContext);
+        var existing = CreateValidAccount();
+
+        writer.Add(existing);
+        Assert.IsTrue((await ((IRegistrationUnitOfWork)dbContext).CommitAsync(CancellationToken.None)).IsRight);
+
+        var service = new RegisterUserService(
+            new AlwaysEmptyUserAccountLookup(),
+            writer,
+            dbContext);
+
+        var result = await service.RegisterAsync(
+            new RegisterUserRequest("Outra Ada", "DOC-90000", "ADA@EXAMPLE.COM", null));
+
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(result));
+        Assert.IsFalse(dbContext.ChangeTracker.Entries<UserAccount>().Any(entry => entry.State == EntityState.Added));
     }
 
     /// <summary>
@@ -552,5 +666,29 @@ public sealed class LanguageExtRegistrationTests
         return result is IStatusCodeHttpResult statusCodeResult
             ? statusCodeResult.StatusCode ?? StatusCodes.Status200OK
             : StatusCodes.Status200OK;
+    }
+
+    /// <summary>
+    /// Test double that simulates a stale read model so the database unique index handles the final race.
+    /// </summary>
+    private sealed class AlwaysEmptyUserAccountLookup : IUserAccountLookup
+    {
+        /// <summary>
+        /// Returns false to simulate a document pre-check that ran before a concurrent insert.
+        /// </summary>
+        public Task<bool> DocumentExistsAsync(string document, CancellationToken cancellationToken) =>
+            Task.FromResult(false);
+
+        /// <summary>
+        /// Returns false to simulate an email pre-check that ran before a concurrent insert.
+        /// </summary>
+        public Task<bool> EmailExistsAsync(Email email, CancellationToken cancellationToken) =>
+            Task.FromResult(false);
+
+        /// <summary>
+        /// Returns no projection because this test double only supports duplicate pre-checks.
+        /// </summary>
+        public Task<Option<UserAccountQueryDto>> FindByIdAsync(Guid id, CancellationToken cancellationToken) =>
+            Task.FromResult<Option<UserAccountQueryDto>>(Prelude.None);
     }
 }

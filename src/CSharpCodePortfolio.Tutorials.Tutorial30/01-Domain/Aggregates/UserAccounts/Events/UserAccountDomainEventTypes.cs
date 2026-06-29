@@ -1,4 +1,6 @@
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
+
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Events;
 
 /// <summary>
 /// Stable user account domain event names kept in constants to avoid scattered magic strings.

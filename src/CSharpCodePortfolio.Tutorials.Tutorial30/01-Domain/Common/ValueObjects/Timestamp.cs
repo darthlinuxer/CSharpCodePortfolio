@@ -1,7 +1,8 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
-namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
+namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 
 /// <summary>
 /// Value object that guarantees domain timestamps are UTC.
@@ -37,6 +38,12 @@ public sealed record Timestamp
     /// </summary>
     public static Timestamp UtcNow =>
         new(DateTime.UtcNow);
+
+    /// <summary>
+    /// Rehydrates a UTC timestamp read from a trusted storage boundary.
+    /// </summary>
+    internal static Timestamp FromTrustedUtc(DateTime value) =>
+        new(DateTime.SpecifyKind(value, DateTimeKind.Utc));
 
     /// <summary>
     /// Adds a duration while preserving the UTC timestamp invariant.

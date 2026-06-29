@@ -36,11 +36,17 @@ execução. Os namespaces continuam sem número: `...Domain`, `...Application`,
 
 Estrutura interna do domínio:
 
-- `01-Domain/Aggregates/UserAccounts`: aggregate root, eventos e erros do `UserAccount`;
-- `01-Domain/Entities`: base entity e contratos comuns;
-- `01-Domain/ValueObjects`: `PersonName`, `Email`, `PhoneNumber`, `Timestamp`;
-- `01-Domain/Events`: contratos comuns de domain events;
-- `01-Domain/Errors`: tipos base `DomainError` e `DomainErrorCode`.
+- `01-Domain/Common/Entities`: base entity e contratos comuns;
+- `01-Domain/Common/Errors`: tipos base `DomainError` e `DomainErrorCode`;
+- `01-Domain/Common/Events`: contratos comuns e base `DomainEvent`;
+- `01-Domain/Common/Functional`: helpers pequenos para interoperar `Option<T>` com bordas nullable;
+- `01-Domain/Common/ValueObjects`: value objects reutilizáveis como `Timestamp`;
+- `01-Domain/Aggregates/UserAccounts`: aggregate root, eventos, erros e value objects específicos de `UserAccount`.
+
+Os namespaces acompanham as pastas para deixar ownership explícito mesmo dentro
+de um único projeto. Exemplo: `UserAccount` vive em
+`...Domain.Aggregates.UserAccounts`, enquanto `DomainError` vive em
+`...Domain.Common.Errors`.
 
 Estrutura interna das outras camadas:
 
@@ -129,15 +135,16 @@ bruta ainda pode ter `string?`, mas ela para em `RegisterUserRequest`. Quem
 transforma esses valores em modelo válido é `UserAccount.Create(...)`, retornando
 `Either<Seq<DomainError>, UserAccount>`.
 
-`UserAccount` herda de `AbstractEntity<Guid>`, então identity, metadados e
+`UserAccount` herda de `AbstractEntity<Guid, UserAccount>`, então identity, metadados e
 domain events ficam no domínio, não no application service. A identity é criada
 no construtor do domínio com `Guid.CreateVersion7()`; quando EF Core materializa
 do banco, ele popula o valor salvo na propriedade `Id`. Quando o aggregate é
 criado, ele levanta `UserAccountRegisteredDomainEvent`. Mudanças posteriores chamam
 métodos de domínio como `Rename`, `ChangeEmail` e `ChangePhoneNumber`, que
 levantam `UserAccountNameChangedDomainEvent`, `UserAccountEmailChangedDomainEvent`
-e `UserAccountPhoneNumberChangedDomainEvent`. A infraestrutura persiste a linha
-e limpa os eventos depois de `SaveChangesAsync`.
+e `UserAccountPhoneNumberChangedDomainEvent`. Neste tutorial, a infraestrutura
+captura os eventos pendentes no commit e os limpa depois que o EF confirma a
+persistência; dispatcher/outbox ficam fora do escopo.
 
 `DomainError` é o tipo base e cada falha esperada é um tipo concreto próximo do
 dono da regra. `EmailInvalidError` fica perto de `Email`; `UserAccountDocumentDuplicateError`
@@ -156,11 +163,12 @@ O tutorial persiste `UserAccount` diretamente. Não existe mais `UserRecord`.
 
 ```csharp
 public DbSet<UserAccount> Users => Set<UserAccount>();
-public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+public Task<Either<Seq<DomainError>, int>> CommitAsync(CancellationToken cancellationToken);
 ```
 
-O mapping fica em `03-Infrastructure/Persistence/ConfigurationMappings/UserAccountConfiguration`
-e usa `ComplexProperty` para value objects:
+O mapping fica em `03-Infrastructure/Persistence/ConfigurationMappings/UserAccountConfiguration`.
+Ele usa `ComplexProperty` para value objects compostos e `HasConversion` para
+scalar wrappers que precisam de índice:
 
 ```csharp
 builder.ComplexProperty(user => user.Name, name =>
@@ -170,6 +178,32 @@ builder.ComplexProperty(user => user.Name, name =>
         .HasMaxLength(200)
         .IsRequired();
 });
+```
+
+Documento e email também têm índices únicos no mapping. O pre-check de
+duplicidade continua existindo para mensagem amigável, mas a constraint do banco
+é a barreira durável contra corrida entre duas requisições.
+
+Os timestamps de audit (`CreatedAt` e `LastModified`) são expostos como
+`Option<Timestamp>` no domínio, mas persistidos por field-only mapping sobre os
+campos privados da base. Assim o tutorial não precisa criar propriedades
+duplicadas só para EF.
+
+`Email` continua sendo value object obrigatório no domínio, mas é persistido como
+scalar wrapper porque EF Core não aceita `HasIndex(user => user.Email.Value)` em
+complex property nested:
+
+```csharp
+builder.Property(user => user.Email)
+    .HasConversion(
+        email => email.Value,
+        value => Email.FromTrustedValue(value))
+    .HasColumnName("Email")
+    .HasMaxLength(320)
+    .IsRequired();
+
+builder.HasIndex(user => user.Email)
+    .IsUnique();
 ```
 
 Documento ficou como scalar normalizado no aggregate para evitar uma classe de
@@ -184,9 +218,13 @@ public string Document { get; private set; }
 complex property opcional do EF Core 10:
 
 ```csharp
-public Option<PhoneNumber> PhoneNumber => ToOption(PhoneNumberValue);
+public Option<PhoneNumber> PhoneNumber => PhoneNumberValue.ToOption();
 internal PhoneNumber? PhoneNumberValue { get; private set; }
 ```
+
+A conversão entre `Option<T>` e nullable fica em
+`01-Domain/Common/Functional/OptionExtensions`, para não repetir helpers em
+entity, aggregate e HTTP.
 
 Duplicidade de email compara o value object mapeado pelo EF no adapter de
 infraestrutura:
@@ -194,13 +232,12 @@ infraestrutura:
 ```csharp
 return dbContext.Users
     .AsNoTracking()
-    .AnyAsync(user => user.Email.Value == email.Value, cancellationToken);
+    .AnyAsync(user => user.Email == email, cancellationToken);
 ```
 
 O aggregate não mantém scalar auxiliar de lookup. O tutorial usa SQLite em
-memória porque é um provider relacional leve e traduz o acesso ao value object
-mapeado por `ComplexProperty`. A coluna `Email` continua configurada no mapping
-e pode receber índice/constraint.
+memória porque é um provider relacional leve e valida o índice único sem exigir
+um servidor de banco.
 
 Não há repository genérico. O writer é propositalmente fino:
 
@@ -231,7 +268,7 @@ EF Core.
 Telefone opcional usa `Option<T>` no domínio:
 
 ```csharp
-public Option<PhoneNumber> PhoneNumber => ToOption(PhoneNumberValue);
+public Option<PhoneNumber> PhoneNumber => PhoneNumberValue.ToOption();
 ```
 
 Sem `PhoneNumber?` público, sem exception para regra esperada.
