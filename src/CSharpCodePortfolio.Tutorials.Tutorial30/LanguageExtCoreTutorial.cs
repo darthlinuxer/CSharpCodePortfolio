@@ -63,7 +63,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         TutorialConsole.WriteExperiment(
             2,
             "Value objects e Option removem nullables do domínio",
-            "Mantenha Name, Document e Email obrigatórios; use Option<T> só para ausência válida, como PhoneNumber.");
+            "Mantenha Name e Email obrigatórios; use Option<T> só para ausência válida, como PhoneNumber.");
         TutorialConsole.WriteCodeSnippet(
             "Aggregate válido por construção",
             typeof(UserAccount),
@@ -86,7 +86,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         TutorialConsole.WriteExperiment(
             3,
             "Application service orquestra domínio, queries e persistência",
-            "Execute o mesmo caso de uso com email ausente inválido, email presente e duplicidade de documento.");
+            "Execute o mesmo caso de uso com email ausente inválido, email presente e duplicidade de email.");
         TutorialConsole.WriteCodeSnippet(
             "Application service funcional",
             typeof(RegisterUserService),
@@ -106,22 +106,23 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         var service = new RegisterUserService(
             new EfUserAccountLookup(dbContext),
             new EfUserAccountWriter(dbContext),
-            dbContext);
+            dbContext,
+            TimeProvider.System);
         var missingEmail = await service.RegisterAsync(
-            new RegisterUserRequest("Ada Lovelace", "DOC-10000", null, "11999998888"),
+            new RegisterUserRequest("Ada Lovelace", null, "11999998888"),
             cancellationToken).ConfigureAwait(false);
         var withEmail = await service.RegisterAsync(
-            new RegisterUserRequest("Grace Hopper", "DOC-20000", "grace@example.com", null),
+            new RegisterUserRequest("Grace Hopper", "grace@example.com", null),
             cancellationToken).ConfigureAwait(false);
-        var duplicateDocument = await service.RegisterAsync(
-            new RegisterUserRequest("Outra Grace", "DOC-20000", "outra@example.com", null),
+        var duplicateEmail = await service.RegisterAsync(
+            new RegisterUserRequest("Outra Grace", "grace@example.com", null),
             cancellationToken).ConfigureAwait(false);
 
         TutorialConsole.WriteEvidence(
             "Persistência assíncrona",
             ("Email ausente", ToScenarioResult(missingEmail)),
             ("Com email", ToScenarioResult(withEmail)),
-            ("Documento duplicado", ToScenarioResult(duplicateDocument)),
+            ("Email duplicado", ToScenarioResult(duplicateEmail)),
             ("Linhas persistidas", (await dbContext.Users.CountAsync(cancellationToken).ConfigureAwait(false)).ToString()));
 
         TutorialConsole.WriteExperiment(
@@ -133,7 +134,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             typeof(RegistrationEndpoint),
             nameof(RegistrationEndpoint.ToHttpResult));
 
-        var conflict = RegistrationEndpoint.ToHttpResult(duplicateDocument);
+        var conflict = RegistrationEndpoint.ToHttpResult(duplicateEmail);
         TutorialConsole.WriteEvidence(
             "Retorno HTTP",
             ("Status duplicidade", GetStatusCode(conflict).ToString()),
@@ -176,7 +177,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
     private static string CreateDomainEventEvidence()
     {
         var account =
-            UserAccount.Create("Alan Turing", "DOC-90000", "alan@example.com", null);
+            UserAccount.Create("Alan Turing", "alan@example.com", null, TimeProvider.System);
 
         return account.Match(
             Right: user =>

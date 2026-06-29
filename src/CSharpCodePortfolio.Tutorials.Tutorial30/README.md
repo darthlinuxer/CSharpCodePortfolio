@@ -1,245 +1,63 @@
 # Tutorial 30 - LanguageExt.Core pragmático
 
-Este tutorial mostra como usar `LanguageExt.Core` em um projeto .NET moderno
-para reduzir nullables no domínio, null checks espalhados, `if/else`
-procedural, exceptions para regra de negócio esperada e services difíceis de
-compor.
+Este tutorial mostra um cadastro de usuário modelado com DDD tático e
+`LanguageExt.Core`: `Option<T>` para ausência válida, `Either<Seq<DomainError>,
+T>` para falhas esperadas e EF Core como adapter de infraestrutura.
 
-## Versão usada
+O projeto alvo é `net10.0` com `LangVersion` fixado em `14.0`. A versão usada
+do pacote funcional é `LanguageExt.Core` `4.4.9`.
 
-O tutorial usa `LanguageExt.Core` `4.4.9`, versão estável mais recente
-confirmada no feed NuGet durante a implementação.
+## Estrutura
 
-Existe prerelease `5.0.0-beta-77`. Ela não é usada aqui porque este tutorial
-quer uma base estável para `Option`, `Either`, `Fin`, `Try`, `Seq`, `Map`,
-`Bind`, `Match`, `Some`, `None`, `Right`, `Left` e LINQ query syntax. A v5 beta
-pode ser avaliada em projeto novo que aceite mudanças de API.
+- `01-Domain`: aggregate, value objects, eventos, erros e building blocks comuns.
+- `02-Application`: caso de uso, DTOs e portas finas.
+- `03-Infrastructure`: EF Core, mapping, writer e unit of work.
+- `03-Presentation`: tradução HTTP de `Either` para `IResult`.
 
-Usings principais:
+O domínio preserva ownership por pasta:
 
-```csharp
-using LanguageExt;
-using static LanguageExt.Prelude;
-```
+- `01-Domain/Common/...`: `AbstractEntity<TId>`, `DomainError`, eventos comuns,
+  helpers pequenos e `Timestamp`.
+- `01-Domain/Aggregates/UserAccounts/...`: `UserAccount`, erros/eventos do
+  aggregate e value objects específicos (`PersonName`, `Email`, `PhoneNumber`).
 
-Estrutura física das camadas:
+## Modelo de domínio
 
-- `01-Domain`: núcleo do modelo; não conhece EF Core, HTTP ou application service;
-- `02-Application`: casos de uso, DTOs e portas;
-- `03-Infrastructure`: adapter externo driven/outbound para EF Core;
-- `03-Presentation`: adapter externo driving/inbound para HTTP.
-
-`Infrastructure` e `Presentation` usam o mesmo número porque são adapters no
-mesmo anel externo. A numeração ensina dependência arquitetural, não ordem de
-execução. Os namespaces continuam sem número: `...Domain`, `...Application`,
-`...Infrastructure` e `...Presentation`.
-
-Estrutura interna do domínio:
-
-- `01-Domain/Common/Entities`: base entity e contratos comuns;
-- `01-Domain/Common/Errors`: tipos base `DomainError` e `DomainErrorCode`;
-- `01-Domain/Common/Events`: contratos comuns e base `DomainEvent`;
-- `01-Domain/Common/Functional`: helpers pequenos para interoperar `Option<T>` com bordas nullable;
-- `01-Domain/Common/ValueObjects`: value objects reutilizáveis como `Timestamp`;
-- `01-Domain/Aggregates/UserAccounts`: aggregate root, eventos, erros e value objects específicos de `UserAccount`.
-
-Os namespaces acompanham as pastas para deixar ownership explícito mesmo dentro
-de um único projeto. Exemplo: `UserAccount` vive em
-`...Domain.Aggregates.UserAccounts`, enquanto `DomainError` vive em
-`...Domain.Common.Errors`.
-
-Estrutura interna das outras camadas:
-
-- `02-Application/Commands`: DTOs e services de caso de uso;
-- `02-Application/Queries`: DTOs e portas de leitura;
-- `02-Application/Persistence`: writer fino e unit of work;
-- `03-Infrastructure/Persistence`: `DbContext`, mappings, writer EF e commit;
-- `03-Infrastructure/Queries`: implementações EF das queries;
-- `03-Presentation/Http`: tradução de `Either` para HTTP e `ProblemDetails`.
-
-## 1. O problema do C# tradicional
-
-O arquivo `Traditional/TraditionalNullRegistrationExample.cs` mostra um cadastro
-de usuário com `string?`, `Email?`, `PhoneNumber?`, vários `if`, `throw` para
-regra esperada, service retornando `null` e controller interpretando estados
-implícitos.
-
-O problema não é o nullable em DTO de entrada. O problema é deixar o domínio e
-o fluxo de aplicação dependerem de ausência implícita:
+`UserAccount` é o aggregate root. Ele mantém `Name` e `Email` como value objects
+obrigatórios e `PhoneNumber` como `Option<PhoneNumber>`.
 
 ```csharp
-public string? Name { get; set; }
-public string? Document { get; set; }
-public Email? Email { get; set; }
-public PhoneNumber? PhoneNumber { get; set; }
+public static Either<Seq<DomainError>, UserAccount> Create(
+    string? name,
+    string? email,
+    string? phoneNumber,
+    TimeProvider clock)
 ```
 
-Depois disso, cada camada precisa perguntar de novo:
+Falhas de regra esperada não usam exception. Cada value object retorna
+`Either<Seq<DomainError>, T>` e o aggregate acumula os erros de entrada. O relógio
+entra por `TimeProvider`, então timestamps de criação, alteração e eventos são
+determinísticos em teste.
 
-- nome existe?
-- documento existe?
-- email ausente é válido ou erro?
-- `null` do service significa conflito, não encontrado ou falha?
-- exception é bug técnico ou regra de negócio?
+`AbstractEntity<TId>` contém somente identidade, `CreatedAt`, `LastModified` e
+domain events. Auditoria de ator fica fora do aggregate, na borda de aplicação ou
+autenticação quando existir.
 
-## 2. Tipos centrais do LanguageExt.Core
+## Erros
 
-`Option<T>` representa ausência válida. Neste tutorial, telefone é opcional;
-email é obrigatório:
+`DomainError` expõe:
 
-```csharp
-public Email Email { get; }
-public Option<PhoneNumber> PhoneNumber { get; }
-```
+- `Code`: código estável para serialização.
+- `Message`: mensagem humana.
+- `Category`: taxonomia de domínio (`validation` ou `conflict`).
 
-`Either<L,R>` representa erro esperado. `Left` carrega erro; `Right` carrega
-valor válido:
+A apresentação traduz `Category` para HTTP em `DomainErrorHttpMap`. Assim um novo
+erro de conflito não obriga o endpoint a conhecer o tipo concreto.
 
-```csharp
-Either<DomainError, Email> email = Email.Create("ada@example.com");
-```
+## Persistência
 
-`Fin<T>` representa sucesso/falha com `LanguageExt.Common.Error`. Use quando a
-falha genérica da biblioteca for suficiente; prefira `Either<DomainError,T>`
-quando o domínio precisa de códigos próprios.
-
-`Try<T>` captura exceções em bordas técnicas. Em `LanguageExt.Core` `4.4.9`,
-executar `Try<T>` retorna `Result<T>`, não `Fin<T>`.
-
-`Seq<T>` é coleção funcional. Aqui o service retorna
-`Either<Seq<DomainError>, RegisteredUserDto>` para permitir mais de um
-erro esperado.
-
-`Map` transforma valor dentro do contexto. `Bind` encadeia funções que também
-retornam contexto. `Match` fecha o fluxo explicitamente. LINQ query syntax
-ajuda quando vários `Either` precisam ser compostos.
-
-## 3. Substituindo nullables no domínio
-
-Campo obrigatório fica direto:
-
-```csharp
-public PersonName Name { get; }
-public string Document { get; }
-public Email Email { get; }
-```
-
-Campo opcional vira `Option<T>`:
-
-```csharp
-public Option<PhoneNumber> PhoneNumber { get; }
-```
-
-Assim o aggregate `UserAccount` não tem estado parcialmente inválido. Entrada
-bruta ainda pode ter `string?`, mas ela para em `RegisterUserRequest`. Quem
-transforma esses valores em modelo válido é `UserAccount.Create(...)`, retornando
-`Either<Seq<DomainError>, UserAccount>`.
-
-`UserAccount` herda de `AbstractEntity<Guid, UserAccount>`, então identity, metadados e
-domain events ficam no domínio, não no application service. A identity é criada
-no construtor do domínio com `Guid.CreateVersion7()`; quando EF Core materializa
-do banco, ele popula o valor salvo na propriedade `Id`. Quando o aggregate é
-criado, ele levanta `UserAccountRegisteredDomainEvent`. Mudanças posteriores chamam
-métodos de domínio como `Rename`, `ChangeEmail` e `ChangePhoneNumber`, que
-levantam `UserAccountNameChangedDomainEvent`, `UserAccountEmailChangedDomainEvent`
-e `UserAccountPhoneNumberChangedDomainEvent`. Neste tutorial, a infraestrutura
-captura os eventos pendentes no commit e os limpa depois que o EF confirma a
-persistência; dispatcher/outbox ficam fora do escopo.
-
-`DomainError` é o tipo base e cada falha esperada é um tipo concreto próximo do
-dono da regra. `EmailInvalidError` fica perto de `Email`; `UserAccountDocumentDuplicateError`
-fica perto de `UserAccount`. Isso evita o acoplamento errado em que value objects
-conhecem a camada `Application` e também evita um catálogo global baseado em
-strings. `DomainErrorCode` continua existindo para serializar o erro em HTTP e
-evidência de console; regra interna compara tipos concretos.
-`DomainException` não é usada neste tutorial: regra esperada retorna
-`Either<DomainError,T>`. Exception fica para falha técnica ou estado impossível
-fora do fluxo normal.
-
-## 4. Persistência com EF Core 10
-
-O tutorial persiste `UserAccount` diretamente. Não existe mais `UserRecord`.
-`RegistrationDbContext` expõe o `DbSet` e implementa a unit of work:
-
-```csharp
-public DbSet<UserAccount> Users => Set<UserAccount>();
-public Task<Either<Seq<DomainError>, int>> CommitAsync(CancellationToken cancellationToken);
-```
-
-O mapping fica em `03-Infrastructure/Persistence/ConfigurationMappings/UserAccountConfiguration`.
-Ele usa `ComplexProperty` para value objects compostos e `HasConversion` para
-scalar wrappers que precisam de índice:
-
-```csharp
-builder.ComplexProperty(user => user.Name, name =>
-{
-    name.Property(value => value.Value)
-        .HasColumnName("Name")
-        .HasMaxLength(200)
-        .IsRequired();
-});
-```
-
-Documento e email também têm índices únicos no mapping. O pre-check de
-duplicidade continua existindo para mensagem amigável, mas a constraint do banco
-é a barreira durável contra corrida entre duas requisições.
-
-Os timestamps de audit (`CreatedAt` e `LastModified`) são expostos como
-`Option<Timestamp>` no domínio, mas persistidos por field-only mapping sobre os
-campos privados da base. Assim o tutorial não precisa criar propriedades
-duplicadas só para EF.
-
-`Email` continua sendo value object obrigatório no domínio, mas é persistido como
-scalar wrapper porque EF Core não aceita `HasIndex(user => user.Email.Value)` em
-complex property nested:
-
-```csharp
-builder.Property(user => user.Email)
-    .HasConversion(
-        email => email.Value,
-        value => Email.FromTrustedValue(value))
-    .HasColumnName("Email")
-    .HasMaxLength(320)
-    .IsRequired();
-
-builder.HasIndex(user => user.Email)
-    .IsUnique();
-```
-
-Documento ficou como scalar normalizado no aggregate para evitar uma classe de
-persistência e o value object `DocumentNumber` foi removido:
-
-```csharp
-public string Document { get; private set; }
-```
-
-`Option<T>` continua sendo a API do domínio para telefone. EF Core não mapeia
-`Option<T>` diretamente; ele mapeia uma propriedade interna nullable como
-complex property opcional do EF Core 10:
-
-```csharp
-public Option<PhoneNumber> PhoneNumber => PhoneNumberValue.ToOption();
-internal PhoneNumber? PhoneNumberValue { get; private set; }
-```
-
-A conversão entre `Option<T>` e nullable fica em
-`01-Domain/Common/Functional/OptionExtensions`, para não repetir helpers em
-entity, aggregate e HTTP.
-
-Duplicidade de email compara o value object mapeado pelo EF no adapter de
-infraestrutura:
-
-```csharp
-return dbContext.Users
-    .AsNoTracking()
-    .AnyAsync(user => user.Email == email, cancellationToken);
-```
-
-O aggregate não mantém scalar auxiliar de lookup. O tutorial usa SQLite em
-memória porque é um provider relacional leve e valida o índice único sem exigir
-um servidor de banco.
-
-Não há repository genérico. O writer é propositalmente fino:
+`RegistrationDbContext` persiste o aggregate diretamente. Não há repository
+genérico. O writer é fino:
 
 ```csharp
 public interface IUserAccountWriter
@@ -249,45 +67,41 @@ public interface IUserAccountWriter
 }
 ```
 
-O commit fica no `IRegistrationUnitOfWork`. Updates são rastreados pelo próprio
-EF Core.
+`IRegistrationUnitOfWork.CommitAsync` concentra o commit e converte conflitos
+esperados de índice único em `Left(Seq<DomainError>)`. O índice único durável é o
+email; o pre-check no application service melhora a resposta, mas a constraint do
+banco continua sendo a proteção contra corrida.
 
-## 5. Fluxo de cadastro
+`Option<PhoneNumber>` é a API pública do aggregate. EF Core mapeia um backing
+value nullable (`PhoneNumberValue`) por `ValueConverter`, mantendo `PhoneNumber?`
+fora do contrato público do domínio.
+
+## Fluxo
 
 `RegisterUserService.RegisterAsync` executa:
 
-1. recebe `RegisterUserRequest`;
-2. chama `UserAccount.Create(...)`;
-3. se o domínio retornar `Left`, devolve `Left(Seq<DomainError>)`;
-4. se o aggregate for válido, consulta fatos de duplicidade via `IUserAccountLookup`;
-5. chama `UserAccount.EnsureCanBeRegistered(...)` para o domínio decidir a regra;
-6. adiciona via `IUserAccountWriter`;
-7. commita via `IRegistrationUnitOfWork`;
-8. devolve `Right(RegisteredUserDto)`.
+1. cria o aggregate com `UserAccount.Create(...)`;
+2. retorna `Left` se a validação do domínio falhar;
+3. consulta `IUserAccountLookup.EmailExistsAsync`;
+4. deixa o aggregate decidir `EnsureCanBeRegistered(emailExists)`;
+5. adiciona pelo writer;
+6. commita pela unit of work;
+7. retorna `RegisteredUserDto` com valores primitivos.
 
-Telefone opcional usa `Option<T>` no domínio:
+`RegistrationEndpoint` fecha o `Either`:
 
-```csharp
-public Option<PhoneNumber> PhoneNumber => PhoneNumberValue.ToOption();
+- `Right(dto)` vira `201 Created`;
+- `validation` vira `400 BadRequest`;
+- `conflict` vira `409 Conflict`.
+
+`Option<string>` só vira `string?` na resposta HTTP.
+
+## Executar
+
+```bash
+dotnet test tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests.csproj
+dotnet run --project src/CSharpCodePortfolio.App -- run 30
 ```
 
-Sem `PhoneNumber?` público, sem exception para regra esperada.
-
-## 6. HTTP explícito
-
-`RegistrationEndpoint.ToHttpResult` transforma o resultado:
-
-- `Right(dto)` -> `201 Created`
-- `Left(Invalid*)` -> `400 BadRequest`
-- `Left(Duplicate*)` -> `409 Conflict`
-
-Controller ou endpoint não interpreta `null`. Ele fecha o `Either` com `Match`.
-Falhas esperadas viram `Results.Problem(...)` com extensão `errors`. O status
-`409 Conflict` é escolhido por pattern matching de tipo concreto, não por
-comparação de string.
-
-## 7. O que ficou fora
-
-`Validation` não entra neste tutorial. `Seq<DomainError>` cobre a lista de
-erros sem aumentar a superfície conceitual. Use `Validation` quando quiser
-acumulação applicative como assunto próprio.
+O tutorial de console imprime evidências de validação, persistência, conflito por
+email e tradução HTTP.

@@ -42,7 +42,6 @@ public static class RegistrationEndpoint
         return new RegisteredUserResponse(
             user.Id,
             user.Name,
-            user.Document,
             user.Email,
             user.PhoneNumber.ToNullable());
     }
@@ -55,6 +54,5 @@ public static class RegistrationEndpoint
 public sealed record RegisteredUserResponse(
     Guid Id,
     string Name,
-    string Document,
     string Email,
     string? PhoneNumber);

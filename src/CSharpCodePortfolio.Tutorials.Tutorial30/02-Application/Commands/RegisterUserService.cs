@@ -13,7 +13,8 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 public sealed class RegisterUserService(
     IUserAccountLookup lookup,
     IUserAccountWriter writer,
-    IRegistrationUnitOfWork unitOfWork)
+    IRegistrationUnitOfWork unitOfWork,
+    TimeProvider clock)
 {
     /// <summary>
     /// Registers a user and returns Either instead of null or exceptions for expected outcomes.
@@ -24,7 +25,7 @@ public sealed class RegisterUserService(
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var account = UserAccount.Create(request.Name, request.Document, request.Email, request.PhoneNumber);
+        var account = UserAccount.Create(request.Name, request.Email, request.PhoneNumber, clock);
 
         return await account.Match(
             Right: validAccount => RegisterValidatedAsync(validAccount, cancellationToken),
@@ -38,9 +39,8 @@ public sealed class RegisterUserService(
         UserAccount account,
         CancellationToken cancellationToken)
     {
-        var documentExists = await lookup.DocumentExistsAsync(account.Document, cancellationToken).ConfigureAwait(false);
         var emailExists = await lookup.EmailExistsAsync(account.Email, cancellationToken).ConfigureAwait(false);
-        var canRegister = account.EnsureCanBeRegistered(documentExists, emailExists);
+        var canRegister = account.EnsureCanBeRegistered(emailExists);
 
         return await canRegister.Match(
             Right: async _ =>
@@ -63,7 +63,6 @@ public sealed class RegisterUserService(
         return new RegisteredUserDto(
             account.Id,
             account.Name.Value,
-            account.Document,
             account.Email.Value,
             account.PhoneNumber.Map(phone => phone.Value));
     }

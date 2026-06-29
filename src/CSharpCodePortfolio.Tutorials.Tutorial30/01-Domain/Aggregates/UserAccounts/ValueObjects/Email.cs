@@ -8,51 +8,34 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccount
 /// <summary>
 /// Value object for the required registration email.
 /// </summary>
-public sealed record Email
+public readonly record struct Email(string Value)
 {
-    private Email()
-    {
-    }
-
-    private Email(string value)
-    {
-        Value = value;
-    }
-
-    /// <summary>
-    /// Gets the normalized email address.
-    /// </summary>
-    public string Value { get; private set; } = string.Empty;
-
     /// <summary>
     /// Validates an email that was actually supplied by the caller.
     /// </summary>
-    public static Either<DomainError, Email> Create(string? value)
+    public static Either<Seq<DomainError>, Email> Create(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return Left<DomainError, Email>(new EmailInvalidError());
-        }
+        return string.IsNullOrWhiteSpace(value)
+            ? Left<Seq<DomainError>, Email>(Seq1<DomainError>(new EmailInvalidError()))
+            : TryNormalize(value);
+    }
 
+    private static Either<Seq<DomainError>, Email> TryNormalize(string value)
+    {
         try
         {
             var normalized = value.Trim().ToLowerInvariant();
             var parsed = new MailAddress(normalized);
 
             return parsed.Address == normalized
-                ? Right<DomainError, Email>(new Email(normalized))
-                : Left<DomainError, Email>(new EmailInvalidError());
+                ? Right<Seq<DomainError>, Email>(new Email(normalized))
+                : Left<Seq<DomainError>, Email>(Seq1<DomainError>(new EmailInvalidError()));
         }
         catch (FormatException)
         {
-            return Left<DomainError, Email>(new EmailInvalidError());
+            return Left<Seq<DomainError>, Email>(Seq1<DomainError>(new EmailInvalidError()));
         }
     }
-
-    /// <summary>
-    /// Rehydrates an already normalized value from a trusted storage boundary.
-    /// </summary>
-    internal static Email FromTrustedValue(string value) => new(value);
 
     /// <summary>
     /// Returns the normalized email address for persistence and comparison.
@@ -64,4 +47,8 @@ public sealed record Email
 /// Error returned when the required email is missing or malformed.
 /// </summary>
 public sealed record EmailInvalidError()
-    : DomainError(new DomainErrorCode("registration.email_invalid"), "Email informado é inválido.");
+    : DomainError(new DomainErrorCode("registration.email_invalid"), "Email informado é inválido.")
+{
+    /// <inheritdoc />
+    public override DomainErrorCategory Category => DomainErrorCategory.Validation;
+}

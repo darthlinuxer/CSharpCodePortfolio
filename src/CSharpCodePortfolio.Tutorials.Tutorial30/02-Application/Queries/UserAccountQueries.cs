@@ -9,7 +9,6 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Queries;
 public sealed record UserAccountQueryDto(
     Guid Id,
     string Name,
-    string Document,
     string Email,
     Option<string> PhoneNumber);
 
@@ -18,11 +17,6 @@ public sealed record UserAccountQueryDto(
 /// </summary>
 public interface IUserAccountLookup
 {
-    /// <summary>
-    /// Checks whether a normalized required document is already registered.
-    /// </summary>
-    Task<bool> DocumentExistsAsync(string document, CancellationToken cancellationToken);
-
     /// <summary>
     /// Checks whether a required email is already registered.
     /// </summary>

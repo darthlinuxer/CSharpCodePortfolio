@@ -1,4 +1,3 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
@@ -15,28 +14,20 @@ public static class ProblemResult
     /// </summary>
     public static IResult FromErrors(Seq<DomainError> errors)
     {
-        var statusCode = IsConflict(errors)
-            ? StatusCodes.Status409Conflict
-            : StatusCodes.Status400BadRequest;
+        var category = errors.Fold(
+            DomainErrorCategory.Validation,
+            static (current, error) => current == DomainErrorCategory.Conflict
+                ? current
+                : error.Category);
+        var (statusCode, title) = DomainErrorHttpMap.Resolve(category);
 
         return Results.Problem(
             statusCode: statusCode,
-            title: statusCode == StatusCodes.Status409Conflict
-                ? "Conflito de cadastro."
-                : "Cadastro inválido.",
+            title: title,
             extensions: new Dictionary<string, object?>
             {
                 ["errors"] = errors.Map(error => new ProblemError(error.Code.ToString(), error.Message)).ToArray()
             });
-    }
-
-    /// <summary>
-    /// Detects errors that should become HTTP 409 instead of HTTP 400.
-    /// </summary>
-    private static bool IsConflict(Seq<DomainError> errors)
-    {
-        return errors.Exists(error =>
-            error is UserAccountDocumentDuplicateError or UserAccountEmailDuplicateError);
     }
 }
 

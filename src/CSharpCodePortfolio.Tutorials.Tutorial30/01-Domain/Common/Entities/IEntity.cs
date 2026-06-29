@@ -12,15 +12,7 @@ public interface IEntity
     void ClearDomainEvents();
 }
 
-public interface IEntity<TActor> : IEntity
-    where TActor : class
-{
-    Option<TActor> CreatedBy { get; }
-    Option<TActor> LastModifiedBy { get; }
-}
-
-public interface IEntity<out TId, TActor> : IEntity<TActor>
-    where TActor : class
+public interface IEntity<out TId> : IEntity
 {
     TId Id { get; }
 }

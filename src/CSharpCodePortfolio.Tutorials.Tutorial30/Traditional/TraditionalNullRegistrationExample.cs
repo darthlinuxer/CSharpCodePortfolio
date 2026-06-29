@@ -12,7 +12,6 @@ public static class TraditionalNullRegistrationExample
     /// </summary>
     public sealed record TraditionalRegisterUserRequest(
         string? Name,
-        string? Document,
         string? Email,
         string? PhoneNumber);
 
@@ -40,11 +39,6 @@ public static class TraditionalNullRegistrationExample
         /// Gets or sets a required name, but the type still allows null.
         /// </summary>
         public string? Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets a required document, but the type still allows null.
-        /// </summary>
-        public string? Document { get; set; }
 
         /// <summary>
         /// Gets or sets a required email through a nullable object.
@@ -78,16 +72,6 @@ public static class TraditionalNullRegistrationExample
                 throw new InvalidOperationException("Nome obrigatório.");
             }
 
-            if (string.IsNullOrWhiteSpace(request.Document))
-            {
-                throw new InvalidOperationException("Documento obrigatório.");
-            }
-
-            if (users.Any(user => user.Document == request.Document))
-            {
-                return Task.FromResult<TraditionalUser?>(null);
-            }
-
             if (string.IsNullOrWhiteSpace(request.Email))
             {
                 throw new InvalidOperationException("Email obrigatório.");
@@ -118,7 +102,6 @@ public static class TraditionalNullRegistrationExample
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
-                Document = request.Document,
                 Email = new Email(request.Email),
                 PhoneNumber = phone
             };
@@ -147,7 +130,7 @@ public static class TraditionalNullRegistrationExample
 
                 if (user is null)
                 {
-                    return Results.Conflict(new { Error = "Documento ou email duplicado." });
+                    return Results.Conflict(new { Error = "Email duplicado." });
                 }
 
                 return Results.Created($"/users/{user.Id}", user);

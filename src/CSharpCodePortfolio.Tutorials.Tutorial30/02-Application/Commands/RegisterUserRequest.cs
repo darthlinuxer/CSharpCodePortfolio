@@ -5,6 +5,5 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 /// </summary>
 public sealed record RegisterUserRequest(
     string? Name,
-    string? Document,
     string? Email,
     string? PhoneNumber);

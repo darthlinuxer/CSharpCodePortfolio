@@ -9,25 +9,24 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Functional;
 internal static class OptionExtensions
 {
     /// <summary>
-    /// Converts nullable materialized state into explicit domain optionality.
+    /// Converts nullable value type state into explicit domain optionality.
     /// </summary>
     internal static Option<T> ToOption<T>(this T? value)
-        where T : class
+        where T : struct
     {
-        return value is null ? None : Some(value);
+        return value.HasValue ? Some(value.Value) : None;
     }
 
     /// <summary>
     /// Converts explicit optionality into the nullable shape expected by EF Core or HTTP.
     /// </summary>
     internal static T? ToNullable<T>(this Option<T> option)
-        where T : class
     {
         foreach (var value in option)
         {
             return value;
         }
 
-        return null;
+        return default;
     }
 }

@@ -7,30 +7,16 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccount
 /// <summary>
 /// Value object that keeps the required user name non-null and normalized.
 /// </summary>
-public sealed record PersonName
+public readonly record struct PersonName(string Value)
 {
-    private PersonName()
-    {
-    }
-
-    private PersonName(string value)
-    {
-        Value = value;
-    }
-
-    /// <summary>
-    /// Gets the normalized name stored by the domain.
-    /// </summary>
-    public string Value { get; private set; } = string.Empty;
-
     /// <summary>
     /// Validates raw input and returns Either instead of throwing for expected user mistakes.
     /// </summary>
-    public static Either<DomainError, PersonName> Create(string? value)
+    public static Either<Seq<DomainError>, PersonName> Create(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
-            ? Left<DomainError, PersonName>(new PersonNameRequiredError())
-            : Right<DomainError, PersonName>(new PersonName(value.Trim()));
+            ? Left<Seq<DomainError>, PersonName>(Seq1<DomainError>(new PersonNameRequiredError()))
+            : Right<Seq<DomainError>, PersonName>(new PersonName(value.Trim()));
     }
 
     /// <summary>
@@ -43,4 +29,8 @@ public sealed record PersonName
 /// Error returned when the required user name is missing.
 /// </summary>
 public sealed record PersonNameRequiredError()
-    : DomainError(new DomainErrorCode("registration.name_required"), "Nome obrigatório.");
+    : DomainError(new DomainErrorCode("registration.name_required"), "Nome obrigatório.")
+{
+    /// <inheritdoc />
+    public override DomainErrorCategory Category => DomainErrorCategory.Validation;
+}

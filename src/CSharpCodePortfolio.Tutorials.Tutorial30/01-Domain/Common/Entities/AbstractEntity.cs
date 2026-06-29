@@ -1,24 +1,20 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Functional;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Entities;
 
 /// <summary>
-/// Base class for entities that need identity, audit metadata, and domain events.
+/// Base class for entities that need identity, timestamp audit metadata, and domain events.
 /// </summary>
 /// <typeparam name="TId">Identity type used by the entity.</typeparam>
-/// <typeparam name="TActor">Actor aggregate type used by audit metadata.</typeparam>
-public abstract class AbstractEntity<TId, TActor> : IEntity<TId, TActor>
+public abstract class AbstractEntity<TId> : IEntity<TId>
     where TId : notnull
-    where TActor : class
 {
     private readonly List<IDomainEvent> _domainEvents = [];
     private Timestamp? _createdAt;
-    private TActor? _createdBy;
     private Timestamp? _lastModified;
-    private TActor? _lastModifiedBy;
 
     /// <summary>
     /// Initializes an empty entity for EF Core materialization.
@@ -44,22 +40,12 @@ public abstract class AbstractEntity<TId, TActor> : IEntity<TId, TActor>
     /// <summary>
     /// Gets the optional UTC creation timestamp.
     /// </summary>
-    public Option<Timestamp> CreatedAt => _createdAt.ToOption();
-
-    /// <summary>
-    /// Gets the optional actor that created the entity.
-    /// </summary>
-    public Option<TActor> CreatedBy => _createdBy.ToOption();
+    public Option<Timestamp> CreatedAt => _createdAt.HasValue ? Some(_createdAt.Value) : None;
 
     /// <summary>
     /// Gets the optional UTC timestamp for the latest modification.
     /// </summary>
-    public Option<Timestamp> LastModified => _lastModified.ToOption();
-
-    /// <summary>
-    /// Gets the optional actor that last modified the entity.
-    /// </summary>
-    public Option<TActor> LastModifiedBy => _lastModifiedBy.ToOption();
+    public Option<Timestamp> LastModified => _lastModified.HasValue ? Some(_lastModified.Value) : None;
 
     /// <summary>
     /// Gets events raised by completed domain behavior.
@@ -69,19 +55,17 @@ public abstract class AbstractEntity<TId, TActor> : IEntity<TId, TActor>
     /// <summary>
     /// Records creation metadata after a factory has validated the aggregate.
     /// </summary>
-    protected void MarkCreated(Timestamp createdAt, Option<TActor> createdBy)
+    protected void MarkCreated(Timestamp createdAt)
     {
         _createdAt = createdAt;
-        _createdBy = createdBy.ToNullable();
     }
 
     /// <summary>
     /// Records modification metadata after behavior changes entity state.
     /// </summary>
-    protected void MarkModified(Timestamp modifiedAt, Option<TActor> modifiedBy)
+    protected void MarkModified(Timestamp modifiedAt)
     {
         _lastModified = modifiedAt;
-        _lastModifiedBy = modifiedBy.ToNullable();
     }
 
     /// <summary>
@@ -110,5 +94,4 @@ public abstract class AbstractEntity<TId, TActor> : IEntity<TId, TActor>
             ? (TId)(object)Guid.CreateVersion7()
             : default!;
     }
-
 }

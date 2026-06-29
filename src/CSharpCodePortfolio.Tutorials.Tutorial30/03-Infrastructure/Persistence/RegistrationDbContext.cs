@@ -93,13 +93,6 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
         foreach (var account in accounts)
         {
             if (await Users.AsNoTracking()
-                    .AnyAsync(user => user.Id != account.Id && user.Document == account.Document, cancellationToken)
-                    .ConfigureAwait(false))
-            {
-                errors.Add(new UserAccountDocumentDuplicateError());
-            }
-
-            if (await Users.AsNoTracking()
                     .AnyAsync(user => user.Id != account.Id && user.Email == account.Email, cancellationToken)
                     .ConfigureAwait(false))
             {

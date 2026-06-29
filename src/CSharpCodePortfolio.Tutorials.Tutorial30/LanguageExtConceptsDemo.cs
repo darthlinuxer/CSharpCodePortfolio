@@ -26,7 +26,7 @@ public static class LanguageExtConceptsDemo
 
         var emailLength =
             from email in Email.Create("ada@example.com")
-            from normalized in Right<DomainError, string>(email.Value)
+            from normalized in Right<Seq<DomainError>, string>(email.Value)
             select normalized.Length;
 
         var composed =

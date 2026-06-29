@@ -1,9 +1,11 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings;
 
@@ -13,8 +15,20 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.Co
 public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAccount>
 {
     private static readonly ValueConverter<Timestamp?, DateTime?> TimestampConverter = new(
-        timestamp => timestamp == null ? null : timestamp.Value,
-        value => value == null ? null : Timestamp.FromTrustedUtc(value.Value));
+        timestamp => timestamp.HasValue ? timestamp.Value.Value : null,
+        value => value.HasValue ? Timestamp.FromTrustedUtc(value.Value) : null);
+
+    private static readonly ValueConverter<PersonName, string> PersonNameConverter = new(
+        name => name.Value,
+        value => new PersonName(value));
+
+    private static readonly ValueConverter<Email, string> EmailConverter = new(
+        email => email.Value,
+        value => new Email(value));
+
+    private static readonly ValueConverter<PhoneNumber?, string?> PhoneNumberConverter = new(
+        phone => PhoneToProvider(phone),
+        value => PhoneFromProvider(value));
 
     /// <summary>
     /// Configures the aggregate table without introducing a persistence-only record type.
@@ -30,9 +44,7 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
 
         builder.Ignore(user => user.DomainEvents);
         builder.Ignore(user => user.CreatedAt);
-        builder.Ignore(user => user.CreatedBy);
         builder.Ignore(user => user.LastModified);
-        builder.Ignore(user => user.LastModifiedBy);
         builder.Ignore(user => user.PhoneNumber);
 
         builder.Property<Timestamp?>("_createdAt")
@@ -43,25 +55,14 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
             .HasConversion(TimestampConverter)
             .HasColumnName("LastModifiedAtUtc");
 
-        builder.ComplexProperty(user => user.Name, name =>
-        {
-            name.Property(value => value.Value)
-                .HasColumnName("Name")
-                .HasMaxLength(200)
-                .IsRequired();
-        });
-
-        builder.Property(user => user.Document)
-            .HasMaxLength(20)
+        builder.Property(user => user.Name)
+            .HasConversion(PersonNameConverter)
+            .HasColumnName("Name")
+            .HasMaxLength(200)
             .IsRequired();
 
-        builder.HasIndex(user => user.Document)
-            .IsUnique();
-
         builder.Property(user => user.Email)
-            .HasConversion(
-                email => email.Value,
-                value => Email.FromTrustedValue(value))
+            .HasConversion(EmailConverter)
             .HasColumnName("Email")
             .HasMaxLength(320)
             .IsRequired();
@@ -69,11 +70,16 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.HasIndex(user => user.Email)
             .IsUnique();
 
-        builder.ComplexProperty(user => user.PhoneNumberValue, phone =>
-        {
-            phone.Property(value => value.Value)
-                .HasColumnName("PhoneNumber")
-                .HasMaxLength(15);
-        });
+        builder.Property(user => user.PhoneNumberValue)
+            .HasConversion(PhoneNumberConverter)
+            .HasColumnName("PhoneNumber")
+            .HasMaxLength(15)
+            .IsRequired(false);
     }
+
+    private static string? PhoneToProvider(PhoneNumber? phone) =>
+        phone.HasValue ? phone.Value.Value : null;
+
+    private static PhoneNumber? PhoneFromProvider(string? value) =>
+        value == null ? null : new PhoneNumber(value);
 }

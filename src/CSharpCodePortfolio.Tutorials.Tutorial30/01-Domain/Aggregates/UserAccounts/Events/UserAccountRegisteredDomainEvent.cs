@@ -9,7 +9,6 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccount
 /// </summary>
 public sealed record UserAccountRegisteredDomainEvent(
     Guid UserId,
-    string Document,
     Email Email,
     Timestamp OccurredAtUtc)
     : DomainEvent(UserAccountDomainEventTypes.Registered, OccurredAtUtc);
