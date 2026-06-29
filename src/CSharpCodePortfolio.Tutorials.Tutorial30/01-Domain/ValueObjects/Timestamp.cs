@@ -4,42 +4,28 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 
 /// <summary>
-/// Value object that guarantees domain timestamps are UTC.
+/// First-class value object that guarantees domain timestamps are UTC.
+/// Modeled as a <c>readonly record struct</c> so it can be compared by
+/// value, accumulated without allocation, and used as a key in audit
+/// sequences without boxing.
 /// </summary>
 /// <remarks>
-/// Kept as a <c>sealed record class</c> (with <c>private init</c>-only
-/// setters) in Task 0 because <see cref="AbstractEntity{TId}"/> still calls
-/// <c>ToOption&lt;T&gt;(T? value) where T : class</c> for the
-/// <c>_createdAt</c> / <c>_lastModified</c> fields. Task 1 will convert
-/// all value objects to <c>readonly record struct</c> and lift
-/// <c>AbstractEntity</c> at the same time. The <c>private init</c> form
-/// already removes the EF-only parameterless constructor hack that the
-/// old <c>private set</c> form carried.
+/// <para>
+/// Time flows from the outside: the only place that reads the clock is
+/// <see cref="UtcNow(TimeProvider)"/>. Tests inject
+/// <c>FakeTimeProvider</c> via <c>Microsoft.Extensions.TimeProvider.Testing</c>.
+/// </para>
+/// <para>
+/// EF Core 10 happily materialises <c>readonly record struct</c> VOs via
+/// the positional <c>Value</c> setter when a complex property is mapped
+/// to one — there is no need for a private parameterless constructor.
+/// </para>
 /// </remarks>
-public sealed record Timestamp
+public readonly record struct Timestamp(DateTime Value)
 {
     /// <summary>
-    /// Initializes an empty timestamp for EF Core materialization.
-    /// </summary>
-    private Timestamp()
-    {
-    }
-
-    /// <summary>
-    /// Initializes a timestamp with the supplied UTC value.
-    /// </summary>
-    private Timestamp(DateTime value)
-    {
-        Value = value;
-    }
-
-    /// <summary>
-    /// Gets the UTC DateTime value.
-    /// </summary>
-    public DateTime Value { get; private init; }
-
-    /// <summary>
-    /// Creates a timestamp or returns a domain error when the DateTime kind is not UTC.
+    /// Creates a timestamp or returns a domain error when the DateTime
+    /// kind is not UTC.
     /// </summary>
     public static Either<DomainError, Timestamp> Create(DateTime value)
     {
@@ -49,24 +35,20 @@ public sealed record Timestamp
     }
 
     /// <summary>
-    /// Creates a timestamp from the UTC instant exposed by the injected clock.
+    /// Creates a timestamp from the UTC instant exposed by the injected
+    /// clock. This is the single entry point in the domain for "the
+    /// current moment".
     /// </summary>
-    /// <remarks>
-    /// This is the single entry point in the domain for "the current moment".
-    /// All aggregate methods accept a <see cref="TimeProvider"/> parameter and
-    /// route through here so tests can substitute a deterministic clock.
-    /// </remarks>
     public static Timestamp UtcNow(TimeProvider clock)
     {
         ArgumentNullException.ThrowIfNull(clock);
-        return FromClock(clock);
+        return new Timestamp(clock.GetUtcNow().UtcDateTime);
     }
 
     /// <summary>
     /// Adds a duration while preserving the UTC timestamp invariant.
     /// </summary>
-    public Timestamp Add(TimeSpan timeSpan) =>
-        new(Value.Add(timeSpan));
+    public Timestamp Add(TimeSpan timeSpan) => new(Value.Add(timeSpan));
 
     /// <summary>
     /// Compares two timestamps by their UTC value.
@@ -87,12 +69,6 @@ public sealed record Timestamp
     /// Compares two timestamps by their UTC value.
     /// </summary>
     public static bool operator <=(Timestamp left, Timestamp right) => left.Value <= right.Value;
-
-    /// <summary>
-    /// Converts a <see cref="TimeProvider"/> instant into a domain <see cref="Timestamp"/>.
-    /// </summary>
-    private static Timestamp FromClock(TimeProvider clock) =>
-        new(clock.GetUtcNow().UtcDateTime);
 }
 
 /// <summary>
@@ -100,4 +76,3 @@ public sealed record Timestamp
 /// </summary>
 public sealed record TimestampUtcRequiredError()
     : DomainError(new DomainErrorCode("registration.timestamp_utc_required"), "Timestamp de domínio deve estar em UTC.");
-

@@ -4,26 +4,17 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 
 /// <summary>
-/// Value object that keeps the required user name non-null and normalized.
+/// Required value object that keeps the natural-person display name non-null
+/// and trimmed. Modeled as a <c>readonly record struct</c> so that
+/// equality is structural by value, no allocation is required per instance,
+/// and the absence-vs-presence contract (always present) stays at the type
+/// level rather than at the nullability level.
 /// </summary>
-public sealed record PersonName
+public readonly record struct PersonName(string Value)
 {
-    private PersonName()
-    {
-    }
-
-    private PersonName(string value)
-    {
-        Value = value;
-    }
-
     /// <summary>
-    /// Gets the normalized name stored by the domain.
-    /// </summary>
-    public string Value { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Validates raw input and returns Either instead of throwing for expected user mistakes.
+    /// Validates raw input and returns Either instead of throwing for
+    /// expected user mistakes.
     /// </summary>
     public static Either<DomainError, PersonName> Create(string? value)
     {
@@ -33,7 +24,7 @@ public sealed record PersonName
     }
 
     /// <summary>
-    /// Returns the name value for console evidence.
+    /// Returns the name value for console evidence and DTO mapping.
     /// </summary>
     public override string ToString() => Value;
 }

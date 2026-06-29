@@ -108,19 +108,23 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     }
 
     /// <summary>
-    /// Converts nullable EF materialized state into explicit domain optionality.
+    /// Converts a nullable value-type EF-materialized state into an explicit
+    /// domain Option. Constraint is <c>struct</c> so this helper is compatible
+    /// with the readonly record struct value objects used by the domain.
     /// </summary>
     private static Option<T> ToOption<T>(T? value)
-        where T : class
+        where T : struct
     {
-        return value is null ? None : Some(value);
+        return value.HasValue ? Some(value.Value) : None;
     }
 
     /// <summary>
-    /// Converts explicit domain optionality into nullable state EF Core can map.
+    /// Converts an explicit domain Option into a nullable value-type that EF
+    /// Core can materialise. Constraint is <c>struct</c> so the helper pairs
+    /// with <see cref="ToOption{T}(T?)"/>.
     /// </summary>
     private static T? ToNullable<T>(Option<T> option)
-        where T : class
+        where T : struct
     {
         foreach (var value in option)
         {

@@ -5,26 +5,17 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 
 /// <summary>
-/// Value object for the required registration email.
+/// Required value object for the registration email. Modeled as a
+/// <c>readonly record struct</c> so that normalized equality is structural,
+/// allocation-free, and the contract (always present and normalized) is
+/// enforced by the smart constructor.
 /// </summary>
-public sealed record Email
+public readonly record struct Email(string Value)
 {
-    private Email()
-    {
-    }
-
-    private Email(string value)
-    {
-        Value = value;
-    }
-
     /// <summary>
-    /// Gets the normalized email address.
-    /// </summary>
-    public string Value { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Validates an email that was actually supplied by the caller.
+    /// Validates and normalizes an email that was actually supplied by
+    /// the caller. Returns <see cref="Either{DomainError, Email}"/> so the
+    /// caller must close the error path explicitly.
     /// </summary>
     public static Either<DomainError, Email> Create(string? value)
     {

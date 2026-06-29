@@ -171,19 +171,21 @@ public sealed class UserAccount : AbstractEntity<Guid>
     }
 
     /// <summary>
-    /// Converts a nullable EF materialized value into an explicit domain Option.
+    /// Converts a nullable value-type EF-materialized state into an explicit
+    /// domain Option. Mirrors the AbstractEntity helper; constrained to
+    /// <c>struct</c> for compatibility with the readonly record struct VOs.
     /// </summary>
     private static Option<T> ToOption<T>(T? value)
-        where T : class
+        where T : struct
     {
-        return value is null ? None : Some(value);
+        return value.HasValue ? Some(value.Value) : None;
     }
 
     /// <summary>
-    /// Converts an Option value into the nullable complex type EF Core maps.
+    /// Converts an Option value into the nullable value-type that EF Core maps.
     /// </summary>
     private static T? ToNullable<T>(Option<T> option)
-        where T : class
+        where T : struct
     {
         foreach (var value in option)
         {

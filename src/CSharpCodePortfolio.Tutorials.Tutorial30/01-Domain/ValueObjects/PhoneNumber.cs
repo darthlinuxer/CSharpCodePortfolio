@@ -4,26 +4,16 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain;
 
 /// <summary>
-/// Value object for optional phone numbers represented as Option&lt;PhoneNumber&gt; in the aggregate.
+/// Optional value object for phone numbers. Modeled as a
+/// <c>readonly record struct</c> so absence in the aggregate is expressed
+/// by <see cref="Option{PhoneNumber}"/> (a domain-level concept) instead of
+/// <see cref="Nullable{T}"/> (a runtime-level concept).
 /// </summary>
-public sealed record PhoneNumber
+public readonly record struct PhoneNumber(string Value)
 {
-    private PhoneNumber()
-    {
-    }
-
-    private PhoneNumber(string value)
-    {
-        Value = value;
-    }
-
     /// <summary>
-    /// Gets the normalized phone digits.
-    /// </summary>
-    public string Value { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Validates an optional phone, making absence explicit with None.
+    /// Validates an optional phone, making absence explicit with
+    /// <c>Option&lt;PhoneNumber&gt;.None</c>.
     /// </summary>
     public static Either<DomainError, Option<PhoneNumber>> CreateOptional(string? value)
     {
@@ -40,7 +30,7 @@ public sealed record PhoneNumber
     }
 
     /// <summary>
-    /// Returns the normalized phone for DTO and persistence mapping.
+    /// Returns the normalized phone digits for DTO mapping.
     /// </summary>
     public override string ToString() => Value;
 }
