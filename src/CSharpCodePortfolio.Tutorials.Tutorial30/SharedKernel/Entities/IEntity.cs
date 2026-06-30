@@ -14,6 +14,7 @@ public interface IEntity<out TId>
 public interface IAggregate
 {
     bool HasDomainEvents { get; }
+    Seq<IDomainEvent> RecordedDomainEvents { get; }
     void ClearDomainEvents();
 }
 

@@ -3,19 +3,25 @@ using CSharpCodePortfolio.Tutorials.Abstractions;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Commands;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Persistence.ConfigurationMappings;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Queries;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Customers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Outbox;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Traditional;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
@@ -66,12 +72,10 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         TutorialConsole.WriteCodeSnippet("Identity mapping", typeof(UserAccountConfiguration), nameof(UserAccountConfiguration.Configure));
 
         await using var dbContext = CreateDbContext();
-        var outbox = new EfIntegrationOutbox(dbContext);
         var registerUser = new RegisterUserService(
             new EfUserAccountLookup(dbContext),
             new EfUserAccountWriter(dbContext),
-            outbox,
-            dbContext,
+            CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var registered = await registerUser.RegisterAsync(
             new RegisterUserRequest("Grace Hopper", "grace@example.com", "11999998888"),
@@ -97,7 +101,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         var placeOrder = new PlaceOrderService(
             new EfCustomerDirectory(dbContext),
             new EfOrderWriter(dbContext),
-            dbContext,
+            CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var unknownCustomer = await placeOrder.PlaceAsync(
             new PlaceOrderRequest(Guid.CreateVersion7(), [new PlaceOrderLineRequest("book-ddd", 1, 120)]),
@@ -121,8 +125,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
 
         var confirmOrder = new ConfirmOrderService(
             new EfOrderWriter(dbContext),
-            outbox,
-            dbContext,
+            CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var confirmed = await confirmOrder.ConfirmAsync(
             new ConfirmOrderRequest(GetRight(placed).Id),
@@ -169,14 +172,40 @@ public sealed class LanguageExtCoreTutorial : ITutorial
 
     private static InProcessOutboxDispatcher CreateDispatcher(Tutorial30DbContext dbContext)
     {
-        var customerDirectory = new EfCustomerDirectory(dbContext);
-        var customerHandler = new RegisterCustomerWhenUserRegisteredHandler(customerDirectory, dbContext);
+        var unitOfWork = CreateUnitOfWork(dbContext);
+        var customerHandler = new RegisterCustomerWhenUserRegisteredHandler(new EfCustomerDirectory(dbContext), unitOfWork);
         var billingHandler = new CreateInvoiceWhenOrderConfirmedHandler(
             new EfInvoiceWriter(dbContext),
-            dbContext,
+            unitOfWork,
             TimeProvider.System);
 
-        return new InProcessOutboxDispatcher(dbContext, customerHandler, billingHandler, TimeProvider.System);
+        return new InProcessOutboxDispatcher(
+            dbContext,
+            [
+                new OutboxIntegrationEventConsumer<UserRegisteredIntegrationEvent, Unit>(
+                    UserRegisteredIntegrationEvent.EventType,
+                    customerHandler),
+                new OutboxIntegrationEventConsumer<OrderConfirmedIntegrationEvent, InvoiceHandlingResult>(
+                    OrderConfirmedIntegrationEvent.EventType,
+                    billingHandler)
+            ],
+            TimeProvider.System);
+    }
+
+    private static EfTutorial30UnitOfWork CreateUnitOfWork(Tutorial30DbContext dbContext) =>
+        new(dbContext, CreateDomainEventBus(dbContext));
+
+    private static InMemoryDomainEventBus CreateDomainEventBus(Tutorial30DbContext dbContext)
+    {
+        var integrationEventBus = new OutboxIntegrationEventBus(dbContext);
+
+        return new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(
+                new PublishUserRegisteredIntegrationEventHandler(integrationEventBus)),
+            new DomainEventConsumer<OrderConfirmedDomainEvent>(
+                new PublishOrderConfirmedIntegrationEventHandler(integrationEventBus))
+        ]);
     }
 
     private static string ToIdentityResult(Either<Seq<DomainError>, RegisteredUserDto> result) =>

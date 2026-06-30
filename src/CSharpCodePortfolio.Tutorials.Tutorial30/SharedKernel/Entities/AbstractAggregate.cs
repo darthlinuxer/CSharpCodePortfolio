@@ -50,6 +50,8 @@ public abstract class AbstractAggregate<TAggregate, TId> : IAggregate<TAggregate
     /// </summary>
     public Seq<AbstractDomainEvent<TAggregate>> DomainEvents => _domainEvents.ToSeq();
 
+    public Seq<IDomainEvent> RecordedDomainEvents => _domainEvents.Cast<IDomainEvent>().ToSeq();
+
     public bool HasDomainEvents => _domainEvents.Count > 0;
 
     /// <summary>

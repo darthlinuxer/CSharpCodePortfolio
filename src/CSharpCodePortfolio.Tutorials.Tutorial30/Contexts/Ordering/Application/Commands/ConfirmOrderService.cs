@@ -2,21 +2,18 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Per
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Outbox;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Commands;
 
 /// <summary>
-/// Confirms an order and writes the published Billing contract to the outbox.
+/// Confirms an order and lets the domain event flow publish the Billing contract.
 /// </summary>
 public sealed class ConfirmOrderService(
     IOrderWriter orderWriter,
-    IIntegrationOutbox outbox,
     ITutorial30UnitOfWork unitOfWork,
     TimeProvider clock)
 {
@@ -58,12 +55,6 @@ public sealed class ConfirmOrderService(
         Order order,
         CancellationToken cancellationToken)
     {
-        outbox.Add(new OrderConfirmedIntegrationEvent(
-            Guid.CreateVersion7(),
-            Timestamp.UtcNow(clock),
-            order.Id.Value,
-            order.CustomerId.Value,
-            order.Total.Value));
         var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
 
         return commit.Match(

@@ -8,20 +8,23 @@ contexts e comunicação por eventos:
 - Aggregates independentes por bounded context.
 - Domain events internos.
 - Integration events como published language entre contexts.
-- Outbox persistida simples e dispatcher in-process para o tutorial.
+- Outbox persistida simples e dispatcher in-process como broker emulado.
 
 ## Estrutura
 
 - `SharedKernel`: building blocks mínimos (`IEntity`, `IAggregate`,
   `AbstractAggregate`, `DomainError`, `AbstractDomainEvent`, `Timestamp`).
 - `Contexts/Identity`: `UserAccount`, cadastro e evento
-  `UserRegisteredIntegrationEvent`.
+  `UserAccountRegisteredDomainEvent`.
 - `Contexts/Ordering`: `Order`, `OrderLine`, `CustomerDirectory`, commands de
-  criação/confirmação e evento `OrderConfirmedIntegrationEvent`.
+  criação/confirmação e `OrderConfirmedDomainEvent`.
 - `Contexts/Billing`: `Invoice`, handler idempotente com resultado explícito
   `Created`/`AlreadyHandled`.
-- `Integration`: contratos publicados, outbox e dispatcher sem broker real.
-- `Infrastructure`: `Tutorial30DbContext`, usado só como adapter de persistência.
+- `Integration/Messaging`: porta `IIntegrationEventBus`, consumidores genéricos
+  e dispatcher sem referência a contexts.
+- `Integration/Events`: contratos publicados entre bounded contexts.
+- `Integration/Outbox`: envelope persistido para mensagens pendentes.
+- `Infrastructure`: `Tutorial30DbContext` e `EfTutorial30UnitOfWork`.
 - `Presentation`: tradução HTTP fina de `Either` para `IResult`.
 
 ## Fronteiras DDD
@@ -32,15 +35,27 @@ usa `CustomerId` local, alimentado por `UserRegisteredIntegrationEvent`.
 `Billing` não referencia `Order`: cria `Invoice` a partir do contrato publicado
 `OrderConfirmedIntegrationEvent`. O payload é mínimo: ids e valor total.
 
+Domain events ficam dentro do próprio bounded context e são enviados por
+`IInMemoryDomainEventBus`. Handlers locais podem publicar integration events
+por `IIntegrationEventBus`; a implementação atual grava na outbox e pode ser
+trocada por RabbitMQ, fila ou broker real depois.
+
 ## Fluxo demonstrado
 
 1. `RegisterUserService` cria `UserAccount`.
-2. `EfIntegrationOutbox` grava `UserRegisteredIntegrationEvent` na mesma
+2. `EfTutorial30UnitOfWork` salva o aggregate e publica
+   `UserAccountRegisteredDomainEvent` no bus local.
+3. O handler local de Identity publica `UserRegisteredIntegrationEvent` pela
+   porta `IIntegrationEventBus`.
+4. `OutboxIntegrationEventBus` grava a mensagem na outbox durante a mesma
    transação.
-3. `InProcessOutboxDispatcher` entrega o evento ao ACL de Ordering.
-4. `PlaceOrderService` cria `Order` usando apenas `CustomerId`.
-5. `ConfirmOrderService` confirma `Order` e grava `OrderConfirmedIntegrationEvent`.
-6. Billing consome o evento e cria uma `Invoice` uma única vez.
+5. `InProcessOutboxDispatcher` lê a outbox e entrega a mensagem a consumidores
+   registrados por contrato.
+6. Ordering atualiza `CustomerDirectory` e cria `Order` usando apenas
+   `CustomerId`.
+7. `ConfirmOrderService` confirma `Order`; o domain handler de Ordering publica
+   `OrderConfirmedIntegrationEvent`.
+8. Billing consome o evento de integração e cria uma `Invoice` uma única vez.
 
 ## O que ficou fora
 

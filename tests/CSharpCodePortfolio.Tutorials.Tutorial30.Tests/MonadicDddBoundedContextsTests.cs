@@ -3,11 +3,15 @@ using System.Text.RegularExpressions;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Commands;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Customers;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Events;
@@ -16,9 +20,11 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Outbox;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using static LanguageExt.Prelude;
@@ -57,6 +63,83 @@ public sealed class MonadicDddBoundedContextsTests
         Assert.HasCount(1, messages);
         Assert.AreEqual(UserRegisteredIntegrationEvent.EventType, messages[0].Type);
         Assert.IsTrue(messages[0].ProcessedAtUtc.IsNone);
+    }
+
+    [TestMethod]
+    public async Task DomainEventBus_DispatchesOnlyHandlersFromSameBoundedContext()
+    {
+        var integrationEventBus = new RecordingIntegrationEventBus();
+        var domainEventBus = new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(
+                new PublishUserRegisteredIntegrationEventHandler(integrationEventBus))
+        ]);
+
+        var result = await domainEventBus.PublishAsync(
+            Seq<IDomainEvent>(
+                NewUserAccountRegisteredDomainEvent(),
+                NewOrderConfirmedDomainEvent()),
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.HasCount(1, integrationEventBus.Events);
+        Assert.IsInstanceOfType<UserRegisteredIntegrationEvent>(integrationEventBus.Events.Single());
+    }
+
+    [TestMethod]
+    public async Task Identity_DomainEventHandler_PublishesUserRegisteredIntegrationEvent()
+    {
+        var integrationEventBus = new RecordingIntegrationEventBus();
+        var handler = new PublishUserRegisteredIntegrationEventHandler(integrationEventBus);
+
+        var result = await handler.HandleAsync(NewUserAccountRegisteredDomainEvent(), CancellationToken.None);
+
+        var integrationEvent = Assert.IsInstanceOfType<UserRegisteredIntegrationEvent>(integrationEventBus.Events.Single());
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual("grace@example.com", integrationEvent.Email);
+    }
+
+    [TestMethod]
+    public async Task Ordering_DomainEventHandler_PublishesOrderConfirmedIntegrationEvent()
+    {
+        var integrationEventBus = new RecordingIntegrationEventBus();
+        var handler = new PublishOrderConfirmedIntegrationEventHandler(integrationEventBus);
+
+        var result = await handler.HandleAsync(NewOrderConfirmedDomainEvent(), CancellationToken.None);
+
+        var integrationEvent = Assert.IsInstanceOfType<OrderConfirmedIntegrationEvent>(integrationEventBus.Events.Single());
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual(120, integrationEvent.TotalAmount);
+    }
+
+    [TestMethod]
+    public async Task IntegrationEventBus_StoresEventsInOutboxWithoutCallingConsumerDirectly()
+    {
+        await using var dbContext = CreateDbContext();
+        var integrationEventBus = new OutboxIntegrationEventBus(dbContext);
+
+        var result = await integrationEventBus.PublishAsync(NewUserRegisteredIntegrationEvent(), CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual(1, await dbContext.OutboxMessages.CountAsync());
+        Assert.AreEqual(0, await dbContext.CustomerDirectory.CountAsync());
+    }
+
+    [TestMethod]
+    public async Task OutboxDispatcher_DeliversIntegrationEventsToRegisteredConsumers()
+    {
+        await using var dbContext = CreateDbContext();
+        var integrationEventBus = new OutboxIntegrationEventBus(dbContext);
+        var integrationEvent = NewUserRegisteredIntegrationEvent();
+        await integrationEventBus.PublishAsync(integrationEvent, CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var dispatched = await CreateDispatcher(dbContext).DispatchPendingAsync(CancellationToken.None);
+        var customers = await dbContext.CustomerDirectory.AsNoTracking().ToArrayAsync();
+
+        Assert.AreEqual(1, dispatched);
+        Assert.IsTrue(customers.Any(customer => customer.Id.Value == integrationEvent.UserAccountId));
     }
 
     [TestMethod]
@@ -209,7 +292,10 @@ public sealed class MonadicDddBoundedContextsTests
     public async Task Billing_HandleAsync_ReturnsCreatedThenAlreadyHandled()
     {
         await using var dbContext = CreateDbContext();
-        var handler = new CreateInvoiceWhenOrderConfirmedHandler(new EfInvoiceWriter(dbContext), dbContext, TimeProvider.System);
+        var handler = new CreateInvoiceWhenOrderConfirmedHandler(
+            new EfInvoiceWriter(dbContext),
+            CreateUnitOfWork(dbContext),
+            TimeProvider.System);
         var integrationEvent = new OrderConfirmedIntegrationEvent(
             Guid.CreateVersion7(),
             CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects.Timestamp.UtcNow(TimeProvider.System),
@@ -244,13 +330,66 @@ public sealed class MonadicDddBoundedContextsTests
     }
 
     [TestMethod]
-    public void Architecture_CrossContextContractsUseIntegrationEventsOnly()
+    public void Architecture_ContextsDoNotReferenceOtherContexts()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
         var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Contexts"), "*.cs", SearchOption.AllDirectories)
             .SelectMany(file => File.ReadLines(file)
                 .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
-            .Where(item => CrossesContextWithoutIntegrationContract(item.File, item.Text))
+            .Where(item => CrossesAnotherContext(item.File, item.Text))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_DomainEventHandlersStayInsideTheirBoundedContext()
+    {
+        var handlerContract = typeof(IDomainEventHandler<>);
+        var offenders = typeof(UserAccount).Assembly.GetTypes()
+            .Where(type => type.Namespace?.Contains(".Contexts.", StringComparison.Ordinal) == true)
+            .SelectMany(type => type.GetInterfaces()
+                .Where(contract => contract.IsGenericType && contract.GetGenericTypeDefinition() == handlerContract)
+                .Select(contract => new
+                {
+                    Handler = type,
+                    DomainEvent = contract.GetGenericArguments()[0]
+                }))
+            .Where(pair => ContextName(pair.Handler) != ContextName(pair.DomainEvent))
+            .Select(pair => $"{pair.Handler.FullName} handles {pair.DomainEvent.FullName}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_IntegrationMessagingDoesNotReferenceContexts()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var messagingRoot = Path.Combine(sourceRoot, "Integration", "Messaging");
+        var offenders = Directory.EnumerateFiles(messagingRoot, "*.cs", SearchOption.AllDirectories)
+            .SelectMany(file => File.ReadLines(file)
+                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+            .Where(item => item.Text.Contains(".Contexts.", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_CommandServicesDoNotPublishIntegrationEventsDirectly()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Contexts"), "*.cs", SearchOption.AllDirectories)
+            .Where(file => file.Contains($"{Path.DirectorySeparatorChar}Application{Path.DirectorySeparatorChar}Commands{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .SelectMany(file => File.ReadLines(file)
+                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+            .Where(item => item.Text.Contains(".Integration.Events", StringComparison.Ordinal)
+                || item.Text.Contains(".Integration.Messaging", StringComparison.Ordinal)
+                || item.Text.Contains("IIntegrationEventBus", StringComparison.Ordinal)
+                || item.Text.Contains("OutboxIntegrationEventBus", StringComparison.Ordinal))
             .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
             .ToArray();
 
@@ -278,26 +417,50 @@ public sealed class MonadicDddBoundedContextsTests
         new(
             new EfUserAccountLookup(dbContext),
             new EfUserAccountWriter(dbContext),
-            new EfIntegrationOutbox(dbContext),
-            dbContext,
+            CreateUnitOfWork(dbContext),
             TimeProvider.System);
 
     private static PlaceOrderService CreatePlaceOrderService(Tutorial30DbContext dbContext) =>
         new(
             new EfCustomerDirectory(dbContext),
             new EfOrderWriter(dbContext),
-            dbContext,
+            CreateUnitOfWork(dbContext),
             TimeProvider.System);
 
     private static ConfirmOrderService CreateConfirmOrderService(Tutorial30DbContext dbContext) =>
-        new(new EfOrderWriter(dbContext), new EfIntegrationOutbox(dbContext), dbContext, TimeProvider.System);
+        new(new EfOrderWriter(dbContext), CreateUnitOfWork(dbContext), TimeProvider.System);
 
     private static InProcessOutboxDispatcher CreateDispatcher(Tutorial30DbContext dbContext) =>
         new(
             dbContext,
-            new RegisterCustomerWhenUserRegisteredHandler(new EfCustomerDirectory(dbContext), dbContext),
-            new CreateInvoiceWhenOrderConfirmedHandler(new EfInvoiceWriter(dbContext), dbContext, TimeProvider.System),
+            [
+                new OutboxIntegrationEventConsumer<UserRegisteredIntegrationEvent, Unit>(
+                    UserRegisteredIntegrationEvent.EventType,
+                    new RegisterCustomerWhenUserRegisteredHandler(new EfCustomerDirectory(dbContext), CreateUnitOfWork(dbContext))),
+                new OutboxIntegrationEventConsumer<OrderConfirmedIntegrationEvent, InvoiceHandlingResult>(
+                    OrderConfirmedIntegrationEvent.EventType,
+                    new CreateInvoiceWhenOrderConfirmedHandler(
+                        new EfInvoiceWriter(dbContext),
+                        CreateUnitOfWork(dbContext),
+                        TimeProvider.System))
+            ],
             TimeProvider.System);
+
+    private static EfTutorial30UnitOfWork CreateUnitOfWork(Tutorial30DbContext dbContext) =>
+        new(dbContext, CreateDomainEventBus(dbContext));
+
+    private static InMemoryDomainEventBus CreateDomainEventBus(Tutorial30DbContext dbContext)
+    {
+        var integrationEventBus = new OutboxIntegrationEventBus(dbContext);
+
+        return new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(
+                new PublishUserRegisteredIntegrationEventHandler(integrationEventBus)),
+            new DomainEventConsumer<OrderConfirmedDomainEvent>(
+                new PublishOrderConfirmedIntegrationEventHandler(integrationEventBus))
+        ]);
+    }
 
     private static async Task<RegisteredUserDto> RegisterAndDispatchCustomerAsync(Tutorial30DbContext dbContext)
     {
@@ -307,6 +470,26 @@ public sealed class MonadicDddBoundedContextsTests
 
         return GetRight(registered);
     }
+
+    private static UserAccountRegisteredDomainEvent NewUserAccountRegisteredDomainEvent() =>
+        new(
+            Guid.CreateVersion7(),
+            GetRight(Email.Create(Some("grace@example.com"))),
+            Timestamp.UtcNow(TimeProvider.System));
+
+    private static UserRegisteredIntegrationEvent NewUserRegisteredIntegrationEvent() =>
+        new(
+            Guid.CreateVersion7(),
+            Timestamp.UtcNow(TimeProvider.System),
+            Guid.CreateVersion7(),
+            "grace@example.com");
+
+    private static OrderConfirmedDomainEvent NewOrderConfirmedDomainEvent() =>
+        new(
+            GetRight(OrderId.Create(Guid.CreateVersion7())),
+            GetRight(CustomerId.Create(Guid.CreateVersion7())),
+            GetRight(Money.Create(120)),
+            Timestamp.UtcNow(TimeProvider.System));
 
     private static Order CreateOrder()
     {
@@ -364,17 +547,11 @@ public sealed class MonadicDddBoundedContextsTests
             || context != "Billing" && text.Contains(".Contexts.Billing.", StringComparison.Ordinal);
     }
 
-    private static bool CrossesContextWithoutIntegrationContract(string file, string text) =>
-        !UsesIntegrationContract(file, text) && (
-            file.Contains($"{Path.DirectorySeparatorChar}Ordering{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-            && text.Contains(".Contexts.Identity.", StringComparison.Ordinal)
-            || file.Contains($"{Path.DirectorySeparatorChar}Billing{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-            && (text.Contains(".Contexts.Identity.", StringComparison.Ordinal)
-                || text.Contains(".Contexts.Ordering.Domain.", StringComparison.Ordinal)));
-
-    private static bool UsesIntegrationContract(string file, string text) =>
-        file.Contains($"{Path.DirectorySeparatorChar}Integration{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-        || text.Contains(".Integration.Events", StringComparison.Ordinal);
+    private static string ContextName(Type type) =>
+        (type.Namespace ?? string.Empty)
+        .Split(".Contexts.", StringSplitOptions.None)
+        .Last()
+        .Split('.')[0];
 
     private static IEnumerable<string> Tutorial30SourceFiles() =>
         Directory.EnumerateFiles(Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30"), "*.cs", SearchOption.AllDirectories)
@@ -413,6 +590,21 @@ public sealed class MonadicDddBoundedContextsTests
         {
             yield return current;
             current = current.Parent;
+        }
+    }
+
+    private sealed class RecordingIntegrationEventBus : IIntegrationEventBus
+    {
+        private readonly List<IIntegrationEvent> events = [];
+
+        public IReadOnlyCollection<IIntegrationEvent> Events => events;
+
+        public Task<Either<Seq<DomainError>, Unit>> PublishAsync(
+            IIntegrationEvent integrationEvent,
+            CancellationToken cancellationToken)
+        {
+            events.Add(integrationEvent);
+            return Task.FromResult(Right<Seq<DomainError>, Unit>(default));
         }
     }
 }

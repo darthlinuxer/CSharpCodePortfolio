@@ -3,8 +3,8 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Per
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Outbox;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 

@@ -1,10 +1,8 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Outbox;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -16,7 +14,6 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application
 public sealed class RegisterUserService(
     IUserAccountLookup lookup,
     IUserAccountWriter writer,
-    IIntegrationOutbox outbox,
     ITutorial30UnitOfWork unitOfWork,
     TimeProvider clock)
 {
@@ -60,11 +57,6 @@ public sealed class RegisterUserService(
         CancellationToken cancellationToken)
     {
         writer.Add(account);
-        outbox.Add(new UserRegisteredIntegrationEvent(
-            Guid.CreateVersion7(),
-            Timestamp.UtcNow(clock),
-            account.Id,
-            account.Email.Value));
         var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
 
         return commit.Match(
