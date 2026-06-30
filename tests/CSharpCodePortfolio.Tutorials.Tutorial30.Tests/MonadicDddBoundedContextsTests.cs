@@ -53,6 +53,10 @@ public sealed class MonadicDddBoundedContextsTests
 
     private static readonly Regex ForbiddenBranchRegex = new(@"\b(" + "i" + "f" + "|" + "s" + "witch" + @")\b", RegexOptions.Compiled);
 
+    private static readonly Regex ContextReferenceRegex = new(
+        @"\.Contexts\.([A-Za-z][A-Za-z0-9_]*)\.",
+        RegexOptions.Compiled);
+
     [TestMethod]
     public async Task Identity_RegisterUser_PublishesUserRegisteredIntegrationEvent()
     {
@@ -587,6 +591,17 @@ public sealed class MonadicDddBoundedContextsTests
     }
 
     [TestMethod]
+    public void Architecture_CrossContextScannerHandlesNewBoundedContexts()
+    {
+        var shippingFile = Path.Combine("src", "CSharpCodePortfolio.Tutorials.Tutorial30", "Contexts", "Shipping", "Application", "Handlers", "Handler.cs");
+        var shippingReference = "using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Shipping.Domain;";
+        var billingReference = "using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application;";
+
+        Assert.IsFalse(CrossesAnotherContext(shippingFile, shippingReference));
+        Assert.IsTrue(CrossesAnotherContext(shippingFile, billingReference));
+    }
+
+    [TestMethod]
     public void Architecture_DomainEventHandlersStayInsideTheirBoundedContext()
     {
         var handlerContract = typeof(IDomainEventHandler<>);
@@ -841,22 +856,33 @@ public sealed class MonadicDddBoundedContextsTests
 
     private static bool CrossesAnotherContext(string file, string text)
     {
-        var context = file.Contains($"{Path.DirectorySeparatorChar}Identity{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-            ? "Identity"
-            : file.Contains($"{Path.DirectorySeparatorChar}Ordering{Path.DirectorySeparatorChar}", StringComparison.Ordinal)
-                ? "Ordering"
-                : "Billing";
+        var context = ContextNameFromPath(file);
 
-        return context != "Identity" && text.Contains(".Contexts.Identity.", StringComparison.Ordinal)
-            || context != "Ordering" && text.Contains(".Contexts.Ordering.", StringComparison.Ordinal)
-            || context != "Billing" && text.Contains(".Contexts.Billing.", StringComparison.Ordinal);
+        return ContextReferences(text)
+            .Any(referencedContext => referencedContext != context);
     }
 
     private static string ContextName(Type type) =>
-        (type.Namespace ?? string.Empty)
-        .Split(".Contexts.", StringSplitOptions.None)
-        .Last()
-        .Split('.')[0];
+        ContextNameFromNamespace(type.Namespace ?? string.Empty);
+
+    private static string ContextNameFromPath(string file) =>
+        file.Split(Path.DirectorySeparatorChar)
+            .SkipWhile(segment => segment != "Contexts")
+            .Skip(1)
+            .FirstOrDefault()
+        ?? throw new AssertFailedException($"Path is not inside Contexts: {file}");
+
+    private static string ContextNameFromNamespace(string namespaceName) =>
+        namespaceName
+            .Split(".Contexts.", StringSplitOptions.None)
+            .Skip(1)
+            .Select(value => value.Split('.')[0])
+            .FirstOrDefault()
+        ?? throw new AssertFailedException($"Namespace is not inside Contexts: {namespaceName}");
+
+    private static IEnumerable<string> ContextReferences(string text) =>
+        ContextReferenceRegex.Matches(text)
+            .Select(match => match.Groups[1].Value);
 
     private static IEnumerable<string> Tutorial30SourceFiles() =>
         Directory.EnumerateFiles(Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30"), "*.cs", SearchOption.AllDirectories)
