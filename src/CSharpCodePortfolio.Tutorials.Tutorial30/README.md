@@ -1,8 +1,9 @@
 # Tutorial 30 - LanguageExt.Core pragmático
 
 Este tutorial mostra um cadastro de usuário modelado com DDD tático e
-`LanguageExt.Core`: `Option<T>` para ausência válida, `Either<Seq<DomainError>,
-T>` para falhas esperadas e EF Core como adapter de infraestrutura.
+`LanguageExt.Core`: `Option<T>` para ausência válida, `Either<DomainError,T>`
+para validações simples, `Either<Seq<DomainError>,T>` quando há acúmulo de
+falhas esperadas, e EF Core como adapter de infraestrutura.
 
 O projeto alvo é `net10.0` com `LangVersion` fixado em `14.0`. A versão usada
 do pacote funcional é `LanguageExt.Core` `4.4.9`.
@@ -16,8 +17,8 @@ do pacote funcional é `LanguageExt.Core` `4.4.9`.
 
 O domínio preserva ownership por pasta:
 
-- `01-Domain/Common/...`: `AbstractEntity<TId>`, `DomainError`, eventos comuns,
-  helpers pequenos e `Timestamp`.
+- `01-Domain/Common/...`: `AbstractEntity<TAggregate,TId>`, `DomainError`,
+  eventos comuns, helpers pequenos e `Timestamp`.
 - `01-Domain/Aggregates/UserAccounts/...`: `UserAccount`, erros/eventos do
   aggregate e value objects específicos (`PersonName`, `Email`, `PhoneNumber`).
 
@@ -28,20 +29,24 @@ obrigatórios e `PhoneNumber` como `Option<PhoneNumber>`.
 
 ```csharp
 public static Either<Seq<DomainError>, UserAccount> Create(
-    string? name,
-    string? email,
-    string? phoneNumber,
+    Option<string> name,
+    Option<string> email,
+    Option<string> phoneNumber,
     TimeProvider clock)
 ```
 
 Falhas de regra esperada não usam exception. Cada value object retorna
-`Either<Seq<DomainError>, T>` e o aggregate acumula os erros de entrada. O relógio
-entra por `TimeProvider`, então timestamps de criação, alteração e eventos são
-determinísticos em teste.
+`Either<DomainError,T>` porque valida uma única propriedade. O aggregate usa
+`Either<Seq<DomainError>,UserAccount>` no factory para acumular os erros de
+entrada. Ausência chega ao domínio como `None`; nullable fica restrito às bordas
+de aplicação, HTTP e persistência. O relógio entra por `TimeProvider`, então
+timestamps de criação, alteração e eventos são determinísticos em teste.
 
-`AbstractEntity<TId>` contém somente identidade, `CreatedAt`, `LastModified` e
-domain events. Auditoria de ator fica fora do aggregate, na borda de aplicação ou
-autenticação quando existir.
+`AbstractEntity<TAggregate,TId>` contém somente identidade, `CreatedAt`,
+`LastModified` e domain events tipados pelo aggregate dono. Um `UserAccount`
+coleta apenas `AbstractDomainEvent<UserAccount>`, então eventos de outro
+aggregate não entram nesse stream por acidente. Auditoria de ator fica fora do
+aggregate, na borda de aplicação ou autenticação quando existir.
 
 ## Erros
 
@@ -72,9 +77,9 @@ esperados de índice único em `Left(Seq<DomainError>)`. O índice único duráv
 email; o pre-check no application service melhora a resposta, mas a constraint do
 banco continua sendo a proteção contra corrida.
 
-`Option<PhoneNumber>` é a API pública do aggregate. EF Core mapeia um backing
-value nullable (`PhoneNumberValue`) por `ValueConverter`, mantendo `PhoneNumber?`
-fora do contrato público do domínio.
+`Option<PhoneNumber>` é a API pública e o backing value do aggregate. EF Core usa
+`ValueConverter` no adapter para gravar valores não nulos no banco e reidratar
+`None` no domínio, sem `PhoneNumber?` no layer `01-Domain`.
 
 ## Fluxo
 

@@ -12,4 +12,4 @@ public sealed record UserAccountEmailChangedDomainEvent(
     Email PreviousEmail,
     Email NewEmail,
     Timestamp OccurredAtUtc)
-    : DomainEvent(UserAccountDomainEventTypes.EmailChanged, OccurredAtUtc);
+    : AbstractDomainEvent<UserAccount>("Email changed",OccurredAtUtc);

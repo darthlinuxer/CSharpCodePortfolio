@@ -25,7 +25,11 @@ public sealed class RegisterUserService(
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var account = UserAccount.Create(request.Name, request.Email, request.PhoneNumber, clock);
+        var account = UserAccount.Create(
+            ToOption(request.Name),
+            ToOption(request.Email),
+            ToOption(request.PhoneNumber),
+            clock);
 
         return await account.Match(
             Right: validAccount => RegisterValidatedAsync(validAccount, cancellationToken),
@@ -43,16 +47,20 @@ public sealed class RegisterUserService(
         var canRegister = account.EnsureCanBeRegistered(emailExists);
 
         return await canRegister.Match(
-            Right: async _ =>
-            {
-                writer.Add(account);
-                var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+            Right: _ => CommitRegisteredAsync(account, cancellationToken),
+            Left: error => Task.FromResult(Left<Seq<DomainError>, RegisteredUserDto>(Seq1<DomainError>(error)))).ConfigureAwait(false);
+    }
 
-                return commit.Match(
-                    Right: _ => Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account)),
-                    Left: errors => Left<Seq<DomainError>, RegisteredUserDto>(errors));
-            },
-            Left: errors => Task.FromResult(Left<Seq<DomainError>, RegisteredUserDto>(errors))).ConfigureAwait(false);
+    private async Task<Either<Seq<DomainError>, RegisteredUserDto>> CommitRegisteredAsync(
+        UserAccount account,
+        CancellationToken cancellationToken)
+    {
+        writer.Add(account);
+        var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+
+        return commit.Match(
+            Right: _ => Right<Seq<DomainError>, RegisteredUserDto>(ToDto(account)),
+            Left: errors => Left<Seq<DomainError>, RegisteredUserDto>(errors));
     }
 
     /// <summary>
@@ -66,4 +74,7 @@ public sealed class RegisterUserService(
             account.Email.Value,
             account.PhoneNumber.Map(phone => phone.Value));
     }
+
+    private static Option<string> ToOption(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? None : Some(value);
 }

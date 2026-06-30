@@ -13,4 +13,4 @@ public sealed record UserAccountPhoneNumberChangedDomainEvent(
     Option<PhoneNumber> PreviousPhoneNumber,
     Option<PhoneNumber> NewPhoneNumber,
     Timestamp OccurredAtUtc)
-    : DomainEvent(UserAccountDomainEventTypes.PhoneNumberChanged, OccurredAtUtc);
+    : AbstractDomainEvent<UserAccount>("Phone changed", OccurredAtUtc);

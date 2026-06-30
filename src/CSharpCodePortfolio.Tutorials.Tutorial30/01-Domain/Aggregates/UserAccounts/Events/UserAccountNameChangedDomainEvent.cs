@@ -12,4 +12,4 @@ public sealed record UserAccountNameChangedDomainEvent(
     PersonName PreviousName,
     PersonName NewName,
     Timestamp OccurredAtUtc)
-    : DomainEvent(UserAccountDomainEventTypes.NameChanged, OccurredAtUtc);
+    : AbstractDomainEvent<UserAccount>("PersonName changed",OccurredAtUtc);

@@ -1,4 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.ValueObjects;
 using LanguageExt;
 using static LanguageExt.Prelude;
@@ -8,29 +9,24 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Entities;
 /// <summary>
 /// Base class for entities that need identity, timestamp audit metadata, and domain events.
 /// </summary>
+/// <typeparam name="TAggregate">Aggregate type allowed to raise events through this entity.</typeparam>
 /// <typeparam name="TId">Identity type used by the entity.</typeparam>
-public abstract class AbstractEntity<TId> : IEntity<TId>
+public abstract class AbstractEntity<TAggregate, TId> : IEntity<TAggregate, TId>
     where TId : notnull
 {
-    private readonly List<IDomainEvent> _domainEvents = [];
-    private Timestamp? _createdAt;
-    private Timestamp? _lastModified;
+    private readonly List<AbstractDomainEvent<TAggregate>> _domainEvents = [];
+    private Option<Timestamp> _createdAt = None;
+    private Option<Timestamp> _lastModified = None;
 
     /// <summary>
     /// Initializes an empty entity for EF Core materialization.
     /// </summary>
-    protected AbstractEntity()
-    {
-        Id = NewId();
-    }
+    protected AbstractEntity() => Id = NewId();
 
     /// <summary>
     /// Initializes the entity with its stable identity.
     /// </summary>
-    protected AbstractEntity(TId id)
-    {
-        Id = id;
-    }
+    protected AbstractEntity(TId id) => Id = id;
 
     /// <summary>
     /// Gets the entity identity.
@@ -40,38 +36,61 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// <summary>
     /// Gets the optional UTC creation timestamp.
     /// </summary>
-    public Option<Timestamp> CreatedAt => _createdAt.HasValue ? Some(_createdAt.Value) : None;
+    public Option<Timestamp> CreatedAt => _createdAt;
 
     /// <summary>
     /// Gets the optional UTC timestamp for the latest modification.
     /// </summary>
-    public Option<Timestamp> LastModified => _lastModified.HasValue ? Some(_lastModified.Value) : None;
+    public Option<Timestamp> LastModified => _lastModified;
 
     /// <summary>
     /// Gets events raised by completed domain behavior.
     /// </summary>
-    public Seq<IDomainEvent> DomainEvents => _domainEvents.ToSeq();
+    public Seq<AbstractDomainEvent<TAggregate>> DomainEvents => _domainEvents.ToSeq();
 
     /// <summary>
-    /// Records creation metadata after a factory has validated the aggregate.
+    /// Records creation metadata and the domain fact for a validated aggregate.
     /// </summary>
-    protected void MarkCreated(Timestamp createdAt)
+    protected Unit RecordCreated(Timestamp occurredAtUtc, Func<Timestamp, AbstractDomainEvent<TAggregate>> createEvent)
     {
-        _createdAt = createdAt;
+        ArgumentNullException.ThrowIfNull(createEvent);
+
+        _createdAt = Some(occurredAtUtc);
+        AddDomainEvent(createEvent(occurredAtUtc));
+        return default;
     }
 
     /// <summary>
-    /// Records modification metadata after behavior changes entity state.
+    /// Applies a real state change and records its domain fact; no-op changes stay silent.
     /// </summary>
-    protected void MarkModified(Timestamp modifiedAt)
+    protected Either<DomainError, Unit> ApplyChangeIfDifferent<TValue>(
+        TValue current,
+        TValue next,
+        TimeProvider clock,
+        Action<TValue> apply,
+        Func<TValue, TValue, Timestamp, AbstractDomainEvent<TAggregate>> createEvent)
     {
-        _lastModified = modifiedAt;
+        ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(apply);
+        ArgumentNullException.ThrowIfNull(createEvent);
+
+        if (EqualityComparer<TValue>.Default.Equals(current, next))
+        {
+            return Right<DomainError, Unit>(default);
+        }
+
+        var occurredAtUtc = Timestamp.UtcNow(clock);
+        apply(next);
+        _lastModified = Some(occurredAtUtc);
+        AddDomainEvent(createEvent(current, next, occurredAtUtc));
+
+        return Right<DomainError, Unit>(default);
     }
 
     /// <summary>
     /// Adds a domain event for effects that should happen after persistence.
     /// </summary>
-    protected void RaiseDomainEvent(IDomainEvent domainEvent)
+    private void AddDomainEvent(AbstractDomainEvent<TAggregate> domainEvent)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
         _domainEvents.Add(domainEvent);
@@ -80,18 +99,20 @@ public abstract class AbstractEntity<TId> : IEntity<TId>
     /// <summary>
     /// Clears domain events after the persistence boundary has captured them.
     /// </summary>
-    public void ClearDomainEvents()
-    {
-        _domainEvents.Clear();
-    }
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
+    public override string ToString() => $"{typeof(TAggregate).Name}({Id})";
 
     /// <summary>
     /// Generates a domain identity for new Guid-backed entities; EF Core overwrites it when materializing from the database.
     /// </summary>
     private static TId NewId()
     {
-        return typeof(TId) == typeof(Guid)
-            ? (TId)(object)Guid.CreateVersion7()
-            : default!;
+        if (typeof(TId) == typeof(Guid))
+        {
+            return (TId)(object)Guid.CreateVersion7();
+        }
+
+        throw new NotSupportedException($"Automatic identity generation is not configured for {typeof(TId).Name}.");
     }
 }

@@ -1,7 +1,6 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.Errors;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +50,7 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entitiesWithEvents = ChangeTracker
-            .Entries<IEntity>()
+            .Entries<UserAccount>()
             .Select(entry => entry.Entity)
             .Where(entity => !entity.DomainEvents.IsEmpty)
             .ToArray();

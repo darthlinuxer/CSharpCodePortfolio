@@ -14,9 +14,11 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.Co
 /// </summary>
 public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAccount>
 {
-    private static readonly ValueConverter<Timestamp?, DateTime?> TimestampConverter = new(
-        timestamp => timestamp.HasValue ? timestamp.Value.Value : null,
-        value => value.HasValue ? Timestamp.FromTrustedUtc(value.Value) : null);
+    private static readonly DateTime NoTimestamp = DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
+
+    private static readonly ValueConverter<Option<Timestamp>, DateTime> TimestampConverter = new(
+        timestamp => TimestampToProvider(timestamp),
+        value => TimestampFromProvider(value));
 
     private static readonly ValueConverter<PersonName, string> PersonNameConverter = new(
         name => name.Value,
@@ -26,7 +28,7 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         email => email.Value,
         value => new Email(value));
 
-    private static readonly ValueConverter<PhoneNumber?, string?> PhoneNumberConverter = new(
+    private static readonly ValueConverter<Option<PhoneNumber>, string> PhoneNumberConverter = new(
         phone => PhoneToProvider(phone),
         value => PhoneFromProvider(value));
 
@@ -47,11 +49,11 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.Ignore(user => user.LastModified);
         builder.Ignore(user => user.PhoneNumber);
 
-        builder.Property<Timestamp?>("_createdAt")
+        builder.Property<Option<Timestamp>>("_createdAt")
             .HasConversion(TimestampConverter)
             .HasColumnName("CreatedAtUtc");
 
-        builder.Property<Timestamp?>("_lastModified")
+        builder.Property<Option<Timestamp>>("_lastModified")
             .HasConversion(TimestampConverter)
             .HasColumnName("LastModifiedAtUtc");
 
@@ -73,13 +75,32 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.Property(user => user.PhoneNumberValue)
             .HasConversion(PhoneNumberConverter)
             .HasColumnName("PhoneNumber")
-            .HasMaxLength(15)
-            .IsRequired(false);
+            .HasMaxLength(15);
     }
 
-    private static string? PhoneToProvider(PhoneNumber? phone) =>
-        phone.HasValue ? phone.Value.Value : null;
+    private static DateTime TimestampToProvider(Option<Timestamp> timestamp)
+    {
+        foreach (var value in timestamp)
+        {
+            return value.Value;
+        }
 
-    private static PhoneNumber? PhoneFromProvider(string? value) =>
-        value == null ? null : new PhoneNumber(value);
+        return NoTimestamp;
+    }
+
+    private static Option<Timestamp> TimestampFromProvider(DateTime value) =>
+        value == NoTimestamp ? None : Some(Timestamp.FromTrustedUtc(value));
+
+    private static string PhoneToProvider(Option<PhoneNumber> phone)
+    {
+        foreach (var value in phone)
+        {
+            return value.Value;
+        }
+
+        return string.Empty;
+    }
+
+    private static Option<PhoneNumber> PhoneFromProvider(string value) =>
+        string.IsNullOrWhiteSpace(value) ? None : Some(new PhoneNumber(value));
 }

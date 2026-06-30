@@ -11,4 +11,4 @@ public sealed record UserAccountRegisteredDomainEvent(
     Guid UserId,
     Email Email,
     Timestamp OccurredAtUtc)
-    : DomainEvent(UserAccountDomainEventTypes.Registered, OccurredAtUtc);
+    : AbstractDomainEvent<UserAccount>("User account created", OccurredAtUtc);

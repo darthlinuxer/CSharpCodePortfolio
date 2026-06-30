@@ -10,6 +10,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Traditional;
 using CSharpCodePortfolio.Tutorials.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30;
 
@@ -71,7 +72,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
 
         TutorialConsole.WriteEvidence(
             "Aggregate DDD",
-            ("Domain event", CreateDomainEventEvidence()));
+            ("Domain events", CreateDomainEventEvidence()));
 
         var concepts = LanguageExtConceptsDemo.Run();
         TutorialConsole.WriteEvidence(
@@ -176,16 +177,32 @@ public sealed class LanguageExtCoreTutorial : ITutorial
     /// </summary>
     private static string CreateDomainEventEvidence()
     {
+        var clock = TimeProvider.System;
         var account =
-            UserAccount.Create("Alan Turing", "alan@example.com", null, TimeProvider.System);
+            UserAccount.Create(Some("Alan Turing"), Some("alan@example.com"), None, clock);
 
         return account.Match(
             Right: user =>
             {
-                var events = user.DomainEvents.ToArray();
-                return $"{events.Length} {events[0].GetType().Name}";
+                var changes = ApplyDomainChanges(user, clock);
+
+                return changes.Match(
+                    Right: changedUser => string.Join(" | ", changedUser.DomainEvents.Map(domainEvent => domainEvent.ToString())),
+                    Left: error => error.Code.ToString());
             },
             Left: errors => string.Join(", ", errors.Map(error => error.Code.ToString())));
+    }
+
+    /// <summary>
+    /// Applies valid mutations so the tutorial prints domain events beyond creation.
+    /// </summary>
+    private static LanguageExt.Either<DomainError, UserAccount> ApplyDomainChanges(UserAccount user, TimeProvider clock)
+    {
+        return
+            from renamed in user.Rename(Some("Alan Mathison Turing"), clock)
+            from changedEmail in user.ChangeEmail(Some("alan.turing@example.com"), clock)
+            from changedPhone in user.ChangePhoneNumber(Some("11987654321"), clock)
+            select user;
     }
 
     /// <summary>

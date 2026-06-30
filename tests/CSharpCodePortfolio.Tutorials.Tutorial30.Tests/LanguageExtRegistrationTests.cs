@@ -33,9 +33,9 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void RequiredValueObjects_ReturnErrorsWithoutBusinessExceptions()
     {
-        Assert.IsInstanceOfType<PersonNameRequiredError>(GetOnlyError(PersonName.Create(" ")));
-        Assert.IsInstanceOfType<EmailInvalidError>(GetOnlyError(Email.Create(null)));
-        Assert.IsInstanceOfType<PhoneNumberInvalidError>(GetOnlyError(PhoneNumber.CreateOptional("1")));
+        Assert.IsInstanceOfType<PersonNameRequiredError>(GetOnlyError(PersonName.Create(Some(" "))));
+        Assert.IsInstanceOfType<EmailInvalidError>(GetOnlyError(Email.Create(None)));
+        Assert.IsInstanceOfType<PhoneNumberInvalidError>(GetOnlyError(PhoneNumber.CreateOptional(Some("1"))));
     }
 
     [TestMethod]
@@ -51,14 +51,14 @@ public sealed class LanguageExtRegistrationTests
         var domainEvent = Assert.IsInstanceOfType<UserAccountRegisteredDomainEvent>(account.DomainEvents.Single());
         Assert.AreEqual(account.Id, domainEvent.UserId);
         Assert.AreEqual(account.Email, domainEvent.Email);
-        Assert.AreEqual(UserAccountDomainEventTypes.Registered, domainEvent.EventType);
         Assert.AreEqual(now.UtcDateTime, domainEvent.OccurredAtUtc.Value);
+        Assert.AreEqual("UserAccount", domainEvent.AggregateName);
     }
 
     [TestMethod]
     public void UserAccountCreate_AccumulatesRequiredFieldErrors()
     {
-        var result = UserAccount.Create(" ", null, "1", TimeProvider.System);
+        var result = UserAccount.Create(Some(" "), None, Some("1"), TimeProvider.System);
 
         var errors = GetLeft(result).Select(error => error.GetType()).ToArray();
 
@@ -70,18 +70,35 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void UserAccountChangeMethods_RaiseTypedDomainEventsForRealChanges()
     {
-        var clock = new FakeTimeProvider(new DateTimeOffset(2026, 6, 29, 12, 0, 0, TimeSpan.Zero));
+        var now = new DateTimeOffset(2026, 6, 29, 12, 0, 0, TimeSpan.Zero);
+        var clock = new FakeTimeProvider(now);
         var account = CreateValidAccount(clock);
         account.ClearDomainEvents();
 
-        Assert.IsTrue(account.Rename("Augusta Ada", clock).IsRight);
-        Assert.IsTrue(account.ChangeEmail("ada.lovelace@example.com", clock).IsRight);
-        Assert.IsTrue(account.ChangePhoneNumber("(11) 99999-8888", clock).IsRight);
+        Assert.IsTrue(account.Rename(Some("Augusta Ada"), clock).IsRight);
+        Assert.IsTrue(account.ChangeEmail(Some("ada.lovelace@example.com"), clock).IsRight);
+        Assert.IsTrue(account.ChangePhoneNumber(Some("(11) 99999-8888"), clock).IsRight);
 
-        var eventTypes = account.DomainEvents.Map(domainEvent => domainEvent.EventType).ToArray();
-        CollectionAssert.Contains(eventTypes, UserAccountDomainEventTypes.NameChanged);
-        CollectionAssert.Contains(eventTypes, UserAccountDomainEventTypes.EmailChanged);
-        CollectionAssert.Contains(eventTypes, UserAccountDomainEventTypes.PhoneNumberChanged);
+        var events = account.DomainEvents.ToArray();
+        Assert.HasCount(3, events);
+
+        var nameChanged = Assert.IsInstanceOfType<UserAccountNameChangedDomainEvent>(events[0]);
+        Assert.AreEqual(account.Id, nameChanged.UserId);
+        Assert.AreEqual("Ada Lovelace", nameChanged.PreviousName.Value);
+        Assert.AreEqual("Augusta Ada", nameChanged.NewName.Value);
+        Assert.AreEqual(now.UtcDateTime, nameChanged.OccurredAtUtc.Value);
+
+        var emailChanged = Assert.IsInstanceOfType<UserAccountEmailChangedDomainEvent>(events[1]);
+        Assert.AreEqual(account.Id, emailChanged.UserId);
+        Assert.AreEqual("ada@example.com", emailChanged.PreviousEmail.Value);
+        Assert.AreEqual("ada.lovelace@example.com", emailChanged.NewEmail.Value);
+        Assert.AreEqual(now.UtcDateTime, emailChanged.OccurredAtUtc.Value);
+
+        var phoneChanged = Assert.IsInstanceOfType<UserAccountPhoneNumberChangedDomainEvent>(events[2]);
+        Assert.AreEqual(account.Id, phoneChanged.UserId);
+        Assert.IsTrue(phoneChanged.PreviousPhoneNumber.IsNone);
+        Assert.AreEqual("11999998888", phoneChanged.NewPhoneNumber.Match(Some: phone => phone.Value, None: () => string.Empty));
+        Assert.AreEqual(now.UtcDateTime, phoneChanged.OccurredAtUtc.Value);
         Assert.IsTrue(account.LastModified.IsSome);
     }
 
@@ -92,9 +109,9 @@ public sealed class LanguageExtRegistrationTests
         var account = CreateValidAccount(clock);
         account.ClearDomainEvents();
 
-        Assert.IsTrue(account.Rename("Ada Lovelace", clock).IsRight);
-        Assert.IsTrue(account.ChangeEmail("ada@example.com", clock).IsRight);
-        Assert.IsTrue(account.ChangePhoneNumber(null, clock).IsRight);
+        Assert.IsTrue(account.Rename(Some("Ada Lovelace"), clock).IsRight);
+        Assert.IsTrue(account.ChangeEmail(Some("ada@example.com"), clock).IsRight);
+        Assert.IsTrue(account.ChangePhoneNumber(None, clock).IsRight);
 
         Assert.IsEmpty(account.DomainEvents.ToArray());
         Assert.IsTrue(account.LastModified.IsNone);
@@ -161,25 +178,28 @@ public sealed class LanguageExtRegistrationTests
     [TestMethod]
     public void AbstractEntity_ExposesOnlyTimestampAuditAndDomainEvents()
     {
-        Assert.AreEqual(typeof(AbstractEntity<Guid>), typeof(UserAccount).BaseType);
+        Assert.AreEqual(typeof(AbstractEntity<UserAccount, Guid>), typeof(UserAccount).BaseType);
         Assert.IsNull(typeof(UserAccount).GetProperty("CreatedBy"));
         Assert.IsNull(typeof(UserAccount).GetProperty("LastModifiedBy"));
-        Assert.IsEmpty(typeof(AbstractEntity<Guid>)
+        Assert.IsEmpty(typeof(AbstractEntity<UserAccount, Guid>)
             .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
             .Where(property => property.Name.EndsWith("Value", StringComparison.Ordinal))
             .ToArray());
     }
 
     [TestMethod]
-    public void UserAccountDomainEvents_InheritCommonDomainEventBase()
+    public void UserAccountDomainEvents_AreScopedToUserAccountAggregate()
     {
         var domainEvent = new UserAccountRegisteredDomainEvent(
             Guid.NewGuid(),
-            GetRight(Email.Create("ada@example.com")),
+            GetRight(Email.Create(Some("ada@example.com"))),
             Timestamp.UtcNow(TimeProvider.System));
 
-        Assert.IsInstanceOfType<DomainEvent>(domainEvent);
-        Assert.AreEqual(UserAccountDomainEventTypes.Registered, domainEvent.EventType);
+        Assert.IsInstanceOfType<AbstractDomainEvent<UserAccount>>(domainEvent);
+        Assert.AreEqual(typeof(Seq<AbstractDomainEvent<UserAccount>>), typeof(UserAccount).GetProperty(nameof(UserAccount.DomainEvents))?.PropertyType);
+        Assert.AreEqual("UserAccount", domainEvent.AggregateName);
+        StringAssert.StartsWith(domainEvent.ToString(), "UserAccount:");
+        StringAssert.StartsWith(CreateValidAccount().ToString(), "UserAccount(");
     }
 
     [TestMethod]
@@ -300,6 +320,22 @@ public sealed class LanguageExtRegistrationTests
         Assert.AreEqual(11, report.ComposedLength);
     }
 
+    [TestMethod]
+    public void LanguageExtCoreTutorial_PrintsDomainEventToStringEvidence()
+    {
+        var method = typeof(LanguageExtCoreTutorial).GetMethod(
+            "CreateDomainEventEvidence",
+            BindingFlags.Static | BindingFlags.NonPublic);
+
+        Assert.IsNotNull(method);
+        var evidence = (string)method.Invoke(null, [])!;
+
+        StringAssert.Contains(evidence, "UserAccount: UserAccountRegisteredDomainEvent");
+        StringAssert.Contains(evidence, "UserAccount: UserAccountNameChangedDomainEvent");
+        StringAssert.Contains(evidence, "UserAccount: UserAccountEmailChangedDomainEvent");
+        StringAssert.Contains(evidence, "UserAccount: UserAccountPhoneNumberChangedDomainEvent");
+    }
+
     private static RegistrationDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<RegistrationDbContext>()
@@ -338,8 +374,11 @@ public sealed class LanguageExtRegistrationTests
         return errors[0];
     }
 
+    private static DomainError GetOnlyError<T>(Either<DomainError, T> result) =>
+        GetLeft(result);
+
     private static UserAccount CreateValidAccount(TimeProvider? clock = null) =>
-        GetRight(UserAccount.Create("Ada Lovelace", "ada@example.com", null, clock ?? TimeProvider.System));
+        GetRight(UserAccount.Create(Some("Ada Lovelace"), Some("ada@example.com"), None, clock ?? TimeProvider.System));
 
     private static string FindTutorialRoot()
     {

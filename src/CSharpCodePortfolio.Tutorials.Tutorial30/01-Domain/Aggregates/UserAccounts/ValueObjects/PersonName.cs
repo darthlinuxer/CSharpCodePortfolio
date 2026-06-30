@@ -12,11 +12,13 @@ public readonly record struct PersonName(string Value)
     /// <summary>
     /// Validates raw input and returns Either instead of throwing for expected user mistakes.
     /// </summary>
-    public static Either<Seq<DomainError>, PersonName> Create(string? value)
+    public static Either<DomainError, PersonName> Create(Option<string> value)
     {
-        return string.IsNullOrWhiteSpace(value)
-            ? Left<Seq<DomainError>, PersonName>(Seq1<DomainError>(new PersonNameRequiredError()))
-            : Right<Seq<DomainError>, PersonName>(new PersonName(value.Trim()));
+        return value.Match(
+            Some: text => string.IsNullOrWhiteSpace(text)
+                ? Left<DomainError, PersonName>(new PersonNameRequiredError())
+                : Right<DomainError, PersonName>(new PersonName(text.Trim())),
+            None: () => Left<DomainError, PersonName>(new PersonNameRequiredError()));
     }
 
     /// <summary>

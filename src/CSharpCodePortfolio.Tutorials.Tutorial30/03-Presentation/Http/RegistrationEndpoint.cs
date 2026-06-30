@@ -1,6 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Functional;
 using LanguageExt;
 using Microsoft.AspNetCore.Http;
 
@@ -43,9 +42,18 @@ public static class RegistrationEndpoint
             user.Id,
             user.Name,
             user.Email,
-            user.PhoneNumber.ToNullable());
+            ToNullable(user.PhoneNumber));
     }
 
+    private static string? ToNullable(Option<string> option)
+    {
+        foreach (var value in option)
+        {
+            return value;
+        }
+
+        return null;
+    }
 }
 
 /// <summary>

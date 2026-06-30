@@ -13,14 +13,16 @@ public readonly record struct Email(string Value)
     /// <summary>
     /// Validates an email that was actually supplied by the caller.
     /// </summary>
-    public static Either<Seq<DomainError>, Email> Create(string? value)
+    public static Either<DomainError, Email> Create(Option<string> value)
     {
-        return string.IsNullOrWhiteSpace(value)
-            ? Left<Seq<DomainError>, Email>(Seq1<DomainError>(new EmailInvalidError()))
-            : TryNormalize(value);
+        return value.Match(
+            Some: text => string.IsNullOrWhiteSpace(text)
+                ? Left<DomainError, Email>(new EmailInvalidError())
+                : TryNormalize(text),
+            None: () => Left<DomainError, Email>(new EmailInvalidError()));
     }
 
-    private static Either<Seq<DomainError>, Email> TryNormalize(string value)
+    private static Either<DomainError, Email> TryNormalize(string value)
     {
         try
         {
@@ -28,12 +30,12 @@ public readonly record struct Email(string Value)
             var parsed = new MailAddress(normalized);
 
             return parsed.Address == normalized
-                ? Right<Seq<DomainError>, Email>(new Email(normalized))
-                : Left<Seq<DomainError>, Email>(Seq1<DomainError>(new EmailInvalidError()));
+                ? Right<DomainError, Email>(new Email(normalized))
+                : Left<DomainError, Email>(new EmailInvalidError());
         }
         catch (FormatException)
         {
-            return Left<Seq<DomainError>, Email>(Seq1<DomainError>(new EmailInvalidError()));
+            return Left<DomainError, Email>(new EmailInvalidError());
         }
     }
 

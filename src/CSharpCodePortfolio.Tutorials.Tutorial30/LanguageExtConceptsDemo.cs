@@ -25,8 +25,8 @@ public static class LanguageExtConceptsDemo
                 .Match(Some: email => email, None: () => "sem email");
 
         var emailLength =
-            from email in Email.Create("ada@example.com")
-            from normalized in Right<Seq<DomainError>, string>(email.Value)
+            from email in Email.Create(Some("ada@example.com"))
+            from normalized in Right<DomainError, string>(email.Value)
             select normalized.Length;
 
         var composed =
