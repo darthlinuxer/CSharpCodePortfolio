@@ -1,112 +1,58 @@
-# Tutorial 30 - LanguageExt.Core pragmático
+# Tutorial 30 - LanguageExt.Core + DDD monádico
 
-Este tutorial mostra um cadastro de usuário modelado com DDD tático e
-`LanguageExt.Core`: `Option<T>` para ausência válida, `Either<DomainError,T>`
-para validações simples, `Either<Seq<DomainError>,T>` quando há acúmulo de
-falhas esperadas, e EF Core como adapter de infraestrutura.
+Este tutorial mostra um esqueleto DDD pequeno com `LanguageExt.Core`, bounded
+contexts e comunicação por eventos:
 
-O projeto alvo é `net10.0` com `LangVersion` fixado em `14.0`. A versão usada
-do pacote funcional é `LanguageExt.Core` `4.4.9`.
+- `Option<T>` para ausência válida.
+- `Either<DomainError,T>` para falhas esperadas.
+- Aggregates independentes por bounded context.
+- Domain events internos.
+- Integration events como published language entre contexts.
+- Outbox persistida simples e dispatcher in-process para o tutorial.
 
 ## Estrutura
 
-- `01-Domain`: aggregate, value objects, eventos, erros e building blocks comuns.
-- `02-Application`: caso de uso, DTOs e portas finas.
-- `03-Infrastructure`: EF Core, mapping, writer e unit of work.
-- `03-Presentation`: tradução HTTP de `Either` para `IResult`.
+- `SharedKernel`: building blocks mínimos (`IEntity`, `IAggregate`,
+  `AbstractAggregate`, `DomainError`, `AbstractDomainEvent`, `Timestamp`).
+- `Contexts/Identity`: `UserAccount`, cadastro e evento
+  `UserRegisteredIntegrationEvent`.
+- `Contexts/Ordering`: `Order`, `OrderLine`, `CustomerDirectory`, commands de
+  criação/confirmação e evento `OrderConfirmedIntegrationEvent`.
+- `Contexts/Billing`: `Invoice`, handler idempotente com resultado explícito
+  `Created`/`AlreadyHandled`.
+- `Integration`: contratos publicados, outbox e dispatcher sem broker real.
+- `Infrastructure`: `Tutorial30DbContext`, usado só como adapter de persistência.
+- `Presentation`: tradução HTTP fina de `Either` para `IResult`.
 
-O domínio preserva ownership por pasta:
+## Fronteiras DDD
 
-- `01-Domain/Common/...`: `AbstractEntity<TAggregate,TId>`, `DomainError`,
-  eventos comuns, helpers pequenos e `Timestamp`.
-- `01-Domain/Aggregates/UserAccounts/...`: `UserAccount`, erros/eventos do
-  aggregate e value objects específicos (`PersonName`, `Email`, `PhoneNumber`).
+`Identity` é dono de `UserAccount`. `Ordering` não referencia esse aggregate:
+usa `CustomerId` local, alimentado por `UserRegisteredIntegrationEvent`.
 
-## Modelo de domínio
+`Billing` não referencia `Order`: cria `Invoice` a partir do contrato publicado
+`OrderConfirmedIntegrationEvent`. O payload é mínimo: ids e valor total.
 
-`UserAccount` é o aggregate root. Ele mantém `Name` e `Email` como value objects
-obrigatórios e `PhoneNumber` como `Option<PhoneNumber>`.
+## Fluxo demonstrado
 
-```csharp
-public static Either<Seq<DomainError>, UserAccount> Create(
-    Option<string> name,
-    Option<string> email,
-    Option<string> phoneNumber,
-    TimeProvider clock)
-```
+1. `RegisterUserService` cria `UserAccount`.
+2. `EfIntegrationOutbox` grava `UserRegisteredIntegrationEvent` na mesma
+   transação.
+3. `InProcessOutboxDispatcher` entrega o evento ao ACL de Ordering.
+4. `PlaceOrderService` cria `Order` usando apenas `CustomerId`.
+5. `ConfirmOrderService` confirma `Order` e grava `OrderConfirmedIntegrationEvent`.
+6. Billing consome o evento e cria uma `Invoice` uma única vez.
 
-Falhas de regra esperada não usam exception. Cada value object retorna
-`Either<DomainError,T>` porque valida uma única propriedade. O aggregate usa
-`Either<Seq<DomainError>,UserAccount>` no factory para acumular os erros de
-entrada. Ausência chega ao domínio como `None`; nullable fica restrito às bordas
-de aplicação, HTTP e persistência. O relógio entra por `TimeProvider`, então
-timestamps de criação, alteração e eventos são determinísticos em teste.
+## O que ficou fora
 
-`AbstractEntity<TAggregate,TId>` contém somente identidade, `CreatedAt`,
-`LastModified` e domain events tipados pelo aggregate dono. Um `UserAccount`
-coleta apenas `AbstractDomainEvent<UserAccount>`, então eventos de outro
-aggregate não entram nesse stream por acidente. Auditoria de ator fica fora do
-aggregate, na borda de aplicação ou autenticação quando existir.
+Sem `GenericRepository<T>`, MediatR, broker real, event sourcing, saga ou CQRS
+pesado. Esses padrões entram só quando houver regra real que pague o custo.
 
-## Erros
-
-`DomainError` expõe:
-
-- `Code`: código estável para serialização.
-- `Message`: mensagem humana.
-- `Category`: taxonomia de domínio (`validation` ou `conflict`).
-
-A apresentação traduz `Category` para HTTP em `DomainErrorHttpMap`. Assim um novo
-erro de conflito não obriga o endpoint a conhecer o tipo concreto.
-
-## Persistência
-
-`RegistrationDbContext` persiste o aggregate diretamente. Não há repository
-genérico. O writer é fino:
-
-```csharp
-public interface IUserAccountWriter
-{
-    void Add(UserAccount account);
-    void Delete(UserAccount account);
-}
-```
-
-`IRegistrationUnitOfWork.CommitAsync` concentra o commit e converte conflitos
-esperados de índice único em `Left(Seq<DomainError>)`. O índice único durável é o
-email; o pre-check no application service melhora a resposta, mas a constraint do
-banco continua sendo a proteção contra corrida.
-
-`Option<PhoneNumber>` é a API pública e o backing value do aggregate. EF Core usa
-`ValueConverter` no adapter para gravar valores não nulos no banco e reidratar
-`None` no domínio, sem `PhoneNumber?` no layer `01-Domain`.
-
-## Fluxo
-
-`RegisterUserService.RegisterAsync` executa:
-
-1. cria o aggregate com `UserAccount.Create(...)`;
-2. retorna `Left` se a validação do domínio falhar;
-3. consulta `IUserAccountLookup.EmailExistsAsync`;
-4. deixa o aggregate decidir `EnsureCanBeRegistered(emailExists)`;
-5. adiciona pelo writer;
-6. commita pela unit of work;
-7. retorna `RegisteredUserDto` com valores primitivos.
-
-`RegistrationEndpoint` fecha o `Either`:
-
-- `Right(dto)` vira `201 Created`;
-- `validation` vira `400 BadRequest`;
-- `conflict` vira `409 Conflict`.
-
-`Option<string>` só vira `string?` na resposta HTTP.
+O diretório `Traditional` fica como anti-exemplo imperativo. O restante do
+Tutorial30 é protegido por teste arquitetural contra condicionais imperativos.
 
 ## Executar
 
 ```bash
-dotnet test tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests.csproj
-dotnet run --project src/CSharpCodePortfolio.App -- run 30
+dotnet test tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests/CSharpCodePortfolio.Tutorials.Tutorial30.Tests.csproj --no-restore
+dotnet run --project src/CSharpCodePortfolio.App --no-restore -- run 30
 ```
-
-O tutorial de console imprime evidências de validação, persistência, conflito por
-email e tradução HTTP.

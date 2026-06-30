@@ -1,5 +1,5 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts.ValueObjects;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.ValueObjects;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;

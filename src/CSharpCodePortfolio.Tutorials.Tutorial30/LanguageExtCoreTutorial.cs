@@ -1,13 +1,23 @@
 using CSharpCodePortfolio.Shared;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Commands;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Aggregates.UserAccounts;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Domain.Common.Errors;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence.ConfigurationMappings;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Queries;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Traditional;
 using CSharpCodePortfolio.Tutorials.Abstractions;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.Handlers;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Commands;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Persistence.ConfigurationMappings;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Queries;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Commands;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Customers;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Outbox;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Presentation.Http;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Traditional;
+using LanguageExt;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static LanguageExt.Prelude;
@@ -15,146 +25,141 @@ using static LanguageExt.Prelude;
 namespace CSharpCodePortfolio.Tutorials.Tutorial30;
 
 /// <summary>
-/// Runs the LanguageExt.Core tutorial from a null-heavy registration flow to a composable functional flow.
+/// Runs the LanguageExt.Core tutorial as a small monadic DDD skeleton with bounded contexts.
 /// </summary>
-[Tutorial("30", "language-ext-core", "LanguageExt.Core pragmático")]
+[Tutorial("30", "language-ext-core", "LanguageExt.Core + DDD monádico")]
 public sealed class LanguageExtCoreTutorial : ITutorial
 {
-    /// <summary>
-    /// Executes the scenario, writes code snippets, and prints runtime evidence for the tutorial.
-    /// </summary>
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        TutorialConsole.WriteHeader("30", "LanguageExt.Core pragmático");
+        TutorialConsole.WriteHeader("30", "LanguageExt.Core + DDD monádico");
         TutorialConsole.WriteContext(
             ("Pacote", "LanguageExt.Core 4.4.9"),
-            ("Prerelease atual", "5.0.0-beta-77"),
-            ("Decisão", "Stable 4.4.9 para evitar mudanças de superfície da v5 beta"),
-            ("Persistência", "EF Core 10 SQLite em memória + ComplexProperty/HasConversion"));
+            ("Bounded contexts", "Identity, Ordering, Billing"),
+            ("Comunicação", "Domain Event -> Integration Event -> Outbox -> handler in-process"),
+            ("Persistência", "EF Core 10 SQLite em memória + value converters"));
 
         TutorialConsole.WriteQuestion(
-            "Como modelar cadastro de usuário sem null checks espalhados, if/else procedural e exceptions para regra esperada?");
+            "Como modelar aggregates independentes, comunicação entre bounded contexts e erros esperados sem null/exception como fluxo de negócio?");
 
         TutorialConsole.WriteHypothesis(
-            "Option<T> torna ausência válida explícita.",
-            "Either<DomainError,T> deixa regra esperada no tipo de retorno.",
-            "Seq<T>, Map, Bind, Match e LINQ query syntax compõem validação, duplicidade, persistência e HTTP sem estados implícitos.");
-
-        TutorialConsole.WritePreparation(
-            "O anti-exemplo mostra string?, Email?, PhoneNumber?, throws e service retornando null.",
-            "O fluxo funcional usa value objects fechados, Option para telefone opcional e Either para falhas esperadas.",
-            "EF Core mapeia UserAccount diretamente; Option<T> fica na API de domínio, não no shape de persistência.",
-            "Try fica nas bordas técnicas; no LanguageExt.Core 4.4.9 executar Try<T> retorna Result<T>, não Fin<T>.");
+            "Cada bounded context protege sua linguagem e seus invariantes.",
+            "Aggregates externos entram por IDs/value objects locais, nunca por referência direta.",
+            "Integration events são contratos publicados; o outbox dá atomicidade sem broker real no tutorial.");
 
         TutorialConsole.WriteExperiment(
             1,
-            "C# tradicional deixa o estado inválido escapar",
-            "Leia o service tradicional: null, throw e if/else carregam significado que o compilador não consegue proteger.");
+            "Anti-exemplo tradicional",
+            "Null, exception e condicionais manuais fazem o fluxo depender de convenção humana.");
         TutorialConsole.WriteCodeSnippet(
-            "Anti-exemplo tradicional | service",
+            "Service tradicional",
             typeof(TraditionalNullRegistrationExample.TraditionalRegistrationService),
             nameof(TraditionalNullRegistrationExample.TraditionalRegistrationService.RegisterAsync));
-        TutorialConsole.WriteCodeSnippet(
-            "Anti-exemplo tradicional | controller",
-            typeof(TraditionalNullRegistrationExample.TraditionalRegistrationController),
-            nameof(TraditionalNullRegistrationExample.TraditionalRegistrationController.RegisterAsync));
 
         TutorialConsole.WriteExperiment(
             2,
-            "Value objects e Option removem nullables do domínio",
-            "Mantenha Name e Email obrigatórios; use Option<T> só para ausência válida, como PhoneNumber.");
-        TutorialConsole.WriteCodeSnippet(
-            "Aggregate válido por construção",
-            typeof(UserAccount),
-            nameof(UserAccount.Create));
+            "Identity cria UserAccount e publica contrato",
+            "UserAccount continua aggregate root rico; registro bem-sucedido grava UserRegisteredIntegrationEvent no outbox.");
+        TutorialConsole.WriteCodeSnippet("UserAccount factory", typeof(UserAccount), nameof(UserAccount.Create));
+        TutorialConsole.WriteCodeSnippet("Identity mapping", typeof(UserAccountConfiguration), nameof(UserAccountConfiguration.Configure));
+
+        await using var dbContext = CreateDbContext();
+        var outbox = new EfIntegrationOutbox(dbContext);
+        var registerUser = new RegisterUserService(
+            new EfUserAccountLookup(dbContext),
+            new EfUserAccountWriter(dbContext),
+            outbox,
+            dbContext,
+            TimeProvider.System);
+        var registered = await registerUser.RegisterAsync(
+            new RegisterUserRequest("Grace Hopper", "grace@example.com", "11999998888"),
+            cancellationToken).ConfigureAwait(false);
+
+        var dispatcher = CreateDispatcher(dbContext);
+        var identityDispatches = await dispatcher.DispatchPendingAsync(cancellationToken).ConfigureAwait(false);
 
         TutorialConsole.WriteEvidence(
-            "Aggregate DDD",
-            ("Domain events", CreateDomainEventEvidence()));
-
-        var concepts = LanguageExtConceptsDemo.Run();
-        TutorialConsole.WriteEvidence(
-            "Tipos centrais do LanguageExt.Core",
-            ("Option None", concepts.AbsentEmailIsNone.ToString()),
-            ("Either Right", concepts.NormalizedEmail),
-            ("Map/Bind/LINQ", concepts.ComposedLength.ToString()),
-            ("Fin", concepts.FinMessage),
-            ("Try", concepts.TryValue.ToString()),
-            ("Seq", concepts.SeqTotal.ToString()));
+            "Identity -> Ordering",
+            ("Registro", ToIdentityResult(registered)),
+            ("Outbox entregue", identityDispatches.ToString()),
+            ("Clientes Ordering", (await dbContext.CustomerDirectory.CountAsync(cancellationToken).ConfigureAwait(false)).ToString()));
 
         TutorialConsole.WriteExperiment(
             3,
-            "Application service orquestra domínio, queries e persistência",
-            "Execute o mesmo caso de uso com email ausente inválido, email presente e duplicidade de email.");
-        TutorialConsole.WriteCodeSnippet(
-            "Application service funcional",
-            typeof(RegisterUserService),
-            nameof(RegisterUserService.RegisterAsync));
-        TutorialConsole.WriteCodeSnippet(
-            "ConfigurationMappings | ComplexProperty + HasConversion",
-            typeof(UserAccountConfiguration),
-            nameof(UserAccountConfiguration.Configure));
+            "Ordering referencia cliente por CustomerId",
+            "Order não conhece UserAccount; cliente vem da projeção local mantida por evento de integração.");
+        TutorialConsole.WriteCodeSnippet("Order.Place", typeof(Order), nameof(Order.Place));
+        TutorialConsole.WriteCodeSnippet("PlaceOrderService", typeof(PlaceOrderService), nameof(PlaceOrderService.PlaceAsync));
 
-        await using var dbContext = CreateDbContext();
-
-        TutorialConsole.WriteEvidence(
-            "Mapeamento EF Core 10",
-            ("Entity", dbContext.Model.FindEntityType(typeof(UserAccount))?.ClrType.Name ?? "não mapeada"),
-            ("ComplexProperties", FormatComplexProperties(dbContext)));
-
-        var service = new RegisterUserService(
-            new EfUserAccountLookup(dbContext),
-            new EfUserAccountWriter(dbContext),
+        var customerId = GetRight(registered).Id;
+        var placeOrder = new PlaceOrderService(
+            new EfCustomerDirectory(dbContext),
+            new EfOrderWriter(dbContext),
             dbContext,
             TimeProvider.System);
-        var missingEmail = await service.RegisterAsync(
-            new RegisterUserRequest("Ada Lovelace", null, "11999998888"),
+        var unknownCustomer = await placeOrder.PlaceAsync(
+            new PlaceOrderRequest(Guid.CreateVersion7(), [new PlaceOrderLineRequest("book-ddd", 1, 120)]),
             cancellationToken).ConfigureAwait(false);
-        var withEmail = await service.RegisterAsync(
-            new RegisterUserRequest("Grace Hopper", "grace@example.com", null),
-            cancellationToken).ConfigureAwait(false);
-        var duplicateEmail = await service.RegisterAsync(
-            new RegisterUserRequest("Outra Grace", "grace@example.com", null),
+        var placed = await placeOrder.PlaceAsync(
+            new PlaceOrderRequest(customerId, [new PlaceOrderLineRequest("book-ddd", 2, 120)]),
             cancellationToken).ConfigureAwait(false);
 
         TutorialConsole.WriteEvidence(
-            "Persistência assíncrona",
-            ("Email ausente", ToScenarioResult(missingEmail)),
-            ("Com email", ToScenarioResult(withEmail)),
-            ("Email duplicado", ToScenarioResult(duplicateEmail)),
-            ("Linhas persistidas", (await dbContext.Users.CountAsync(cancellationToken).ConfigureAwait(false)).ToString()));
+            "Ordering",
+            ("Cliente desconhecido", ToOrderResult(unknownCustomer)),
+            ("Pedido criado", ToOrderResult(placed)),
+            ("Linhas", (await dbContext.Orders.SelectMany(order => order.Lines).CountAsync(cancellationToken).ConfigureAwait(false)).ToString()));
 
         TutorialConsole.WriteExperiment(
             4,
-            "HTTP fica como tradução explícita",
-            "Mapeie Either<Seq<DomainError>, RegisteredUserDto> para Created, BadRequest ou Conflict sem interpretar null.");
-        TutorialConsole.WriteCodeSnippet(
-            "Endpoint mapper",
-            typeof(RegistrationEndpoint),
-            nameof(RegistrationEndpoint.ToHttpResult));
+            "OrderConfirmed vira Invoice no Billing",
+            "Ordering publica OrderConfirmedIntegrationEvent; Billing traduz o contrato e cria Invoice de forma idempotente.");
+        TutorialConsole.WriteCodeSnippet("ConfirmOrderService", typeof(ConfirmOrderService), nameof(ConfirmOrderService.ConfirmAsync));
+        TutorialConsole.WriteCodeSnippet("Billing handler", typeof(CreateInvoiceWhenOrderConfirmedHandler), nameof(CreateInvoiceWhenOrderConfirmedHandler.HandleAsync));
 
-        var conflict = RegistrationEndpoint.ToHttpResult(duplicateEmail);
+        var confirmOrder = new ConfirmOrderService(
+            new EfOrderWriter(dbContext),
+            outbox,
+            dbContext,
+            TimeProvider.System);
+        var confirmed = await confirmOrder.ConfirmAsync(
+            new ConfirmOrderRequest(GetRight(placed).Id),
+            cancellationToken).ConfigureAwait(false);
+        var billingDispatches = await dispatcher.DispatchPendingAsync(cancellationToken).ConfigureAwait(false);
+        var repeatedDispatches = await dispatcher.DispatchPendingAsync(cancellationToken).ConfigureAwait(false);
+
         TutorialConsole.WriteEvidence(
-            "Retorno HTTP",
-            ("Status duplicidade", GetStatusCode(conflict).ToString()),
-            ("Regra esperada", "Conflict em vez de exception"));
+            "Ordering -> Billing",
+            ("Pedido confirmado", ToConfirmedOrderResult(confirmed)),
+            ("Eventos entregues", billingDispatches.ToString()),
+            ("Reentrega idempotente", repeatedDispatches.ToString()),
+            ("Invoices", (await dbContext.Invoices.CountAsync(cancellationToken).ConfigureAwait(false)).ToString()));
+
+        TutorialConsole.WriteExperiment(
+            5,
+            "HTTP continua borda fina",
+            "Presentation só traduz Either para status HTTP; regra fica em Domain/Application.");
+        var conflict = RegistrationEndpoint.ToHttpResult(
+            Left<Seq<DomainError>, RegisteredUserDto>(
+                Seq1<DomainError>(new Contexts.Identity.Domain.Aggregates.UserAccounts.Errors.UserAccountEmailDuplicateError())));
+        TutorialConsole.WriteEvidence(
+            "HTTP",
+            ("Status conflito", GetStatusCode(conflict).ToString()),
+            ("Entidades mapeadas", string.Join(", ", dbContext.Model.GetEntityTypes().Select(entity => entity.ClrType.Name).Order())));
 
         TutorialConsole.WriteConclusion(
-            "O domínio não carrega propriedades nullable. Ausência válida usa Option<T>; regra esperada usa Either; falha técnica fica em Try/exception na borda.",
+            "O tutorial agora mostra Strategic DDD mínimo: contexts separados, aggregates independentes, IDs entre contexts, published language, ACL, outbox e handlers.",
             TutorialConclusionKind.Success);
     }
 
-    /// <summary>
-    /// Creates an isolated SQLite in-memory context for the tutorial run.
-    /// </summary>
-    private static RegistrationDbContext CreateDbContext()
+    private static Tutorial30DbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<RegistrationDbContext>()
+        var options = new DbContextOptionsBuilder<Tutorial30DbContext>()
             .UseSqlite("Data Source=:memory:")
             .Options;
-        var dbContext = new RegistrationDbContext(options);
+        var dbContext = new Tutorial30DbContext(options);
 
         dbContext.Database.OpenConnection();
         dbContext.Database.EnsureCreated();
@@ -162,68 +167,40 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         return dbContext;
     }
 
-    /// <summary>
-    /// Formats an Either result for compact console evidence.
-    /// </summary>
-    private static string ToScenarioResult(LanguageExt.Either<LanguageExt.Seq<DomainError>, RegisteredUserDto> result)
+    private static InProcessOutboxDispatcher CreateDispatcher(Tutorial30DbContext dbContext)
     {
-        return result.Match(
-            Right: user => $"Right({user.Name})",
+        var customerDirectory = new EfCustomerDirectory(dbContext);
+        var customerHandler = new RegisterCustomerWhenUserRegisteredHandler(customerDirectory, dbContext);
+        var billingHandler = new CreateInvoiceWhenOrderConfirmedHandler(
+            new EfInvoiceWriter(dbContext),
+            dbContext,
+            TimeProvider.System);
+
+        return new InProcessOutboxDispatcher(dbContext, customerHandler, billingHandler, TimeProvider.System);
+    }
+
+    private static string ToIdentityResult(Either<Seq<DomainError>, RegisteredUserDto> result) =>
+        result.Match(
+            Right: user => $"Right({user.Email})",
             Left: errors => $"Left({string.Join(", ", errors.Map(error => error.Code.ToString()))})");
-    }
 
-    /// <summary>
-    /// Creates one aggregate directly to show that the domain raises an event without infrastructure.
-    /// </summary>
-    private static string CreateDomainEventEvidence()
-    {
-        var clock = TimeProvider.System;
-        var account =
-            UserAccount.Create(Some("Alan Turing"), Some("alan@example.com"), None, clock);
+    private static string ToOrderResult(Either<Seq<DomainError>, PlacedOrderDto> result) =>
+        result.Match(
+            Right: order => $"Right({order.TotalAmount:0.00})",
+            Left: errors => $"Left({string.Join(", ", errors.Map(error => error.Code.ToString()))})");
 
-        return account.Match(
-            Right: user =>
-            {
-                var changes = ApplyDomainChanges(user, clock);
+    private static string ToConfirmedOrderResult(Either<Seq<DomainError>, ConfirmedOrderDto> result) =>
+        result.Match(
+            Right: order => $"Right({order.TotalAmount:0.00})",
+            Left: errors => $"Left({string.Join(", ", errors.Map(error => error.Code.ToString()))})");
 
-                return changes.Match(
-                    Right: changedUser => string.Join(" | ", changedUser.DomainEvents.Map(domainEvent => domainEvent.ToString())),
-                    Left: error => error.Code.ToString());
-            },
-            Left: errors => string.Join(", ", errors.Map(error => error.Code.ToString())));
-    }
+    private static TRight GetRight<TLeft, TRight>(Either<TLeft, TRight> result) =>
+        result.Match(
+            Right: value => value,
+            Left: error => throw new InvalidOperationException($"Expected Right, got Left({error})."));
 
-    /// <summary>
-    /// Applies valid mutations so the tutorial prints domain events beyond creation.
-    /// </summary>
-    private static LanguageExt.Either<DomainError, UserAccount> ApplyDomainChanges(UserAccount user, TimeProvider clock)
-    {
-        return
-            from renamed in user.Rename(Some("Alan Mathison Turing"), clock)
-            from changedEmail in user.ChangeEmail(Some("alan.turing@example.com"), clock)
-            from changedPhone in user.ChangePhoneNumber(Some("11987654321"), clock)
-            select user;
-    }
-
-    /// <summary>
-    /// Formats mapped complex properties so the tutorial proves EF is not using a persistence-only record.
-    /// </summary>
-    private static string FormatComplexProperties(RegistrationDbContext dbContext)
-    {
-        var userEntity = dbContext.Model.FindEntityType(typeof(UserAccount));
-
-        return userEntity is null
-            ? "nenhuma"
-            : string.Join(", ", userEntity.GetComplexProperties().Select(property => property.Name));
-    }
-
-    /// <summary>
-    /// Reads the status code exposed by ASP.NET Core result implementations.
-    /// </summary>
-    private static int GetStatusCode(IResult result)
-    {
-        return result is IStatusCodeHttpResult statusCodeResult
+    private static int GetStatusCode(IResult result) =>
+        result is IStatusCodeHttpResult statusCodeResult
             ? statusCodeResult.StatusCode ?? StatusCodes.Status200OK
             : StatusCodes.Status200OK;
-    }
 }
