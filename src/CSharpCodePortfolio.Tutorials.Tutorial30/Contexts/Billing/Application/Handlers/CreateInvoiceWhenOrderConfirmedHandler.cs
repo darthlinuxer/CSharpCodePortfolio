@@ -4,6 +4,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregate
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
@@ -47,15 +48,10 @@ public sealed class CreateInvoiceWhenOrderConfirmedHandler(
         var orderId = BilledOrderId.Create(integrationEvent.OrderId);
         var customerId = BillingCustomerId.Create(integrationEvent.CustomerId);
         var amount = InvoiceAmount.Create(integrationEvent.TotalAmount);
-        var errors = Seq(
-            ErrorOf(orderId),
-            ErrorOf(customerId),
-            ErrorOf(amount))
-            .Bind(error => error.Match(Some: Seq1, None: Seq<DomainError>));
 
-        return errors.IsEmpty
-            ? Right<Seq<DomainError>, InvoiceValues>(new InvoiceValues(GetRight(orderId), GetRight(customerId), GetRight(amount)))
-            : Left<Seq<DomainError>, InvoiceValues>(errors);
+        return (orderId, customerId, amount)
+            .Combine((validOrderId, validCustomerId, validAmount) =>
+                new InvoiceValues(validOrderId, validCustomerId, validAmount));
     }
 
     private async Task<Either<Seq<DomainError>, InvoiceHandlingResult>> CreateAndCommitAsync(
@@ -89,12 +85,6 @@ public sealed class CreateInvoiceWhenOrderConfirmedHandler(
                 new InvoiceHandlingResult.Created(invoice.Id)),
             Left: errors => Left<Seq<DomainError>, InvoiceHandlingResult>(errors));
     }
-
-    private static Option<DomainError> ErrorOf<T>(Either<DomainError, T> result) =>
-        result.Match(Right: _ => None, Left: Some);
-
-    private static T GetRight<T>(Either<DomainError, T> result) =>
-        result.Match(Right: value => value, Left: error => throw new InvalidOperationException(error.Message));
 
     private sealed record InvoiceValues(BilledOrderId OrderId, BillingCustomerId CustomerId, InvoiceAmount Amount);
 }

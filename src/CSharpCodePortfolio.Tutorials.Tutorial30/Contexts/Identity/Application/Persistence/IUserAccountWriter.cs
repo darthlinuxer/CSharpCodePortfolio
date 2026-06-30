@@ -1,4 +1,5 @@
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
+using LanguageExt;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Persistence;
 
@@ -11,4 +12,6 @@ public interface IUserAccountWriter
     /// Adds a new aggregate to the current unit of work.
     /// </summary>
     void Add(UserAccount account);
+
+    Task<Option<UserAccount>> FindByIdAsync(Guid id, CancellationToken cancellationToken);
 }

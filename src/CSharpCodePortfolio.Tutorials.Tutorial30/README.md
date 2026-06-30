@@ -20,11 +20,12 @@ contexts e comunicação por eventos:
   criação/confirmação e `OrderConfirmedDomainEvent`.
 - `Contexts/Billing`: `Invoice`, handler idempotente com resultado explícito
   `Created`/`AlreadyHandled`.
-- `Integration/Messaging`: porta `IIntegrationEventBus`, consumidores genéricos
-  e dispatcher sem referência a contexts.
+- `Integration/Messaging`: contratos puros de publicação e consumo de eventos
+  de integração.
 - `Integration/Events`: contratos publicados entre bounded contexts.
 - `Integration/Outbox`: envelope persistido para mensagens pendentes.
-- `Infrastructure`: `Tutorial30DbContext` e `EfTutorial30UnitOfWork`.
+- `Infrastructure`: `Tutorial30DbContext`, `EfTutorial30UnitOfWork`,
+  tradutores EF de erro esperado e dispatcher outbox in-process.
 - `Presentation`: tradução HTTP fina de `Either` para `IResult`.
 
 ## Fronteiras DDD
@@ -37,8 +38,8 @@ usa `CustomerId` local, alimentado por `UserRegisteredIntegrationEvent`.
 
 Domain events ficam dentro do próprio bounded context e são enviados por
 `IInMemoryDomainEventBus`. Handlers locais podem publicar integration events
-por `IIntegrationEventBus`; a implementação atual grava na outbox e pode ser
-trocada por RabbitMQ, fila ou broker real depois.
+por `IIntegrationEventBus`; a implementação de infraestrutura atual grava na
+outbox e pode ser trocada por RabbitMQ, fila ou broker real depois.
 
 ## Fluxo demonstrado
 
@@ -47,9 +48,9 @@ trocada por RabbitMQ, fila ou broker real depois.
    `UserAccountRegisteredDomainEvent` no bus local.
 3. O handler local de Identity publica `UserRegisteredIntegrationEvent` pela
    porta `IIntegrationEventBus`.
-4. `OutboxIntegrationEventBus` grava a mensagem na outbox durante a mesma
-   transação.
-5. `InProcessOutboxDispatcher` lê a outbox e entrega a mensagem a consumidores
+4. A implementação `OutboxIntegrationEventBus` grava a mensagem na outbox
+   durante a mesma transação.
+5. O dispatcher in-process lê a outbox e entrega a mensagem a consumidores
    registrados por contrato.
 6. Ordering atualiza `CustomerDirectory` e cria `Order` usando apenas
    `CustomerId`.

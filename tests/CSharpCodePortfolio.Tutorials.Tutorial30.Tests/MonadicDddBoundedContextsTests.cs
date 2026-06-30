@@ -5,6 +5,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Infrastructure.P
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Handlers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Infrastructure.Persistence;
@@ -18,12 +19,14 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregat
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Events;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +66,168 @@ public sealed class MonadicDddBoundedContextsTests
         Assert.HasCount(1, messages);
         Assert.AreEqual(UserRegisteredIntegrationEvent.EventType, messages[0].Type);
         Assert.IsTrue(messages[0].ProcessedAtUtc.IsNone);
+    }
+
+    [TestMethod]
+    public async Task Identity_RegisterUser_ReturnsUserAccountDto()
+    {
+        await using var dbContext = CreateDbContext();
+        var service = CreateRegisterUserService(dbContext);
+
+        var result = await service.RegisterAsync(new RegisterUserRequest("Grace Hopper", "grace@example.com", null));
+
+        var user = Assert.IsInstanceOfType<UserAccountDto>(GetRight(result));
+        Assert.AreEqual("Grace Hopper", user.Name);
+        Assert.AreEqual("grace@example.com", user.Email);
+    }
+
+    [TestMethod]
+    public async Task Identity_UpdateProfile_PersistsChanges()
+    {
+        await using var dbContext = CreateDbContext();
+        var registered = await CreateRegisterUserService(dbContext)
+            .RegisterAsync(new RegisterUserRequest("Grace Hopper", "grace@example.com", null));
+        var service = CreateUpdateUserAccountProfileService(dbContext);
+
+        var result = await service.UpdateAsync(new UpdateUserAccountProfileRequest(
+            GetRight(registered).Id,
+            "Amazing Grace",
+            "amazing@example.com",
+            "11988887777"));
+        var user = await dbContext.Users.AsNoTracking().SingleAsync();
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual("Amazing Grace", user.Name.Value);
+        Assert.AreEqual("amazing@example.com", user.Email.Value);
+        Assert.AreEqual("11988887777", user.PhoneNumber.Single().Value);
+    }
+
+    [TestMethod]
+    public async Task Identity_UpdateProfile_RejectsUnknownUser()
+    {
+        await using var dbContext = CreateDbContext();
+        var service = CreateUpdateUserAccountProfileService(dbContext);
+
+        var result = await service.UpdateAsync(new UpdateUserAccountProfileRequest(
+            Guid.CreateVersion7(),
+            "Grace Hopper",
+            "grace@example.com",
+            null));
+
+        Assert.IsInstanceOfType<UserAccountNotFoundError>(GetOnlyError(result));
+    }
+
+    [TestMethod]
+    public async Task Identity_UpdateProfile_RejectsDuplicateEmail()
+    {
+        await using var dbContext = CreateDbContext();
+        var grace = await CreateRegisterUserService(dbContext)
+            .RegisterAsync(new RegisterUserRequest("Grace Hopper", "grace@example.com", null));
+        await CreateRegisterUserService(dbContext)
+            .RegisterAsync(new RegisterUserRequest("Ada Lovelace", "ada@example.com", null));
+        var service = CreateUpdateUserAccountProfileService(dbContext);
+
+        var result = await service.UpdateAsync(new UpdateUserAccountProfileRequest(
+            GetRight(grace).Id,
+            "Grace Hopper",
+            "ada@example.com",
+            null));
+
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(result));
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_TranslatesUserEmailUniqueConstraintWithoutContextCoupling()
+    {
+        await using var dbContext = CreateDbContext();
+        var writer = new EfUserAccountWriter(dbContext);
+        writer.Add(CreateUserAccount("Grace Hopper", "grace@example.com"));
+        writer.Add(CreateUserAccount("Ada Lovelace", "grace@example.com"));
+
+        var result = await CreateUnitOfWork(dbContext).CommitAsync(CancellationToken.None);
+
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(result));
+    }
+
+    [TestMethod]
+    public void UserAccount_Create_AccumulatesValueObjectErrors()
+    {
+        var result = UserAccount.Create(None, Some("not-email"), Some("abc"), TimeProvider.System);
+        var errors = GetLeft(result).ToArray();
+
+        Assert.HasCount(3, errors);
+        Assert.IsTrue(errors.Any(error => error is PersonNameRequiredError));
+        Assert.IsTrue(errors.Any(error => error is EmailInvalidError));
+        Assert.IsTrue(errors.Any(error => error is PhoneNumberInvalidError));
+    }
+
+    [TestMethod]
+    public void UserAccount_EnsureEmailIsAvailable_ReturnsDuplicateError()
+    {
+        var result = UserAccount.EnsureEmailIsAvailable(emailAlreadyExists: true);
+
+        Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetLeft(result));
+    }
+
+    [TestMethod]
+    public void UserAccount_EnsureEmailCanChangeTo_AllowsCurrentEmail()
+    {
+        var account = CreateUserAccount();
+
+        var result = account.EnsureEmailCanChangeTo(account.Email, emailAlreadyExists: true);
+
+        Assert.IsTrue(result.IsRight);
+    }
+
+    [TestMethod]
+    public void UserAccount_Rename_ChangesNameAndPublishesEvent()
+    {
+        var account = CreateUserAccount();
+        account.ClearDomainEvents();
+
+        var result = account.Rename(GetRight(PersonName.Create(Some("Amazing Grace"))), TimeProvider.System);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual("Amazing Grace", account.Name.Value);
+        Assert.IsInstanceOfType<UserAccountNameChangedDomainEvent>(account.DomainEvents.Single());
+    }
+
+    [TestMethod]
+    public void UserAccount_Rename_WithSameName_DoesNotPublishEvent()
+    {
+        var account = CreateUserAccount();
+        account.ClearDomainEvents();
+
+        var result = account.Rename(account.Name, TimeProvider.System);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.IsEmpty(account.DomainEvents);
+    }
+
+    [TestMethod]
+    public void UserAccount_ChangeEmail_ChangesEmailAndPublishesEvent()
+    {
+        var account = CreateUserAccount();
+        account.ClearDomainEvents();
+
+        var result = account.ChangeEmail(GetRight(Email.Create(Some("amazing@example.com"))), TimeProvider.System);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual("amazing@example.com", account.Email.Value);
+        Assert.IsInstanceOfType<UserAccountEmailChangedDomainEvent>(account.DomainEvents.Single());
+    }
+
+    [TestMethod]
+    public void UserAccount_ChangePhoneNumber_ChangesPhoneAndPublishesEvent()
+    {
+        var account = CreateUserAccount();
+        account.ClearDomainEvents();
+
+        var result = account.ChangePhoneNumber(GetRight(PhoneNumber.CreateOptional(Some("11988887777"))), TimeProvider.System);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual("11988887777", account.PhoneNumber.Single().Value);
+        Assert.IsInstanceOfType<UserAccountPhoneNumberChangedDomainEvent>(account.DomainEvents.Single());
     }
 
     [TestMethod]
@@ -312,6 +477,84 @@ public sealed class MonadicDddBoundedContextsTests
     }
 
     [TestMethod]
+    public void FunctionalExtensions_Combine_AccumulatesValueObjectErrors()
+    {
+        var result = (
+            Sku.Create(None),
+            Quantity.Create(0),
+            Money.Create(0))
+            .Combine((sku, quantity, money) => new OrderLineDraft(sku, quantity, money));
+
+        var errors = GetLeft(result).ToArray();
+
+        Assert.HasCount(3, errors);
+        Assert.IsTrue(errors.Any(error => error is SkuRequiredError));
+        Assert.IsTrue(errors.Any(error => error is QuantityPositiveRequiredError));
+        Assert.IsTrue(errors.Any(error => error is MoneyPositiveRequiredError));
+    }
+
+    [TestMethod]
+    public void FunctionalExtensions_Combine_ReturnsProjectedValue()
+    {
+        var result = (
+            Sku.Create(Some("book-ddd")),
+            Quantity.Create(2),
+            Money.Create(30))
+            .Combine((sku, quantity, money) => new OrderLineDraft(sku, quantity, money));
+
+        var draft = GetRight(result);
+
+        Assert.AreEqual("BOOK-DDD", draft.Sku.Value);
+        Assert.AreEqual(2, draft.Quantity.Value);
+        Assert.AreEqual(30, draft.UnitPrice.Value);
+    }
+
+    [TestMethod]
+    public void FunctionalExtensions_Collect_AccumulatesErrors()
+    {
+        var results = new[]
+        {
+            Right<Seq<DomainError>, OrderLineDraft>(CreateOrderLineDraft("book-ddd")),
+            Left<Seq<DomainError>, OrderLineDraft>(Seq1<DomainError>(new SkuRequiredError())),
+            Left<Seq<DomainError>, OrderLineDraft>(Seq1<DomainError>(new QuantityPositiveRequiredError()))
+        };
+
+        var collected = results.Collect();
+        var errors = GetLeft(collected).ToArray();
+
+        Assert.HasCount(2, errors);
+        Assert.IsTrue(errors.Any(error => error is SkuRequiredError));
+        Assert.IsTrue(errors.Any(error => error is QuantityPositiveRequiredError));
+    }
+
+    [TestMethod]
+    public void FunctionalExtensions_Ensure_ReturnsUnitOrError()
+    {
+        var right = true.Ensure(() => new SkuRequiredError());
+        var left = false.Ensure(() => new SkuRequiredError());
+        var rightSeq = true.EnsureSeq(() => new SkuRequiredError());
+        var leftSeq = false.EnsureSeq(() => new SkuRequiredError());
+
+        Assert.IsTrue(right.IsRight);
+        Assert.IsInstanceOfType<SkuRequiredError>(GetLeft(left));
+        Assert.IsTrue(rightSeq.IsRight);
+        Assert.IsInstanceOfType<SkuRequiredError>(GetLeft(leftSeq).Single());
+    }
+
+    [TestMethod]
+    public void FunctionalExtensions_ToNonBlankOption_MapsBlankToNone()
+    {
+        Assert.IsTrue(((string?)null).ToNonBlankOption().IsNone);
+        Assert.IsTrue(string.Empty.ToNonBlankOption().IsNone);
+        Assert.IsTrue("   ".ToNonBlankOption().IsNone);
+        Assert.AreEqual(
+            "Ada",
+            "Ada".ToNonBlankOption().Match(
+                Some: value => value,
+                None: () => throw new AssertFailedException()));
+    }
+
+    [TestMethod]
     public void Architecture_DomainDoesNotReferenceOtherContextsInfrastructureOrPresentation()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30", "Contexts");
@@ -379,6 +622,51 @@ public sealed class MonadicDddBoundedContextsTests
     }
 
     [TestMethod]
+    public void Architecture_IntegrationMessagingContainsOnlyContracts()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Integration", "Messaging"), "*.cs", SearchOption.AllDirectories)
+            .SelectMany(file => File.ReadLines(file)
+                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+            .Where(item => item.Text.Contains(" class ", StringComparison.Ordinal)
+                || item.Text.Contains(".Infrastructure.", StringComparison.Ordinal)
+                || item.Text.Contains(".Outbox", StringComparison.Ordinal)
+                || item.Text.Contains("Tutorial30DbContext", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_InfrastructureMessagingDoesNotReferenceContexts()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Infrastructure", "Messaging"), "*.cs", SearchOption.AllDirectories)
+            .SelectMany(file => File.ReadLines(file)
+                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+            .Where(item => item.Text.Contains(".Contexts.", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_UnitOfWorkDoesNotReferenceSpecificBoundedContexts()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var unitOfWork = Path.Combine(sourceRoot, "Infrastructure", "Persistence", "EfTutorial30UnitOfWork.cs");
+        var offenders = File.ReadLines(unitOfWork)
+            .Select((line, index) => new { Line = index + 1, Text = line })
+            .Where(item => item.Text.Contains(".Contexts.", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, unitOfWork)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
     public void Architecture_CommandServicesDoNotPublishIntegrationEventsDirectly()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
@@ -420,6 +708,13 @@ public sealed class MonadicDddBoundedContextsTests
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
 
+    private static UpdateUserAccountProfileService CreateUpdateUserAccountProfileService(Tutorial30DbContext dbContext) =>
+        new(
+            new EfUserAccountLookup(dbContext),
+            new EfUserAccountWriter(dbContext),
+            CreateUnitOfWork(dbContext),
+            TimeProvider.System);
+
     private static PlaceOrderService CreatePlaceOrderService(Tutorial30DbContext dbContext) =>
         new(
             new EfCustomerDirectory(dbContext),
@@ -447,7 +742,7 @@ public sealed class MonadicDddBoundedContextsTests
             TimeProvider.System);
 
     private static EfTutorial30UnitOfWork CreateUnitOfWork(Tutorial30DbContext dbContext) =>
-        new(dbContext, CreateDomainEventBus(dbContext));
+        new(dbContext, CreateDomainEventBus(dbContext), [new IdentityPersistenceErrorTranslator()]);
 
     private static InMemoryDomainEventBus CreateDomainEventBus(Tutorial30DbContext dbContext)
     {
@@ -462,7 +757,7 @@ public sealed class MonadicDddBoundedContextsTests
         ]);
     }
 
-    private static async Task<RegisteredUserDto> RegisterAndDispatchCustomerAsync(Tutorial30DbContext dbContext)
+    private static async Task<UserAccountDto> RegisterAndDispatchCustomerAsync(Tutorial30DbContext dbContext)
     {
         var registered = await CreateRegisterUserService(dbContext)
             .RegisterAsync(new RegisterUserRequest("Grace Hopper", "grace@example.com", null));
@@ -470,6 +765,16 @@ public sealed class MonadicDddBoundedContextsTests
 
         return GetRight(registered);
     }
+
+    private static UserAccount CreateUserAccount() =>
+        CreateUserAccount("Grace Hopper", "grace@example.com");
+
+    private static UserAccount CreateUserAccount(string name, string email) =>
+        GetRight(UserAccount.Create(
+            Some(name),
+            Some(email),
+            None,
+            TimeProvider.System));
 
     private static UserAccountRegisteredDomainEvent NewUserAccountRegisteredDomainEvent() =>
         new(

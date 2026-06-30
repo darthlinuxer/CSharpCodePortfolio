@@ -2,9 +2,9 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregate
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
 using LanguageExt;
-using static LanguageExt.Prelude;
 
 namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices;
 
@@ -54,9 +54,9 @@ public sealed class Invoice : AbstractAggregate<Invoice, InvoiceId>
     {
         ArgumentNullException.ThrowIfNull(clock);
 
-        return sourceIntegrationEventId == Guid.Empty
-            ? Left<Seq<DomainError>, Invoice>(Seq1<DomainError>(new SourceIntegrationEventRequiredError()))
-            : Right<Seq<DomainError>, Invoice>(new Invoice(
+        return (sourceIntegrationEventId != Guid.Empty)
+            .EnsureSeq(() => new SourceIntegrationEventRequiredError())
+            .Map(_ => new Invoice(
                 InvoiceId.New(),
                 orderId,
                 customerId,

@@ -1,5 +1,3 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Events;
@@ -13,7 +11,8 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 
 public sealed class EfTutorial30UnitOfWork(
     Tutorial30DbContext dbContext,
-    IInMemoryDomainEventBus domainEventBus) : ITutorial30UnitOfWork
+    IInMemoryDomainEventBus domainEventBus,
+    IEnumerable<IEfPersistenceErrorTranslator> persistenceErrorTranslators) : ITutorial30UnitOfWork
 {
     public async Task<Either<Seq<DomainError>, int>> CommitAsync(CancellationToken cancellationToken)
     {
@@ -23,8 +22,8 @@ public sealed class EfTutorial30UnitOfWork(
         }
         catch (DbUpdateException exception) when (IsUniqueConstraintViolation(exception))
         {
-            var errors = await DetectUniqueConstraintErrorsAsync(cancellationToken).ConfigureAwait(false);
-            DetachFailedInserts();
+            var errors = await TranslateErrorsAsync(exception, cancellationToken).ConfigureAwait(false);
+            DetachFailedEntries();
 
             return Left<Seq<DomainError>, int>(errors);
         }
@@ -75,41 +74,36 @@ public sealed class EfTutorial30UnitOfWork(
                message.Contains("duplicate", StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task<Seq<DomainError>> DetectUniqueConstraintErrorsAsync(CancellationToken cancellationToken)
+    private async Task<Seq<DomainError>> TranslateErrorsAsync(
+        DbUpdateException exception,
+        CancellationToken cancellationToken)
     {
-        var accounts = dbContext.ChangeTracker
-            .Entries<UserAccount>()
-            .Where(entry => entry.State is EntityState.Added or EntityState.Modified)
-            .Select(entry => entry.Entity)
-            .ToArray();
-
         var errors = new List<DomainError>();
 
-        foreach (var account in accounts)
+        foreach (var translator in persistenceErrorTranslators)
         {
-            _ = (await dbContext.Users.AsNoTracking()
-                    .AnyAsync(user => user.Id != account.Id && user.Email == account.Email, cancellationToken)
-                    .ConfigureAwait(false))
-                ? Add(errors, new UserAccountEmailDuplicateError())
-                : default;
+            _ = (await translator.TranslateAsync(exception, dbContext, cancellationToken).ConfigureAwait(false))
+                .Match(
+                    Some: value => AddRange(errors, value),
+                    None: () => default);
         }
 
         return errors.Count == 0
-            ? Seq1<DomainError>(new UserAccountRegistrationConflictError())
+            ? Seq1<DomainError>(new PersistenceConflictError())
             : errors.DistinctBy(error => error.GetType()).ToSeq();
     }
 
-    private void DetachFailedInserts()
+    private void DetachFailedEntries()
     {
-        foreach (var entry in dbContext.ChangeTracker.Entries<UserAccount>().Where(entry => entry.State == EntityState.Added))
+        foreach (var entry in dbContext.ChangeTracker.Entries().Where(entry => entry.State == EntityState.Added))
         {
             entry.State = EntityState.Detached;
         }
     }
 
-    private static Unit Add(List<DomainError> errors, DomainError error)
+    private static Unit AddRange(List<DomainError> errors, Seq<DomainError> values)
     {
-        errors.Add(error);
+        errors.AddRange(values);
         return default;
     }
 }

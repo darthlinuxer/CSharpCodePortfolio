@@ -16,6 +16,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregat
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
@@ -145,7 +146,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             "HTTP continua borda fina",
             "Presentation só traduz Either para status HTTP; regra fica em Domain/Application.");
         var conflict = RegistrationEndpoint.ToHttpResult(
-            Left<Seq<DomainError>, RegisteredUserDto>(
+            Left<Seq<DomainError>, UserAccountDto>(
                 Seq1<DomainError>(new Contexts.Identity.Domain.Aggregates.UserAccounts.Errors.UserAccountEmailDuplicateError())));
         TutorialConsole.WriteEvidence(
             "HTTP",
@@ -193,7 +194,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
     }
 
     private static EfTutorial30UnitOfWork CreateUnitOfWork(Tutorial30DbContext dbContext) =>
-        new(dbContext, CreateDomainEventBus(dbContext));
+        new(dbContext, CreateDomainEventBus(dbContext), [new IdentityPersistenceErrorTranslator()]);
 
     private static InMemoryDomainEventBus CreateDomainEventBus(Tutorial30DbContext dbContext)
     {
@@ -208,7 +209,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         ]);
     }
 
-    private static string ToIdentityResult(Either<Seq<DomainError>, RegisteredUserDto> result) =>
+    private static string ToIdentityResult(Either<Seq<DomainError>, UserAccountDto> result) =>
         result.Match(
             Right: user => $"Right({user.Email})",
             Left: errors => $"Left({string.Join(", ", errors.Map(error => error.Code.ToString()))})");

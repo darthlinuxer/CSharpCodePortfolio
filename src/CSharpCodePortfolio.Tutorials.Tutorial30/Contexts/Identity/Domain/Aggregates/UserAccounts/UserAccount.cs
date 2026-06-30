@@ -3,6 +3,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregat
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
 using LanguageExt;
 using static LanguageExt.Prelude;
@@ -63,85 +64,26 @@ public sealed class UserAccount : AbstractAggregate<UserAccount, Guid>
     {
         ArgumentNullException.ThrowIfNull(clock);
 
-        var validName = PersonName.Create(name);
-        var validEmail = Email.Create(email);
-        var validPhoneNumber = PhoneNumberVo.CreateOptional(phoneNumber);
-        var errors = FlattenErrors(Seq(
-                ErrorOf(validName),
-                ErrorOf(validEmail),
-                ErrorOf(validPhoneNumber)));
-
-        var account =
-            from userName in validName
-            from userEmail in validEmail
-            from userPhoneNumber in validPhoneNumber
-            select new UserAccount(userName, userEmail, userPhoneNumber, Timestamp.UtcNow(clock));
-
-        return account.Match(
-            Right: value => Right<Seq<DomainError>, UserAccount>(value),
-            Left: error => Left<Seq<DomainError>, UserAccount>(errors.IsEmpty ? Seq1(error) : errors));
+        return (
+            PersonName.Create(name),
+            Email.Create(email),
+            PhoneNumberVo.CreateOptional(phoneNumber))
+            .Combine((userName, userEmail, userPhoneNumber) =>
+                new UserAccount(userName, userEmail, userPhoneNumber, Timestamp.UtcNow(clock)));
     }
 
-    /// <summary>
-    /// Decides registration uniqueness from persistence facts supplied by the application layer.
-    /// </summary>
-    public Either<DomainError, Unit> EnsureCanBeRegistered(bool emailExists)
-    {
-        return !emailExists
+    public static Either<DomainError, Unit> EnsureEmailIsAvailable(bool emailAlreadyExists) =>
+        (!emailAlreadyExists).Ensure(() => new UserAccountEmailDuplicateError());
+
+    public Either<DomainError, Unit> EnsureEmailCanChangeTo(Email newEmail, bool emailAlreadyExists) =>
+        EqualityComparer<Email>.Default.Equals(Email, newEmail)
             ? Right<DomainError, Unit>(default)
-            : Left<DomainError, Unit>(new UserAccountEmailDuplicateError());
-    }
+            : EnsureEmailIsAvailable(emailAlreadyExists);
 
     /// <summary>
     /// Changes the user's required name and raises a typed domain event.
     /// </summary>
-    public Either<DomainError, Unit> Rename(Option<string> value, TimeProvider clock)
-    {
-        ArgumentNullException.ThrowIfNull(clock);
-
-        return PersonName.Create(value).Bind(newName => Rename(newName, clock));
-    }
-
-    /// <summary>
-    /// Changes the user's required email and raises a typed domain event.
-    /// </summary>
-    public Either<DomainError, Unit> ChangeEmail(Option<string> value, TimeProvider clock)
-    {
-        ArgumentNullException.ThrowIfNull(clock);
-
-        return Email.Create(value).Bind(newEmail => ChangeEmail(newEmail, clock));
-    }
-
-    /// <summary>
-    /// Changes the user's optional phone and raises a typed domain event.
-    /// </summary>
-    public Either<DomainError, Unit> ChangePhoneNumber(Option<string> value, TimeProvider clock)
-    {
-        ArgumentNullException.ThrowIfNull(clock);
-
-        return PhoneNumberVo.CreateOptional(value).Bind(newPhoneNumber => ChangePhoneNumber(newPhoneNumber, clock));
-    }
-
-    /// <summary>
-    /// Extracts an expected value-object error for aggregate-level accumulation.
-    /// </summary>
-    private static Option<DomainError> ErrorOf<T>(Either<DomainError, T> result)
-    {
-        return result.Match(
-            Right: _ => None,
-            Left: errors => Some(errors));
-    }
-
-    /// <summary>
-    /// Flattens collected value-object validation errors.
-    /// </summary>
-    private static Seq<DomainError> FlattenErrors(Seq<Option<DomainError>> errors) =>
-        errors.Bind(error => error.Match(Some: Seq1, None: Seq<DomainError>));
-
-    /// <summary>
-    /// Applies a valid name change after the factory has parsed the raw value.
-    /// </summary>
-    private Either<DomainError, Unit> Rename(PersonName newName, TimeProvider clock)
+    public Either<DomainError, Unit> Rename(PersonName newName, TimeProvider clock)
     {
         return ApplyChangeIfDifferent(
             current: Name,
@@ -153,9 +95,9 @@ public sealed class UserAccount : AbstractAggregate<UserAccount, Guid>
     }
 
     /// <summary>
-    /// Applies a valid email change after the factory has parsed the raw value.
+    /// Changes the user's required email and raises a typed domain event.
     /// </summary>
-    private Either<DomainError, Unit> ChangeEmail(Email newEmail, TimeProvider clock)
+    public Either<DomainError, Unit> ChangeEmail(Email newEmail, TimeProvider clock)
     {
         return ApplyChangeIfDifferent(
             current: Email,
@@ -167,9 +109,9 @@ public sealed class UserAccount : AbstractAggregate<UserAccount, Guid>
     }
 
     /// <summary>
-    /// Applies a valid optional phone change after the factory has parsed the raw value.
+    /// Changes the user's optional phone and raises a typed domain event.
     /// </summary>
-    private Either<DomainError, Unit> ChangePhoneNumber(Option<PhoneNumber> newPhoneNumber, TimeProvider clock)
+    public Either<DomainError, Unit> ChangePhoneNumber(Option<PhoneNumber> newPhoneNumber, TimeProvider clock)
     {
         return ApplyChangeIfDifferent(
             current: PhoneNumber,

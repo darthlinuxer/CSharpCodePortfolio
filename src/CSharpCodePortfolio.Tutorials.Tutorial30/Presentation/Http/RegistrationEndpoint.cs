@@ -26,7 +26,7 @@ public static class RegistrationEndpoint
     /// <summary>
     /// Maps Either to Created, BadRequest, or Conflict based on explicit domain errors.
     /// </summary>
-    public static IResult ToHttpResult(Either<Seq<DomainError>, RegisteredUserDto> result)
+    public static IResult ToHttpResult(Either<Seq<DomainError>, UserAccountDto> result)
     {
         return result.Match(
             Right: user => Results.Created($"/users/{user.Id}", ToResponse(user)),
@@ -36,7 +36,7 @@ public static class RegistrationEndpoint
     /// <summary>
     /// Converts the application DTO into a simple HTTP response DTO.
     /// </summary>
-    private static RegisteredUserResponse ToResponse(RegisteredUserDto user)
+    private static RegisteredUserResponse ToResponse(UserAccountDto user)
     {
         return new RegisteredUserResponse(
             user.Id,

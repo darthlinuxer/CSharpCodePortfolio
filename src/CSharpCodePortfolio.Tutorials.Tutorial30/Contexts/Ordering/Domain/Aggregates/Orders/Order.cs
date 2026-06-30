@@ -3,6 +3,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregat
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Entities;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
+using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.ValueObjects;
 using LanguageExt;
 using static LanguageExt.Prelude;
@@ -43,9 +44,9 @@ public sealed class Order : AbstractAggregate<Order, OrderId>
     {
         ArgumentNullException.ThrowIfNull(clock);
 
-        return lines.IsEmpty
-            ? Left<Seq<DomainError>, Order>(Seq1<DomainError>(new OrderLineRequiredError()))
-            : Right<Seq<DomainError>, Order>(CreatePlaced(customerId, lines, clock));
+        return (!lines.IsEmpty)
+            .EnsureSeq(() => new OrderLineRequiredError())
+            .Map(_ => CreatePlaced(customerId, lines, clock));
     }
 
     public Either<DomainError, Unit> AddLine(OrderLineDraft line, TimeProvider clock)
@@ -68,32 +69,28 @@ public sealed class Order : AbstractAggregate<Order, OrderId>
     {
         ArgumentNullException.ThrowIfNull(clock);
 
-        return Status == OrderStatus.Confirmed
-            ? Left<DomainError, Unit>(new OrderAlreadyConfirmedError())
-            : Status == OrderStatus.Cancelled
-                ? Left<DomainError, Unit>(new OrderAlreadyCancelledError())
-                : ApplyChangeIfDifferent(
+        return EnsureNotConfirmed()
+            .Bind(_ => EnsureNotCancelled())
+            .Bind(_ => ApplyChangeIfDifferent(
                 current: Status,
                 next: OrderStatus.Confirmed,
                 clock,
                 apply: value => Status = value,
-                createEvent: (_, _, occurredAtUtc) => new OrderConfirmedDomainEvent(Id, CustomerId, Total, occurredAtUtc));
+                createEvent: occurredAtUtc => new OrderConfirmedDomainEvent(Id, CustomerId, Total, occurredAtUtc)));
     }
 
     public Either<DomainError, Unit> Cancel(TimeProvider clock)
     {
         ArgumentNullException.ThrowIfNull(clock);
 
-        return Status == OrderStatus.Cancelled
-            ? Left<DomainError, Unit>(new OrderAlreadyCancelledError())
-            : Status == OrderStatus.Confirmed
-                ? Left<DomainError, Unit>(new OrderAlreadyConfirmedError())
-                : ApplyChangeIfDifferent(
+        return EnsureNotCancelled()
+            .Bind(_ => EnsureNotConfirmed())
+            .Bind(_ => ApplyChangeIfDifferent(
                 current: Status,
                 next: OrderStatus.Cancelled,
                 clock,
                 apply: value => Status = value,
-                createEvent: (_, _, occurredAtUtc) => new OrderCancelledDomainEvent(Id, CustomerId, occurredAtUtc));
+                createEvent: occurredAtUtc => new OrderCancelledDomainEvent(Id, CustomerId, occurredAtUtc)));
     }
 
     private static Order CreatePlaced(CustomerId customerId, Seq<OrderLineDraft> lines, TimeProvider clock)
@@ -136,14 +133,16 @@ public sealed class Order : AbstractAggregate<Order, OrderId>
     }
 
     private Either<DomainError, Unit> EnsureCanChange() =>
-        Status == OrderStatus.Placed
-            ? Right<DomainError, Unit>(default)
-            : Left<DomainError, Unit>(new OrderCannotBeChangedError(Status));
+        (Status == OrderStatus.Placed).Ensure(() => new OrderCannotBeChangedError(Status));
 
     private Either<DomainError, Unit> EnsureCanRemoveLine() =>
-        _lines.Count > 1
-            ? Right<DomainError, Unit>(default)
-            : Left<DomainError, Unit>(new OrderLineRequiredError());
+        (_lines.Count > 1).Ensure(() => new OrderLineRequiredError());
+
+    private Either<DomainError, Unit> EnsureNotConfirmed() =>
+        (Status != OrderStatus.Confirmed).Ensure(() => new OrderAlreadyConfirmedError());
+
+    private Either<DomainError, Unit> EnsureNotCancelled() =>
+        (Status != OrderStatus.Cancelled).Ensure(() => new OrderAlreadyCancelledError());
 
     private Either<DomainError, OrderLine> FindLine(Guid lineId) =>
         Optional(_lines.Find(line => line.Id == lineId))

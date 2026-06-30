@@ -85,6 +85,22 @@ public abstract class AbstractAggregate<TAggregate, TId> : IAggregate<TAggregate
             : ApplyChange(current, next, clock, apply, createEvent);
     }
 
+    protected Either<DomainError, Unit> ApplyChangeIfDifferent<TValue>(
+        TValue current,
+        TValue next,
+        TimeProvider clock,
+        Action<TValue> apply,
+        Func<Timestamp, AbstractDomainEvent<TAggregate>> createEvent)
+    {
+        ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(apply);
+        ArgumentNullException.ThrowIfNull(createEvent);
+
+        return EqualityComparer<TValue>.Default.Equals(current, next)
+            ? Right<DomainError, Unit>(default)
+            : ApplyChange(next, clock, apply, createEvent);
+    }
+
     /// <summary>
     /// Adds a domain event for effects that should happen after persistence.
     /// </summary>
@@ -111,6 +127,20 @@ public abstract class AbstractAggregate<TAggregate, TId> : IAggregate<TAggregate
         apply(next);
         _lastModified = Some(occurredAtUtc);
         AddDomainEvent(createEvent(current, next, occurredAtUtc));
+
+        return Right<DomainError, Unit>(default);
+    }
+
+    private Either<DomainError, Unit> ApplyChange<TValue>(
+        TValue next,
+        TimeProvider clock,
+        Action<TValue> apply,
+        Func<Timestamp, AbstractDomainEvent<TAggregate>> createEvent)
+    {
+        var occurredAtUtc = Timestamp.UtcNow(clock);
+        apply(next);
+        _lastModified = Some(occurredAtUtc);
+        AddDomainEvent(createEvent(occurredAtUtc));
 
         return Right<DomainError, Unit>(default);
     }
