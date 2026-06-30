@@ -35,6 +35,12 @@ public sealed class OutboxMessage
 
     public Option<Timestamp> ProcessedAtUtc { get; private set; } = None;
 
+    public int AttemptCount { get; private set; }
+
+    public Option<Timestamp> LastAttemptedAtUtc { get; private set; } = None;
+
+    public string? LastError { get; private set; }
+
     public static OutboxMessage From(IIntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
@@ -50,5 +56,17 @@ public sealed class OutboxMessage
             ?? throw new InvalidOperationException($"Could not deserialize outbox message '{Id}'.");
     }
 
-    public void MarkProcessed(Timestamp processedAtUtc) => ProcessedAtUtc = Some(processedAtUtc);
+    public void MarkProcessed(Timestamp processedAtUtc)
+    {
+        LastAttemptedAtUtc = Some(processedAtUtc);
+        ProcessedAtUtc = Some(processedAtUtc);
+        LastError = null;
+    }
+
+    public void RecordFailure(Timestamp attemptedAtUtc, string error)
+    {
+        AttemptCount++;
+        LastAttemptedAtUtc = Some(attemptedAtUtc);
+        LastError = error;
+    }
 }

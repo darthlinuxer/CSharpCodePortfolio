@@ -1,11 +1,10 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -13,8 +12,8 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application
 
 public sealed class UpdateUserAccountProfileService(
     IUserAccountLookup lookup,
-    IUserAccountWriter writer,
-    ITutorial30UnitOfWork unitOfWork,
+    IRepository<UserAccount, Guid> repository,
+    IUnitOfWork unitOfWork,
     TimeProvider clock)
 {
     public async Task<Either<Seq<DomainError>, UserAccountDto>> UpdateAsync(
@@ -42,7 +41,7 @@ public sealed class UpdateUserAccountProfileService(
         UserAccountProfile values,
         CancellationToken cancellationToken)
     {
-        var account = await writer.FindByIdAsync(userId, cancellationToken).ConfigureAwait(false);
+        var account = await repository.FindByIdAsync(userId, cancellationToken).ConfigureAwait(false);
 
         return await account.Match(
             Some: value => UpdateLoadedAsync(value, values, cancellationToken),
@@ -72,9 +71,9 @@ public sealed class UpdateUserAccountProfileService(
         UserAccount account,
         CancellationToken cancellationToken)
     {
-        var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+        var saved = await unitOfWork.SaveEntitiesAsync(cancellationToken).ConfigureAwait(false);
 
-        return commit.Match(
+        return saved.Match(
             Right: _ => Right<Seq<DomainError>, UserAccountDto>(UserAccountDto.From(account)),
             Left: errors => Left<Seq<DomainError>, UserAccountDto>(errors));
     }

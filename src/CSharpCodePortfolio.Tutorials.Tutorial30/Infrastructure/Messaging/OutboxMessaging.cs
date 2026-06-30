@@ -14,7 +14,7 @@ public interface IOutboxIntegrationEventConsumer
 {
     string EventType { get; }
 
-    Task<bool> HandleAsync(OutboxMessage message, CancellationToken cancellationToken);
+    Task<Either<Seq<DomainError>, Unit>> HandleAsync(OutboxMessage message, CancellationToken cancellationToken);
 }
 
 public sealed class OutboxIntegrationEventBus(Tutorial30DbContext dbContext) : IIntegrationEventBus
@@ -35,10 +35,13 @@ public sealed class OutboxIntegrationEventConsumer<TIntegrationEvent, TResult>(
 {
     public string EventType => eventType;
 
-    public async Task<bool> HandleAsync(OutboxMessage message, CancellationToken cancellationToken) =>
+    public async Task<Either<Seq<DomainError>, Unit>> HandleAsync(
+        OutboxMessage message,
+        CancellationToken cancellationToken) =>
         (await handler
             .HandleAsync(message.Deserialize<TIntegrationEvent>(), cancellationToken)
-            .ConfigureAwait(false)).IsRight;
+            .ConfigureAwait(false))
+        .Map(_ => default(Unit));
 }
 
 public sealed class InProcessOutboxDispatcher(
@@ -73,10 +76,13 @@ public sealed class InProcessOutboxDispatcher(
         var handled = await ConsumerFor(message)
             .Match(
                 Some: consumer => consumer.HandleAsync(message, cancellationToken),
-                None: () => Task.FromResult(false))
+                None: () => Task.FromResult(Left<Seq<DomainError>, Unit>(
+                    Seq1<DomainError>(new OutboxConsumerMissingError(message.Type)))))
             .ConfigureAwait(false);
 
-        return handled ? MarkProcessed(message) : 0;
+        return handled.Match(
+            Right: _ => MarkProcessed(message),
+            Left: errors => RecordFailure(message, errors));
     }
 
     private Option<IOutboxIntegrationEventConsumer> ConsumerFor(OutboxMessage message) =>
@@ -87,4 +93,21 @@ public sealed class InProcessOutboxDispatcher(
         message.MarkProcessed(Timestamp.UtcNow(clock));
         return 1;
     }
+
+    private int RecordFailure(OutboxMessage message, Seq<DomainError> errors)
+    {
+        message.RecordFailure(Timestamp.UtcNow(clock), FormatErrors(errors));
+        return 0;
+    }
+
+    private static string FormatErrors(Seq<DomainError> errors) =>
+        string.Join(", ", errors.Map(error => error.Code.ToString()).Order());
+}
+
+public sealed record OutboxConsumerMissingError(string EventType)
+    : DomainError(
+        new DomainErrorCode("outbox.consumer_missing"),
+        $"Nenhum consumidor registrado para o evento de integração '{EventType}'.")
+{
+    public override DomainErrorCategory Category => DomainErrorCategory.Conflict;
 }

@@ -1,8 +1,8 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -13,7 +13,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application
 /// </summary>
 public sealed class RegisterCustomerWhenUserRegisteredHandler(
     ICustomerDirectory customerDirectory,
-    ITutorial30UnitOfWork unitOfWork) : IIntegrationEventHandler<UserRegisteredIntegrationEvent, Unit>
+    IUnitOfWork unitOfWork) : IIntegrationEventHandler<UserRegisteredIntegrationEvent, Unit>
 {
     public async Task<Either<Seq<DomainError>, Unit>> HandleAsync(
         UserRegisteredIntegrationEvent integrationEvent,
@@ -32,9 +32,9 @@ public sealed class RegisterCustomerWhenUserRegisteredHandler(
         CancellationToken cancellationToken)
     {
         await customerDirectory.AddIfMissingAsync(customerId, email, cancellationToken).ConfigureAwait(false);
-        var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+        var saved = await unitOfWork.SaveEntitiesAsync(cancellationToken).ConfigureAwait(false);
 
-        return commit.Match(
+        return saved.Match(
             Right: _ => Right<Seq<DomainError>, Unit>(default),
             Left: errors => Left<Seq<DomainError>, Unit>(errors));
     }

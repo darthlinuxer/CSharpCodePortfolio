@@ -1,11 +1,10 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Customers;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -16,8 +15,8 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application
 /// </summary>
 public sealed class PlaceOrderService(
     ICustomerDirectory customerDirectory,
-    IOrderWriter orderWriter,
-    ITutorial30UnitOfWork unitOfWork,
+    IRepository<Order, OrderId> repository,
+    IUnitOfWork unitOfWork,
     TimeProvider clock)
 {
     public async Task<Either<Seq<DomainError>, PlacedOrderDto>> PlaceAsync(
@@ -52,18 +51,18 @@ public sealed class PlaceOrderService(
     {
         var order = Order.Place(customerId, lines, clock);
         return await order.Match(
-            Right: value => CommitAsync(value, cancellationToken),
+            Right: value => SaveAsync(value, cancellationToken),
             Left: errors => Task.FromResult(Left<Seq<DomainError>, PlacedOrderDto>(errors))).ConfigureAwait(false);
     }
 
-    private async Task<Either<Seq<DomainError>, PlacedOrderDto>> CommitAsync(
+    private async Task<Either<Seq<DomainError>, PlacedOrderDto>> SaveAsync(
         Order order,
         CancellationToken cancellationToken)
     {
-        orderWriter.Add(order);
-        var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+        repository.Add(order);
+        var saved = await unitOfWork.SaveEntitiesAsync(cancellationToken).ConfigureAwait(false);
 
-        return commit.Match(
+        return saved.Match(
             Right: _ => Right<Seq<DomainError>, PlacedOrderDto>(new PlacedOrderDto(
                 order.Id.Value,
                 order.CustomerId.Value,

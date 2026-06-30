@@ -24,8 +24,11 @@ contexts e comunicação por eventos:
   de integração.
 - `Integration/Events`: contratos publicados entre bounded contexts.
 - `Integration/Outbox`: envelope persistido para mensagens pendentes.
-- `Infrastructure`: `Tutorial30DbContext`, `EfTutorial30UnitOfWork`,
-  tradutores EF de erro esperado e dispatcher outbox in-process.
+- `Application/Persistence`: contratos de repositório por aggregate, unit of
+  work monádica e executor transacional.
+- `Infrastructure`: `Tutorial30DbContext` com repositórios EF por aggregate,
+  `EfTutorial30UnitOfWork`, `EfTransactionalExecution`, tradutores EF de erro
+  esperado e dispatcher outbox in-process.
 - `Presentation`: tradução HTTP fina de `Either` para `IResult`.
 
 ## Fronteiras DDD
@@ -44,24 +47,29 @@ outbox e pode ser trocada por RabbitMQ, fila ou broker real depois.
 ## Fluxo demonstrado
 
 1. `RegisterUserService` cria `UserAccount`.
-2. `EfTutorial30UnitOfWork` salva o aggregate e publica
+2. O repositório EF adiciona o aggregate ao `Tutorial30DbContext`.
+3. `EfTutorial30UnitOfWork.SaveEntitiesAsync` abre uma transação via
+   `EfTransactionalExecution`, salva o aggregate e publica
    `UserAccountRegisteredDomainEvent` no bus local.
-3. O handler local de Identity publica `UserRegisteredIntegrationEvent` pela
+4. O handler local de Identity publica `UserRegisteredIntegrationEvent` pela
    porta `IIntegrationEventBus`.
-4. A implementação `OutboxIntegrationEventBus` grava a mensagem na outbox
+5. A implementação `OutboxIntegrationEventBus` grava a mensagem na outbox
    durante a mesma transação.
-5. O dispatcher in-process lê a outbox e entrega a mensagem a consumidores
+6. A unit of work faz o segundo `SaveChangesAsync`, commita e só então limpa os
+   domain events dos aggregates.
+7. O dispatcher in-process lê a outbox e entrega a mensagem a consumidores
    registrados por contrato.
-6. Ordering atualiza `CustomerDirectory` e cria `Order` usando apenas
+8. Ordering atualiza `CustomerDirectory` e cria `Order` usando apenas
    `CustomerId`.
-7. `ConfirmOrderService` confirma `Order`; o domain handler de Ordering publica
+9. `ConfirmOrderService` confirma `Order`; o domain handler de Ordering publica
    `OrderConfirmedIntegrationEvent`.
-8. Billing consome o evento de integração e cria uma `Invoice` uma única vez.
+10. Billing consome o evento de integração e cria uma `Invoice` uma única vez.
 
 ## O que ficou fora
 
-Sem `GenericRepository<T>`, MediatR, broker real, event sourcing, saga ou CQRS
-pesado. Esses padrões entram só quando houver regra real que pague o custo.
+Sem MediatR, broker real, event sourcing, saga ou CQRS pesado. O repositório
+genérico é mínimo e só cobre aggregate root (`FindById`, `Add`, `Remove`);
+queries e projeções continuam em portas próprias.
 
 O diretório `Traditional` fica como anti-exemplo imperativo. O restante do
 Tutorial30 é protegido por teste arquitetural contra condicionais imperativos.

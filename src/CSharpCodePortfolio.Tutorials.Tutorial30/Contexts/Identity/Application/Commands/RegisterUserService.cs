@@ -1,9 +1,8 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Queries;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -14,8 +13,8 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application
 /// </summary>
 public sealed class RegisterUserService(
     IUserAccountLookup lookup,
-    IUserAccountWriter writer,
-    ITutorial30UnitOfWork unitOfWork,
+    IRepository<UserAccount, Guid> repository,
+    IUnitOfWork unitOfWork,
     TimeProvider clock)
 {
     /// <summary>
@@ -57,10 +56,10 @@ public sealed class RegisterUserService(
         UserAccount account,
         CancellationToken cancellationToken)
     {
-        writer.Add(account);
-        var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+        repository.Add(account);
+        var saved = await unitOfWork.SaveEntitiesAsync(cancellationToken).ConfigureAwait(false);
 
-        return commit.Match(
+        return saved.Match(
             Right: _ => Right<Seq<DomainError>, UserAccountDto>(UserAccountDto.From(account)),
             Left: errors => Left<Seq<DomainError>, UserAccountDto>(errors));
     }

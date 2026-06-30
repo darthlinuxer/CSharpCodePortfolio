@@ -1,6 +1,8 @@
 using CSharpCodePortfolio.Shared;
 using CSharpCodePortfolio.Tutorials.Abstractions;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.Handlers;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Handlers;
@@ -15,7 +17,7 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Application.Cus
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
@@ -46,7 +48,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
             ("Pacote", "LanguageExt.Core 4.4.9"),
             ("Bounded contexts", "Identity, Ordering, Billing"),
             ("Comunicação", "Domain Event -> Integration Event -> Outbox -> handler in-process"),
-            ("Persistência", "EF Core 10 SQLite em memória + value converters"));
+            ("Persistência", "EF Core 10 SQLite em memória + repos por aggregate + UoW transacional"));
 
         TutorialConsole.WriteQuestion(
             "Como modelar aggregates independentes, comunicação entre bounded contexts e erros esperados sem null/exception como fluxo de negócio?");
@@ -75,7 +77,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         await using var dbContext = CreateDbContext();
         var registerUser = new RegisterUserService(
             new EfUserAccountLookup(dbContext),
-            new EfUserAccountWriter(dbContext),
+            dbContext.GetRepository<UserAccount, Guid>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var registered = await registerUser.RegisterAsync(
@@ -101,7 +103,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         var customerId = GetRight(registered).Id;
         var placeOrder = new PlaceOrderService(
             new EfCustomerDirectory(dbContext),
-            new EfOrderWriter(dbContext),
+            dbContext.GetRepository<Order, OrderId>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var unknownCustomer = await placeOrder.PlaceAsync(
@@ -125,7 +127,7 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         TutorialConsole.WriteCodeSnippet("Billing handler", typeof(CreateInvoiceWhenOrderConfirmedHandler), nameof(CreateInvoiceWhenOrderConfirmedHandler.HandleAsync));
 
         var confirmOrder = new ConfirmOrderService(
-            new EfOrderWriter(dbContext),
+            dbContext.GetRepository<Order, OrderId>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var confirmed = await confirmOrder.ConfirmAsync(
@@ -176,7 +178,8 @@ public sealed class LanguageExtCoreTutorial : ITutorial
         var unitOfWork = CreateUnitOfWork(dbContext);
         var customerHandler = new RegisterCustomerWhenUserRegisteredHandler(new EfCustomerDirectory(dbContext), unitOfWork);
         var billingHandler = new CreateInvoiceWhenOrderConfirmedHandler(
-            new EfInvoiceWriter(dbContext),
+            new EfInvoiceLookup(dbContext),
+            dbContext.GetRepository<Invoice, InvoiceId>(),
             unitOfWork,
             TimeProvider.System);
 
@@ -194,7 +197,11 @@ public sealed class LanguageExtCoreTutorial : ITutorial
     }
 
     private static EfTutorial30UnitOfWork CreateUnitOfWork(Tutorial30DbContext dbContext) =>
-        new(dbContext, CreateDomainEventBus(dbContext), [new IdentityPersistenceErrorTranslator()]);
+        new(
+            dbContext,
+            CreateDomainEventBus(dbContext),
+            new EfTransactionalExecution(dbContext),
+            [new IdentityPersistenceErrorTranslator()]);
 
     private static InMemoryDomainEventBus CreateDomainEventBus(Tutorial30DbContext dbContext)
     {

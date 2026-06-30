@@ -1,3 +1,4 @@
+using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices.ValueObjects;
@@ -5,7 +6,6 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Errors;
 using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Functional;
-using CSharpCodePortfolio.Tutorials.Tutorial30.SharedKernel.Persistence;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -15,15 +15,16 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.
 /// ACL that translates Ordering's published event into a Billing invoice.
 /// </summary>
 public sealed class CreateInvoiceWhenOrderConfirmedHandler(
-    IInvoiceWriter invoiceWriter,
-    ITutorial30UnitOfWork unitOfWork,
+    IInvoiceLookup invoiceLookup,
+    IRepository<Invoice, InvoiceId> repository,
+    IUnitOfWork unitOfWork,
     TimeProvider clock) : IIntegrationEventHandler<OrderConfirmedIntegrationEvent, InvoiceHandlingResult>
 {
     public async Task<Either<Seq<DomainError>, InvoiceHandlingResult>> HandleAsync(
         OrderConfirmedIntegrationEvent integrationEvent,
         CancellationToken cancellationToken)
     {
-        var alreadyHandled = await invoiceWriter
+        var alreadyHandled = await invoiceLookup
             .ExistsForIntegrationEventAsync(integrationEvent.Id, cancellationToken)
             .ConfigureAwait(false);
 
@@ -39,7 +40,7 @@ public sealed class CreateInvoiceWhenOrderConfirmedHandler(
     {
         var values = CreateValues(integrationEvent);
         return await values.Match(
-            Right: tuple => CreateAndCommitAsync(tuple.OrderId, tuple.CustomerId, tuple.Amount, integrationEvent.Id, cancellationToken),
+            Right: tuple => CreateAndSaveAsync(tuple.OrderId, tuple.CustomerId, tuple.Amount, integrationEvent.Id, cancellationToken),
             Left: errors => Task.FromResult(Left<Seq<DomainError>, InvoiceHandlingResult>(errors))).ConfigureAwait(false);
     }
 
@@ -54,7 +55,7 @@ public sealed class CreateInvoiceWhenOrderConfirmedHandler(
                 new InvoiceValues(validOrderId, validCustomerId, validAmount));
     }
 
-    private async Task<Either<Seq<DomainError>, InvoiceHandlingResult>> CreateAndCommitAsync(
+    private async Task<Either<Seq<DomainError>, InvoiceHandlingResult>> CreateAndSaveAsync(
         BilledOrderId orderId,
         BillingCustomerId customerId,
         InvoiceAmount amount,
@@ -69,18 +70,18 @@ public sealed class CreateInvoiceWhenOrderConfirmedHandler(
             clock);
 
         return await invoice.Match(
-            Right: value => CommitAsync(value, cancellationToken),
+            Right: value => SaveAsync(value, cancellationToken),
             Left: valueErrors => Task.FromResult(Left<Seq<DomainError>, InvoiceHandlingResult>(valueErrors))).ConfigureAwait(false);
     }
 
-    private async Task<Either<Seq<DomainError>, InvoiceHandlingResult>> CommitAsync(
+    private async Task<Either<Seq<DomainError>, InvoiceHandlingResult>> SaveAsync(
         Invoice invoice,
         CancellationToken cancellationToken)
     {
-        invoiceWriter.Add(invoice);
-        var commit = await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+        repository.Add(invoice);
+        var saved = await unitOfWork.SaveEntitiesAsync(cancellationToken).ConfigureAwait(false);
 
-        return commit.Match(
+        return saved.Match(
             Right: _ => Right<Seq<DomainError>, InvoiceHandlingResult>(
                 new InvoiceHandlingResult.Created(invoice.Id)),
             Left: errors => Left<Seq<DomainError>, InvoiceHandlingResult>(errors));

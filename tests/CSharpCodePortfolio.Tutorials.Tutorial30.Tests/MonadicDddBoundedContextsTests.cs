@@ -1,6 +1,9 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Application.Handlers;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices;
+using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Domain.Aggregates.Invoices.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Billing.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Commands;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Handlers;
@@ -18,7 +21,6 @@ using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregat
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.Events;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders.ValueObjects;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Messaging;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Integration.Events;
@@ -56,6 +58,8 @@ public sealed class MonadicDddBoundedContextsTests
     private static readonly Regex ContextReferenceRegex = new(
         @"\.Contexts\.([A-Za-z][A-Za-z0-9_]*)\.",
         RegexOptions.Compiled);
+
+    private sealed record SourceLine(string File, int Line, string Text);
 
     [TestMethod]
     public async Task Identity_RegisterUser_PublishesUserRegisteredIntegrationEvent()
@@ -144,13 +148,228 @@ public sealed class MonadicDddBoundedContextsTests
     public async Task UnitOfWork_TranslatesUserEmailUniqueConstraintWithoutContextCoupling()
     {
         await using var dbContext = CreateDbContext();
-        var writer = new EfUserAccountWriter(dbContext);
-        writer.Add(CreateUserAccount("Grace Hopper", "grace@example.com"));
-        writer.Add(CreateUserAccount("Ada Lovelace", "grace@example.com"));
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        repository.Add(CreateUserAccount("Grace Hopper", "grace@example.com"));
+        repository.Add(CreateUserAccount("Ada Lovelace", "grace@example.com"));
 
-        var result = await CreateUnitOfWork(dbContext).CommitAsync(CancellationToken.None);
+        var result = await CreateUnitOfWork(dbContext).SaveEntitiesAsync(CancellationToken.None);
 
         Assert.IsInstanceOfType<UserAccountEmailDuplicateError>(GetOnlyError(result));
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_ClearsChangeTrackerAfterTranslatedDbUpdateException()
+    {
+        await using var dbContext = CreateDbContext();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var first = CreateUserAccount("Grace Hopper", "grace@example.com");
+        var second = CreateUserAccount("Ada Lovelace", "grace@example.com");
+        repository.Add(first);
+        repository.Add(second);
+
+        var result = await CreateUnitOfWork(dbContext).SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsLeft);
+        Assert.AreEqual(0, dbContext.ChangeTracker.Entries().Count());
+        Assert.IsFalse(first.DomainEvents.IsEmpty);
+        Assert.IsFalse(second.DomainEvents.IsEmpty);
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_CommitsAggregateAndOutboxAtomically()
+    {
+        await using var dbContext = CreateDbContext();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var account = CreateUserAccount();
+
+        repository.Add(account);
+        var result = await CreateUnitOfWork(dbContext).SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual(1, await dbContext.Users.AsNoTracking().CountAsync());
+        Assert.AreEqual(1, await dbContext.OutboxMessages.AsNoTracking().CountAsync());
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_RollsBackWhenDomainEventHandlerFails()
+    {
+        await using var dbContext = CreateDbContext();
+        var account = CreateUserAccount();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var domainEventBus = new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(
+                new FailingDomainEventHandler<UserAccountRegisteredDomainEvent>())
+        ]);
+        var unitOfWork = new EfTutorial30UnitOfWork(
+            dbContext,
+            domainEventBus,
+            new EfTransactionalExecution(dbContext),
+            [new IdentityPersistenceErrorTranslator()]);
+
+        repository.Add(account);
+        var result = await unitOfWork.SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsLeft);
+        Assert.AreEqual(0, await dbContext.Users.AsNoTracking().CountAsync());
+        Assert.IsFalse(account.DomainEvents.IsEmpty);
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_ClearsDomainEventsOnlyAfterCommit()
+    {
+        await using var dbContext = CreateDbContext();
+        var account = CreateUserAccount();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+
+        repository.Add(account);
+        var result = await CreateUnitOfWork(dbContext).SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.IsEmpty(account.DomainEvents);
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_DispatchesDomainEventsRaisedByDomainEventHandlers()
+    {
+        await using var dbContext = CreateDbContext();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var account = CreateUserAccount();
+        var nestedHandler = new RegisterAnotherUserOnFirstRegistrationHandler(repository);
+        var domainEventBus = new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(nestedHandler)
+        ]);
+        var unitOfWork = new EfTutorial30UnitOfWork(
+            dbContext,
+            domainEventBus,
+            new EfTransactionalExecution(dbContext),
+            [new IdentityPersistenceErrorTranslator()]);
+
+        repository.Add(account);
+        var result = await unitOfWork.SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual(2, await dbContext.Users.AsNoTracking().CountAsync());
+        Assert.AreEqual(2, nestedHandler.HandledCount);
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_RollsBackWhenNestedDomainEventHandlerFails()
+    {
+        await using var dbContext = CreateDbContext();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var account = CreateUserAccount();
+        var nestedHandler = new RegisterAnotherUserOnFirstRegistrationHandler(repository);
+        var failingHandler = new FailOnSecondRegistrationHandler();
+        var domainEventBus = new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(nestedHandler),
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(failingHandler)
+        ]);
+        var unitOfWork = new EfTutorial30UnitOfWork(
+            dbContext,
+            domainEventBus,
+            new EfTransactionalExecution(dbContext),
+            [new IdentityPersistenceErrorTranslator()]);
+
+        repository.Add(account);
+        var result = await unitOfWork.SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsLeft);
+        Assert.AreEqual(0, await dbContext.Users.AsNoTracking().CountAsync());
+        Assert.IsFalse(account.DomainEvents.IsEmpty);
+        Assert.IsFalse(nestedHandler.CreatedAccount?.DomainEvents.IsEmpty ?? false);
+    }
+
+    [TestMethod]
+    public async Task UnitOfWork_SaveEntitiesAsync_ClearsAllTrackedAggregateEventsOnlyAfterCommit()
+    {
+        await using var dbContext = CreateDbContext();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var account = CreateUserAccount();
+        var nestedHandler = new RegisterAnotherUserOnFirstRegistrationHandler(repository);
+        var domainEventBus = new InMemoryDomainEventBus(
+        [
+            new DomainEventConsumer<UserAccountRegisteredDomainEvent>(nestedHandler)
+        ]);
+        var unitOfWork = new EfTutorial30UnitOfWork(
+            dbContext,
+            domainEventBus,
+            new EfTransactionalExecution(dbContext),
+            [new IdentityPersistenceErrorTranslator()]);
+
+        repository.Add(account);
+        var result = await unitOfWork.SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.IsEmpty(account.DomainEvents);
+        Assert.IsEmpty(nestedHandler.CreatedAccount?.DomainEvents ?? Seq<AbstractDomainEvent<UserAccount>>());
+    }
+
+    [TestMethod]
+    public async Task TransactionalExecution_CommitsOnlyRight()
+    {
+        await using var dbContext = CreateDbContext();
+        var execution = new EfTransactionalExecution(dbContext);
+
+        var result = await execution.ExecuteAsync(
+            async cancellationToken =>
+            {
+                dbContext.Users.Add(CreateUserAccount());
+                var rows = await dbContext.SaveChangesAsync(cancellationToken);
+                return Right<Seq<DomainError>, PersistenceResult>(new PersistenceResult(rows));
+            },
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual(1, await dbContext.Users.AsNoTracking().CountAsync());
+    }
+
+    [TestMethod]
+    public async Task TransactionalExecution_RollsBackLeft()
+    {
+        await using var dbContext = CreateDbContext();
+        var execution = new EfTransactionalExecution(dbContext);
+
+        var result = await execution.ExecuteAsync<PersistenceResult>(
+            async cancellationToken =>
+            {
+                dbContext.Users.Add(CreateUserAccount());
+                await dbContext.SaveChangesAsync(cancellationToken);
+                return Left<Seq<DomainError>, PersistenceResult>(
+                    Seq1<DomainError>(new PersistenceConflictError()));
+            },
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsLeft);
+        Assert.AreEqual(0, await dbContext.Users.AsNoTracking().CountAsync());
+    }
+
+    [TestMethod]
+    public async Task Repository_Remove_RemovesAggregateAfterDomainDecision()
+    {
+        await using var dbContext = CreateDbContext();
+        var repository = dbContext.GetRepository<UserAccount, Guid>();
+        var account = CreateUserAccount();
+        repository.Add(account);
+        await CreateUnitOfWork(dbContext).SaveEntitiesAsync(CancellationToken.None);
+
+        repository.Remove(account);
+        var result = await CreateUnitOfWork(dbContext).SaveEntitiesAsync(CancellationToken.None);
+
+        Assert.IsTrue(result.IsRight);
+        Assert.AreEqual(0, await dbContext.Users.AsNoTracking().CountAsync());
+    }
+
+    [TestMethod]
+    public void DbContext_ImplementsAggregateRepositories()
+    {
+        using var dbContext = CreateDbContext();
+
+        Assert.IsInstanceOfType<IRepository<UserAccount, Guid>>(dbContext);
+        Assert.IsInstanceOfType<IRepository<Order, OrderId>>(dbContext);
+        Assert.IsInstanceOfType<IRepository<Invoice, InvoiceId>>(dbContext);
     }
 
     [TestMethod]
@@ -462,7 +681,8 @@ public sealed class MonadicDddBoundedContextsTests
     {
         await using var dbContext = CreateDbContext();
         var handler = new CreateInvoiceWhenOrderConfirmedHandler(
-            new EfInvoiceWriter(dbContext),
+            new EfInvoiceLookup(dbContext),
+            dbContext.GetRepository<Invoice, InvoiceId>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
         var integrationEvent = new OrderConfirmedIntegrationEvent(
@@ -478,6 +698,66 @@ public sealed class MonadicDddBoundedContextsTests
         Assert.IsInstanceOfType<InvoiceHandlingResult.Created>(GetRight(first));
         Assert.IsInstanceOfType<InvoiceHandlingResult.AlreadyHandled>(GetRight(second));
         Assert.AreEqual(1, await dbContext.Invoices.CountAsync());
+    }
+
+    [TestMethod]
+    public async Task OutboxDispatcher_RecordsFailureAndKeepsMessagePendingWhenConsumerReturnsLeft()
+    {
+        await using var dbContext = CreateDbContext();
+        await CreateRegisterUserService(dbContext)
+            .RegisterAsync(new RegisterUserRequest("Grace Hopper", "grace@example.com", null));
+        var handler = new ScriptedIntegrationEventHandler<UserRegisteredIntegrationEvent>(
+        [
+            Left<Seq<DomainError>, Unit>(Seq1<DomainError>(new PersistenceConflictError()))
+        ]);
+        var dispatcher = new InProcessOutboxDispatcher(
+            dbContext,
+            [
+                new OutboxIntegrationEventConsumer<UserRegisteredIntegrationEvent, Unit>(
+                    UserRegisteredIntegrationEvent.EventType,
+                    handler)
+            ],
+            TimeProvider.System);
+
+        var dispatched = await dispatcher.DispatchPendingAsync(CancellationToken.None);
+        var message = await dbContext.OutboxMessages.SingleAsync();
+
+        Assert.AreEqual(0, dispatched);
+        Assert.AreEqual(1, message.AttemptCount);
+        Assert.IsTrue(message.LastAttemptedAtUtc.IsSome);
+        Assert.AreEqual("persistence.conflict", message.LastError);
+        Assert.IsTrue(message.ProcessedAtUtc.IsNone);
+    }
+
+    [TestMethod]
+    public async Task OutboxDispatcher_MarksMessageProcessedAfterSuccessfulRetry()
+    {
+        await using var dbContext = CreateDbContext();
+        await CreateRegisterUserService(dbContext)
+            .RegisterAsync(new RegisterUserRequest("Grace Hopper", "grace@example.com", null));
+        var handler = new ScriptedIntegrationEventHandler<UserRegisteredIntegrationEvent>(
+        [
+            Left<Seq<DomainError>, Unit>(Seq1<DomainError>(new PersistenceConflictError())),
+            Right<Seq<DomainError>, Unit>(default)
+        ]);
+        var dispatcher = new InProcessOutboxDispatcher(
+            dbContext,
+            [
+                new OutboxIntegrationEventConsumer<UserRegisteredIntegrationEvent, Unit>(
+                    UserRegisteredIntegrationEvent.EventType,
+                    handler)
+            ],
+            TimeProvider.System);
+
+        await dispatcher.DispatchPendingAsync(CancellationToken.None);
+        var dispatched = await dispatcher.DispatchPendingAsync(CancellationToken.None);
+        var message = await dbContext.OutboxMessages.SingleAsync();
+
+        Assert.AreEqual(1, dispatched);
+        Assert.AreEqual(1, message.AttemptCount);
+        Assert.IsTrue(message.LastAttemptedAtUtc.IsSome);
+        Assert.IsNull(message.LastError);
+        Assert.IsTrue(message.ProcessedAtUtc.IsSome);
     }
 
     [TestMethod]
@@ -562,10 +842,8 @@ public sealed class MonadicDddBoundedContextsTests
     public void Architecture_DomainDoesNotReferenceOtherContextsInfrastructureOrPresentation()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30", "Contexts");
-        var offenders = Directory.EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(file => file.Contains($"{Path.DirectorySeparatorChar}Domain{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
-            .SelectMany(file => File.ReadLines(file)
-                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+        var offenders = SourceLinesIn(sourceRoot)
+            .Where(item => item.File.Contains($"{Path.DirectorySeparatorChar}Domain{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
             .Where(item => item.Text.Contains(".Infrastructure", StringComparison.Ordinal)
                 || item.Text.Contains(".Application", StringComparison.Ordinal)
                 || item.Text.Contains(".Presentation", StringComparison.Ordinal)
@@ -580,9 +858,7 @@ public sealed class MonadicDddBoundedContextsTests
     public void Architecture_ContextsDoNotReferenceOtherContexts()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
-        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Contexts"), "*.cs", SearchOption.AllDirectories)
-            .SelectMany(file => File.ReadLines(file)
-                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+        var offenders = SourceLinesIn(Path.Combine(sourceRoot, "Contexts"))
             .Where(item => CrossesAnotherContext(item.File, item.Text))
             .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
             .ToArray();
@@ -626,9 +902,7 @@ public sealed class MonadicDddBoundedContextsTests
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
         var messagingRoot = Path.Combine(sourceRoot, "Integration", "Messaging");
-        var offenders = Directory.EnumerateFiles(messagingRoot, "*.cs", SearchOption.AllDirectories)
-            .SelectMany(file => File.ReadLines(file)
-                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+        var offenders = SourceLinesIn(messagingRoot)
             .Where(item => item.Text.Contains(".Contexts.", StringComparison.Ordinal))
             .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
             .ToArray();
@@ -640,9 +914,7 @@ public sealed class MonadicDddBoundedContextsTests
     public void Architecture_IntegrationMessagingContainsOnlyContracts()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
-        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Integration", "Messaging"), "*.cs", SearchOption.AllDirectories)
-            .SelectMany(file => File.ReadLines(file)
-                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+        var offenders = SourceLinesIn(Path.Combine(sourceRoot, "Integration", "Messaging"))
             .Where(item => item.Text.Contains(" class ", StringComparison.Ordinal)
                 || item.Text.Contains(".Infrastructure.", StringComparison.Ordinal)
                 || item.Text.Contains(".Outbox", StringComparison.Ordinal)
@@ -657,9 +929,7 @@ public sealed class MonadicDddBoundedContextsTests
     public void Architecture_InfrastructureMessagingDoesNotReferenceContexts()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
-        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Infrastructure", "Messaging"), "*.cs", SearchOption.AllDirectories)
-            .SelectMany(file => File.ReadLines(file)
-                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+        var offenders = SourceLinesIn(Path.Combine(sourceRoot, "Infrastructure", "Messaging"))
             .Where(item => item.Text.Contains(".Contexts.", StringComparison.Ordinal))
             .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
             .ToArray();
@@ -672,10 +942,79 @@ public sealed class MonadicDddBoundedContextsTests
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
         var unitOfWork = Path.Combine(sourceRoot, "Infrastructure", "Persistence", "EfTutorial30UnitOfWork.cs");
-        var offenders = File.ReadLines(unitOfWork)
-            .Select((line, index) => new { Line = index + 1, Text = line })
+        var offenders = SourceLinesInFile(unitOfWork)
             .Where(item => item.Text.Contains(".Contexts.", StringComparison.Ordinal))
             .Select(item => $"{Path.GetRelativePath(sourceRoot, unitOfWork)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_SharedKernelDoesNotContainPersistencePorts()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var sharedKernel = Path.Combine(sourceRoot, "SharedKernel");
+        var offenders = SourceLinesIn(sharedKernel)
+            .Where(item => item.Text.Contains("IUnitOfWork", StringComparison.Ordinal)
+                || item.Text.Contains("IRepository", StringComparison.Ordinal)
+                || item.Text.Contains("ITransactionalExecution", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_PresentationDoesNotReferenceRepositoriesOrUnitOfWork()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var presentationRoot = Path.Combine(sourceRoot, "Presentation");
+        var offenders = SourceLinesIn(presentationRoot)
+            .Where(item => item.Text.Contains(".Application.Persistence", StringComparison.Ordinal)
+                || item.Text.Contains("IRepository", StringComparison.Ordinal)
+                || item.Text.Contains("IUnitOfWork", StringComparison.Ordinal)
+                || item.Text.Contains("ITransactionalExecution", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_ApplicationServicesDoNotDependOnTransactionalExecution()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var offenders = SourceLinesIn(Path.Combine(sourceRoot, "Contexts"))
+            .Where(item => item.File.Contains($"{Path.DirectorySeparatorChar}Application{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Where(item => item.Text.Contains("ITransactionalExecution", StringComparison.Ordinal)
+                || item.Text.Contains("EfTransactionalExecution", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_ApplicationServicesDoNotCallGetRepository()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var offenders = SourceLinesIn(Path.Combine(sourceRoot, "Contexts"))
+            .Where(item => item.File.Contains($"{Path.DirectorySeparatorChar}Application{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Where(item => item.Text.Contains("GetRepository", StringComparison.Ordinal))
+            .Select(item => $"{Path.GetRelativePath(sourceRoot, item.File)}:{item.Line}: {item.Text.Trim()}")
+            .ToArray();
+
+        Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
+    }
+
+    [TestMethod]
+    public void Architecture_NoEfWriterClassesRemain()
+    {
+        var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
+        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Contexts"), "*.cs", SearchOption.AllDirectories)
+            .Where(file => Path.GetFileNameWithoutExtension(file).Contains("Writer", StringComparison.Ordinal))
+            .Select(file => Path.GetRelativePath(sourceRoot, file))
             .ToArray();
 
         Assert.IsEmpty(offenders, string.Join(Environment.NewLine, offenders));
@@ -685,10 +1024,8 @@ public sealed class MonadicDddBoundedContextsTests
     public void Architecture_CommandServicesDoNotPublishIntegrationEventsDirectly()
     {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "CSharpCodePortfolio.Tutorials.Tutorial30");
-        var offenders = Directory.EnumerateFiles(Path.Combine(sourceRoot, "Contexts"), "*.cs", SearchOption.AllDirectories)
-            .Where(file => file.Contains($"{Path.DirectorySeparatorChar}Application{Path.DirectorySeparatorChar}Commands{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
-            .SelectMany(file => File.ReadLines(file)
-                .Select((line, index) => new { File = file, Line = index + 1, Text = line }))
+        var offenders = SourceLinesIn(Path.Combine(sourceRoot, "Contexts"))
+            .Where(item => item.File.Contains($"{Path.DirectorySeparatorChar}Application{Path.DirectorySeparatorChar}Commands{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
             .Where(item => item.Text.Contains(".Integration.Events", StringComparison.Ordinal)
                 || item.Text.Contains(".Integration.Messaging", StringComparison.Ordinal)
                 || item.Text.Contains("IIntegrationEventBus", StringComparison.Ordinal)
@@ -719,26 +1056,26 @@ public sealed class MonadicDddBoundedContextsTests
     private static RegisterUserService CreateRegisterUserService(Tutorial30DbContext dbContext) =>
         new(
             new EfUserAccountLookup(dbContext),
-            new EfUserAccountWriter(dbContext),
+            dbContext.GetRepository<UserAccount, Guid>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
 
     private static UpdateUserAccountProfileService CreateUpdateUserAccountProfileService(Tutorial30DbContext dbContext) =>
         new(
             new EfUserAccountLookup(dbContext),
-            new EfUserAccountWriter(dbContext),
+            dbContext.GetRepository<UserAccount, Guid>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
 
     private static PlaceOrderService CreatePlaceOrderService(Tutorial30DbContext dbContext) =>
         new(
             new EfCustomerDirectory(dbContext),
-            new EfOrderWriter(dbContext),
+            dbContext.GetRepository<Order, OrderId>(),
             CreateUnitOfWork(dbContext),
             TimeProvider.System);
 
     private static ConfirmOrderService CreateConfirmOrderService(Tutorial30DbContext dbContext) =>
-        new(new EfOrderWriter(dbContext), CreateUnitOfWork(dbContext), TimeProvider.System);
+        new(dbContext.GetRepository<Order, OrderId>(), CreateUnitOfWork(dbContext), TimeProvider.System);
 
     private static InProcessOutboxDispatcher CreateDispatcher(Tutorial30DbContext dbContext) =>
         new(
@@ -750,14 +1087,19 @@ public sealed class MonadicDddBoundedContextsTests
                 new OutboxIntegrationEventConsumer<OrderConfirmedIntegrationEvent, InvoiceHandlingResult>(
                     OrderConfirmedIntegrationEvent.EventType,
                     new CreateInvoiceWhenOrderConfirmedHandler(
-                        new EfInvoiceWriter(dbContext),
+                        new EfInvoiceLookup(dbContext),
+                        dbContext.GetRepository<Invoice, InvoiceId>(),
                         CreateUnitOfWork(dbContext),
                         TimeProvider.System))
             ],
             TimeProvider.System);
 
     private static EfTutorial30UnitOfWork CreateUnitOfWork(Tutorial30DbContext dbContext) =>
-        new(dbContext, CreateDomainEventBus(dbContext), [new IdentityPersistenceErrorTranslator()]);
+        new(
+            dbContext,
+            CreateDomainEventBus(dbContext),
+            new EfTransactionalExecution(dbContext),
+            [new IdentityPersistenceErrorTranslator()]);
 
     private static InMemoryDomainEventBus CreateDomainEventBus(Tutorial30DbContext dbContext)
     {
@@ -892,6 +1234,14 @@ public sealed class MonadicDddBoundedContextsTests
     private static bool IsScannedFile(string file) =>
         IgnoredSourceSegments.All(segment => !file.Contains(segment, StringComparison.Ordinal));
 
+    private static IEnumerable<SourceLine> SourceLinesIn(string root) =>
+        Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
+            .SelectMany(SourceLinesInFile);
+
+    private static IEnumerable<SourceLine> SourceLinesInFile(string file) =>
+        File.ReadLines(file)
+            .Select((line, index) => new SourceLine(file, index + 1, line));
+
     private static IEnumerable<string> ForbiddenTokensIn(string file)
     {
         var code = RemoveNonCode(File.ReadAllText(file));
@@ -937,5 +1287,72 @@ public sealed class MonadicDddBoundedContextsTests
             events.Add(integrationEvent);
             return Task.FromResult(Right<Seq<DomainError>, Unit>(default));
         }
+    }
+
+    private sealed class FailingDomainEventHandler<TDomainEvent> : IDomainEventHandler<TDomainEvent>
+        where TDomainEvent : IDomainEvent
+    {
+        public Task<Either<Seq<DomainError>, Unit>> HandleAsync(
+            TDomainEvent domainEvent,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(Left<Seq<DomainError>, Unit>(
+                Seq1<DomainError>(new PersistenceConflictError())));
+    }
+
+    private sealed class RegisterAnotherUserOnFirstRegistrationHandler(IRepository<UserAccount, Guid> repository)
+        : IDomainEventHandler<UserAccountRegisteredDomainEvent>
+    {
+        private int remainingAdds = 1;
+
+        public int HandledCount { get; private set; }
+
+        public UserAccount? CreatedAccount { get; private set; }
+
+        public Task<Either<Seq<DomainError>, Unit>> HandleAsync(
+            UserAccountRegisteredDomainEvent domainEvent,
+            CancellationToken cancellationToken)
+        {
+            HandledCount++;
+            var shouldAdd = remainingAdds > 0;
+            remainingAdds = Math.Max(0, remainingAdds - 1);
+
+            return Task.FromResult(shouldAdd
+                ? AddAccount()
+                : Right<Seq<DomainError>, Unit>(default));
+        }
+
+        private Either<Seq<DomainError>, Unit> AddAccount()
+        {
+            CreatedAccount = CreateUserAccount("Nested User", $"nested-{Guid.CreateVersion7():N}@example.com");
+            repository.Add(CreatedAccount);
+
+            return Right<Seq<DomainError>, Unit>(default);
+        }
+    }
+
+    private sealed class FailOnSecondRegistrationHandler : IDomainEventHandler<UserAccountRegisteredDomainEvent>
+    {
+        private readonly Queue<Either<Seq<DomainError>, Unit>> results = new(
+        [
+            Right<Seq<DomainError>, Unit>(default),
+            Left<Seq<DomainError>, Unit>(Seq1<DomainError>(new PersistenceConflictError()))
+        ]);
+
+        public Task<Either<Seq<DomainError>, Unit>> HandleAsync(
+            UserAccountRegisteredDomainEvent domainEvent,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(results.Dequeue());
+    }
+
+    private sealed class ScriptedIntegrationEventHandler<TIntegrationEvent>(
+        IEnumerable<Either<Seq<DomainError>, Unit>> results) : IIntegrationEventHandler<TIntegrationEvent, Unit>
+        where TIntegrationEvent : IIntegrationEvent
+    {
+        private readonly Queue<Either<Seq<DomainError>, Unit>> pendingResults = new(results);
+
+        public Task<Either<Seq<DomainError>, Unit>> HandleAsync(
+            TIntegrationEvent integrationEvent,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(pendingResults.Dequeue());
     }
 }

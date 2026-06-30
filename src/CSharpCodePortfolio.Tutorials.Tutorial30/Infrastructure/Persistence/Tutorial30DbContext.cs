@@ -1,4 +1,3 @@
-using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Application.Persistence;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Identity.Domain.Aggregates.UserAccounts;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Domain.Aggregates.Orders;
 using CSharpCodePortfolio.Tutorials.Tutorial30.Contexts.Ordering.Infrastructure.Customers;
@@ -11,7 +10,7 @@ namespace CSharpCodePortfolio.Tutorials.Tutorial30.Infrastructure.Persistence;
 /// <summary>
 /// EF Core context used by the tutorial to prove bounded contexts and outbox in one process.
 /// </summary>
-public sealed class Tutorial30DbContext(DbContextOptions<Tutorial30DbContext> options)
+public sealed partial class Tutorial30DbContext(DbContextOptions<Tutorial30DbContext> options)
     : DbContext(options)
 {
     /// <summary>

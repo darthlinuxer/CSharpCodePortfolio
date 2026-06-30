@@ -40,6 +40,15 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
 
         builder.Property(message => message.ProcessedAtUtc)
             .HasConversion(OptionalTimestampConverter);
+
+        builder.Property(message => message.AttemptCount)
+            .IsRequired();
+
+        builder.Property(message => message.LastAttemptedAtUtc)
+            .HasConversion(OptionalTimestampConverter);
+
+        builder.Property(message => message.LastError)
+            .HasMaxLength(1000);
     }
 
     private static DateTime TimestampToProvider(Option<Timestamp> timestamp)
